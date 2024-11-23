@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="grib_test.go grib.go exec_unix.go" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
+    <module name="xairline-snow" />
+    <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="--tags=test" />
+    <kind value="FILE" />
+    <package value="github.com/xairline/xa-snow/services" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/services/grib_test.go|$PROJECT_DIR$/services/grib.go|$PROJECT_DIR$/services/exec_unix.go" />
+    <framework value="gotest" />
+    <method v="2" />
+  </configuration>
+</component>
