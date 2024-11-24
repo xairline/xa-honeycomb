@@ -9,4 +9,10 @@ import (
 func main() {
 	Logger := honeycomb.NewConsoleLogger()
 	Logger.Info("startup")
+
+	bravoSvc := honeycomb.NewBravoService(Logger)
+
+	//Logger.Infof("BravoService is ready: %v", bravoSvc.IsReady())
+
+	bravoSvc.Exit()
 }

@@ -50,7 +50,7 @@ func NewXplaneService(
 		defer xplaneSvcLock.Unlock()
 		xplaneSvc := &xplaneService{
 			Plugin:       extra.NewPlugin("xa honeycomb - "+VERSION, "com.github.xairline.xa-honeycomb", "honeycomb bridge"),
-			BravoService: honeycomb.NewBravoService(logger, "TODO"),
+			BravoService: honeycomb.NewBravoService(logger),
 			Logger:       logger,
 		}
 		xplaneSvc.Plugin.SetPluginStateCallback(xplaneSvc.onPluginStateChanged)
