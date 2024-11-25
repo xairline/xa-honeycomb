@@ -76,5 +76,6 @@ func (s *xplaneService) messageHandler(message plugins.Message) {
 		aircraftIACO := dataAccess.GetString(aircraftIACODrf)
 		s.Logger.Debugf("Plane ICAO: %s", aircraftIACO)
 		s.setupDataRefs(aircraftIACO)
+		honeycomb.OnLEDAlt()
 	}
 }

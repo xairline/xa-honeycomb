@@ -34,6 +34,7 @@ func (b *bravoService) UpdateLeds() {
 				return
 			default:
 				if LED_STATE_CHANGED {
+					b.Logger.Debugf("LED_STATE_CHANGED: %v", LED_STATE_CHANGED)
 					b.hidReportBuffer[0] = 0x0
 					b.hidReportBuffer[1] = AUTO_PILOT_W
 					b.hidReportBuffer[2] = LANDING_GEAR_W
@@ -42,6 +43,7 @@ func (b *bravoService) UpdateLeds() {
 					bravo, err := hid.OpenFirst(Vendor, Product)
 					if err != nil {
 						b.Logger.Errorf("failed to open device: %v", err)
+						continue
 					}
 
 					if x, err := bravo.SendFeatureReport(b.hidReportBuffer); err != nil {

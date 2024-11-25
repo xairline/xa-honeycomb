@@ -17,6 +17,11 @@ func init() {
 	xplaneLogger := xplane.NewXplaneLogger()
 	plugins.EnableFeature("XPLM_USE_NATIVE_PATHS", true)
 	logging.MinLevel = logging.Info_Level
+
+	if xplane.VERSION == "development" {
+		logging.MinLevel = logging.Debug_Level
+	}
+
 	logging.PluginName = "xa honeycomb - " + xplane.VERSION
 	// get plugin path
 	systemPath := utilities.GetSystemPath()
