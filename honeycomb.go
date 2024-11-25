@@ -4,6 +4,7 @@ package main
 
 import (
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
+	"time"
 )
 
 func main() {
@@ -12,7 +13,13 @@ func main() {
 
 	bravoSvc := honeycomb.NewBravoService(Logger)
 
-	//Logger.Infof("BravoService is ready: %v", bravoSvc.IsReady())
+	honeycomb.OnLEDAlt()
+	honeycomb.OnLEDMasterWarning()
+	time.Sleep(5 * time.Second)
+	honeycomb.OffLEDAlt()
+	honeycomb.OnLEDFuelPump()
+	honeycomb.OnLEDLeftGearGreen()
+	time.Sleep(5 * time.Second)
 
 	bravoSvc.Exit()
 }

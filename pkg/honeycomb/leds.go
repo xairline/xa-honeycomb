@@ -1,0 +1,335 @@
+package honeycomb
+
+const (
+	LED_FUEL_PUMP     = 1
+	LED_PARKING_BRAKE = 2
+	LED_LOW_VOLTS     = 4
+	LED_DOOR          = 8
+
+	LED_LOW_OIL_PRESS  = 1
+	LED_LOW_FUEL_PRESS = 2
+	LED_ANTI_ICE       = 4
+	LED_STARTER        = 8
+	LED_APU            = 16
+	LED_MASTER_CAUTION = 32
+	LED_VACUUM         = 64
+	LED_LOW_HYD_PRESS  = 128
+
+	LED_LEFT_GEAR_GREEN  = 1
+	LED_LEFT_GEAR_RED    = 2
+	LED_NOSE_GEAR_GREEN  = 4
+	LED_NOSE_GEAR_RED    = 8
+	LED_RIGHT_GEAR_GREEN = 16
+	LED_RIGHT_GEAR_RED   = 32
+	LED_MASTER_WARNING   = 64
+	LED_ENGINE_FIRE      = 128
+
+	LED_HEADING = 1
+	LED_NAV     = 2
+	LED_APR     = 4
+	LED_REV     = 8
+	LED_ALT     = 16
+	LED_VS      = 32
+	LED_IAS     = 64
+	LED_AP      = 128
+)
+
+// Global variables for state
+var (
+	ANUNCIATOR_W2     byte = 0
+	ANUNCIATOR_W1     byte = 0
+	LANDING_GEAR_W    byte = 0
+	AUTO_PILOT_W      byte = 0
+	LED_STATE_CHANGED bool = false
+)
+
+func setBit(val byte, bit byte) byte {
+	return val | bit
+}
+
+func clearBit(val byte, bit byte) byte {
+	return val &^ bit
+}
+
+func OnLEDFuelPump() {
+	ANUNCIATOR_W2 = setBit(ANUNCIATOR_W2, LED_FUEL_PUMP)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDFuelPump() {
+	ANUNCIATOR_W2 = clearBit(ANUNCIATOR_W2, LED_FUEL_PUMP)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDParkingBrake() {
+	ANUNCIATOR_W2 = setBit(ANUNCIATOR_W2, LED_PARKING_BRAKE)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDParkingBrake() {
+	ANUNCIATOR_W2 = clearBit(ANUNCIATOR_W2, LED_PARKING_BRAKE)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDLowVolts() {
+	ANUNCIATOR_W2 = setBit(ANUNCIATOR_W2, LED_LOW_VOLTS)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDLowVolts() {
+	ANUNCIATOR_W2 = clearBit(ANUNCIATOR_W2, LED_LOW_VOLTS)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDDoor() {
+	ANUNCIATOR_W2 = setBit(ANUNCIATOR_W2, LED_DOOR)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDDoor() {
+	ANUNCIATOR_W2 = clearBit(ANUNCIATOR_W2, LED_DOOR)
+	LED_STATE_CHANGED = true
+}
+
+// ANUNCIATOR_W1 LEDs
+func OnLEDLowOilPress() {
+	ANUNCIATOR_W1 = setBit(ANUNCIATOR_W1, LED_LOW_OIL_PRESS)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDLowOilPress() {
+	ANUNCIATOR_W1 = clearBit(ANUNCIATOR_W1, LED_LOW_OIL_PRESS)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDLowFuelPress() {
+	ANUNCIATOR_W1 = setBit(ANUNCIATOR_W1, LED_LOW_FUEL_PRESS)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDLowFuelPress() {
+	ANUNCIATOR_W1 = clearBit(ANUNCIATOR_W1, LED_LOW_FUEL_PRESS)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDAntiIce() {
+	ANUNCIATOR_W1 = setBit(ANUNCIATOR_W1, LED_ANTI_ICE)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDAntiIce() {
+	ANUNCIATOR_W1 = clearBit(ANUNCIATOR_W1, LED_ANTI_ICE)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDStarter() {
+	ANUNCIATOR_W1 = setBit(ANUNCIATOR_W1, LED_STARTER)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDStarter() {
+	ANUNCIATOR_W1 = clearBit(ANUNCIATOR_W1, LED_STARTER)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDApu() {
+	ANUNCIATOR_W1 = setBit(ANUNCIATOR_W1, LED_APU)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDApu() {
+	ANUNCIATOR_W1 = clearBit(ANUNCIATOR_W1, LED_APU)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDMasterCaution() {
+	ANUNCIATOR_W1 = setBit(ANUNCIATOR_W1, LED_MASTER_CAUTION)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDMasterCaution() {
+	ANUNCIATOR_W1 = clearBit(ANUNCIATOR_W1, LED_MASTER_CAUTION)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDVacuum() {
+	ANUNCIATOR_W1 = setBit(ANUNCIATOR_W1, LED_VACUUM)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDVacuum() {
+	ANUNCIATOR_W1 = clearBit(ANUNCIATOR_W1, LED_VACUUM)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDLowHydPress() {
+	ANUNCIATOR_W1 = setBit(ANUNCIATOR_W1, LED_LOW_HYD_PRESS)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDLowHydPress() {
+	ANUNCIATOR_W1 = clearBit(ANUNCIATOR_W1, LED_LOW_HYD_PRESS)
+	LED_STATE_CHANGED = true
+}
+
+// LANDING_GEAR_W LEDs
+func OnLEDLeftGearGreen() {
+	LANDING_GEAR_W = setBit(LANDING_GEAR_W, LED_LEFT_GEAR_GREEN)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDLeftGearGreen() {
+	LANDING_GEAR_W = clearBit(LANDING_GEAR_W, LED_LEFT_GEAR_GREEN)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDLeftGearRed() {
+	LANDING_GEAR_W = setBit(LANDING_GEAR_W, LED_LEFT_GEAR_RED)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDLeftGearRed() {
+	LANDING_GEAR_W = clearBit(LANDING_GEAR_W, LED_LEFT_GEAR_RED)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDNoseGearGreen() {
+	LANDING_GEAR_W = setBit(LANDING_GEAR_W, LED_NOSE_GEAR_GREEN)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDNoseGearGreen() {
+	LANDING_GEAR_W = clearBit(LANDING_GEAR_W, LED_NOSE_GEAR_GREEN)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDNoseGearRed() {
+	LANDING_GEAR_W = setBit(LANDING_GEAR_W, LED_NOSE_GEAR_RED)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDNoseGearRed() {
+	LANDING_GEAR_W = clearBit(LANDING_GEAR_W, LED_NOSE_GEAR_RED)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDRightGearGreen() {
+	LANDING_GEAR_W = setBit(LANDING_GEAR_W, LED_RIGHT_GEAR_GREEN)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDRightGearGreen() {
+	LANDING_GEAR_W = clearBit(LANDING_GEAR_W, LED_RIGHT_GEAR_GREEN)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDRightGearRed() {
+	LANDING_GEAR_W = setBit(LANDING_GEAR_W, LED_RIGHT_GEAR_RED)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDRightGearRed() {
+	LANDING_GEAR_W = clearBit(LANDING_GEAR_W, LED_RIGHT_GEAR_RED)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDMasterWarning() {
+	LANDING_GEAR_W = setBit(LANDING_GEAR_W, LED_MASTER_WARNING)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDMasterWarning() {
+	LANDING_GEAR_W = clearBit(LANDING_GEAR_W, LED_MASTER_WARNING)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDEngineFire() {
+	LANDING_GEAR_W = setBit(LANDING_GEAR_W, LED_ENGINE_FIRE)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDEngineFire() {
+	LANDING_GEAR_W = clearBit(LANDING_GEAR_W, LED_ENGINE_FIRE)
+	LED_STATE_CHANGED = true
+}
+
+// AUTO_PILOT_W LEDs
+func OnLEDHeading() {
+	AUTO_PILOT_W = setBit(AUTO_PILOT_W, LED_HEADING)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDHeading() {
+	AUTO_PILOT_W = clearBit(AUTO_PILOT_W, LED_HEADING)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDNav() {
+	AUTO_PILOT_W = setBit(AUTO_PILOT_W, LED_NAV)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDNav() {
+	AUTO_PILOT_W = clearBit(AUTO_PILOT_W, LED_NAV)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDAPR() {
+	AUTO_PILOT_W = setBit(AUTO_PILOT_W, LED_APR)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDAPR() {
+	AUTO_PILOT_W = clearBit(AUTO_PILOT_W, LED_APR)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDREV() {
+	AUTO_PILOT_W = setBit(AUTO_PILOT_W, LED_REV)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDREV() {
+	AUTO_PILOT_W = clearBit(AUTO_PILOT_W, LED_REV)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDAlt() {
+	AUTO_PILOT_W = setBit(AUTO_PILOT_W, LED_ALT)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDAlt() {
+	AUTO_PILOT_W = clearBit(AUTO_PILOT_W, LED_ALT)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDVS() {
+	AUTO_PILOT_W = setBit(AUTO_PILOT_W, LED_VS)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDVS() {
+	AUTO_PILOT_W = clearBit(AUTO_PILOT_W, LED_VS)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDIAS() {
+	AUTO_PILOT_W = setBit(AUTO_PILOT_W, LED_IAS)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDIAS() {
+	AUTO_PILOT_W = clearBit(AUTO_PILOT_W, LED_IAS)
+	LED_STATE_CHANGED = true
+}
+
+func OnLEDAP() {
+	AUTO_PILOT_W = setBit(AUTO_PILOT_W, LED_AP)
+	LED_STATE_CHANGED = true
+}
+
+func OffLEDAP() {
+	AUTO_PILOT_W = clearBit(AUTO_PILOT_W, LED_AP)
+	LED_STATE_CHANGED = true
+}
