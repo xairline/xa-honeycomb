@@ -1,11 +1,13 @@
 module github.com/xairline/xa-honeycomb
 
-go 1.18
+go 1.20
 
 require (
-	github.com/joho/godotenv v1.5.1
-	github.com/stretchr/testify v1.8.4
+	github.com/sstallion/go-hid v0.14.1
 	github.com/xairline/goplane v1.301.5
 )
 
-require github.com/go-errors/errors v1.0.1 // indirect
+require (
+	github.com/go-errors/errors v1.0.1 // indirect
+	golang.org/x/sys v0.8.0 // indirect
+)
