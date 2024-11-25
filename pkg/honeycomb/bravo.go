@@ -18,7 +18,6 @@ type BravoService interface {
 
 type bravoService struct {
 	Logger pkg.Logger
-	Bravo  *hid.Device
 	ctx    context.Context
 
 	hidReportBuffer []byte
@@ -40,14 +39,19 @@ func (b *bravoService) UpdateLeds() {
 					b.hidReportBuffer[2] = LANDING_GEAR_W
 					b.hidReportBuffer[3] = ANUNCIATOR_W1
 					b.hidReportBuffer[4] = ANUNCIATOR_W2
-				}
+					bravo, err := hid.OpenFirst(Vendor, Product)
+					if err != nil {
+						b.Logger.Errorf("failed to open device: %v", err)
+					}
 
-				if x, err := b.Bravo.SendFeatureReport(b.hidReportBuffer); err != nil {
-					b.Logger.Errorf("failed to write to device: %v", err)
-					b.Logger.Infof("bytes written: %d\n", x)
+					if x, err := bravo.SendFeatureReport(b.hidReportBuffer); err != nil {
+						b.Logger.Errorf("failed to write to device: %v", err)
+						b.Logger.Infof("bytes written: %d\n", x)
+					}
+					LED_STATE_CHANGED = false
+					bravo.Close()
+					time.Sleep(100 * time.Millisecond) // Simulated delay
 				}
-				LED_STATE_CHANGED = false
-				time.Sleep(100 * time.Millisecond) // Simulated delay
 			}
 		}
 	}()
@@ -61,13 +65,16 @@ func (b bravoService) Exit() {
 	b.hidReportBuffer[2] = 0x0
 	b.hidReportBuffer[3] = 0x0
 	b.hidReportBuffer[4] = 0x0
-
-	if x, err := b.Bravo.SendFeatureReport(b.hidReportBuffer); err != nil {
+	bravo, err := hid.OpenFirst(Vendor, Product)
+	if err != nil {
+		b.Logger.Errorf("failed to open device: %v", err)
+	}
+	if x, err := bravo.SendFeatureReport(b.hidReportBuffer); err != nil {
 		b.Logger.Errorf("failed to write to device: %v", err)
 		b.Logger.Infof("bytes written: %d\n", x)
 	}
 
-	if err := b.Bravo.Close(); err != nil {
+	if err := bravo.Close(); err != nil {
 		b.Logger.Errorf("failed to close device: %v", err)
 	}
 	if err := hid.Exit(); err != nil {
@@ -91,15 +98,10 @@ func NewBravoService(logger pkg.Logger) BravoService {
 			logger.Errorf("failed to initialize hidapi: %v", err)
 			return nil
 		}
-		bravo, err := hid.OpenFirst(Vendor, Product)
-		if err != nil {
-			logger.Errorf("failed to open device: %v", err)
-			return nil
-		}
+
 		ctx, cancel := context.WithCancel(context.Background())
 		bravoSvc = &bravoService{
 			Logger:          logger,
-			Bravo:           bravo,
 			ctx:             ctx,
 			hidReportBuffer: make([]byte, 65),
 			cancelFunc:      cancel,

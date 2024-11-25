@@ -27,6 +27,7 @@ dev:
 	CGO_LDFLAGS="-F/System/Library/Frameworks/ -F${CURDIR}/Libraries/Mac -framework XPLM" \
 	go build -buildmode c-shared -o ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/mac.xpl \
 		-ldflags="-X github.com/xairline/xa-honeycomb/services.VERSION=${VERSION}" main.go
+	cp -r profiles ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/
 win:
 	CGO_CFLAGS="-DIBM=1 -static -O2 -g" \
 	CGO_LDFLAGS="-L${CURDIR}/Libraries/Win -lXPLM_64 -static-libgcc -static-libstdc++ -Wl,--exclude-libs,ALL" \

@@ -43,6 +43,7 @@ jobs:
           TAG=${GITHUB_REF##*/}
           cp ${{ github.workspace }}/skunkcrafts_updater.cfg ${{ github.workspace }}/build/xa-honeycomb/
           cp ${{ github.workspace }}/LICENSE ${{ github.workspace }}/build/xa-honeycomb/
+          cp -r ${{ github.workspace }}/profiles ${{ github.workspace }}/build/xa-honeycomb/
           sed -i '' "s/REPLACE_ME/${TAG}/g" ${{ github.workspace }}/build/xa-honeycomb/skunkcrafts_updater.cfg
           root=$(pwd)
           cd ${{ github.workspace }}/build/ && zip -r xa-honeycomb.zip xa-honeycomb && cd $root

@@ -1,0 +1,27 @@
+name,datarefs,operators,thresholds,conditions,description
+BUS_VOLTAGE,sim/cockpit/electrical/battery_array_on,==,1,any,this make sure no lights on when there is no power in the plane
+HDG,Rotate/aircraft/systems/afs_roll_mode,==,4,any,description
+NAV,Rotate/aircraft/systems/afs_roll_mode,==,1,any,description
+APR,Rotate/aircraft/systems/afs_appr_engaged,==,1,any,description
+REV,sim/cockpit2/autopilot/backcourse_status,==,1,any,description
+ALT,sim/cockpit2/autopilot/altitude_mode,==,3,any,description
+VS,Rotate/aircraft/systems/afs_pitch_mode,==,4,any,description
+IAS,Rotate/aircraft/systems/afs_fms_spd_engaged,==,1,any,description
+AP,Rotate/aircraft/systems/afs_ap_engaged,>,0.01,any,description
+AP_STATE,sim/cockpit/autopilot/autopilot_state,~=,0,any,description
+GEAR,sim/flightmodel2/gear/deploy_ratio,~=,0,any,description
+RETRACTABLE_GEAR,sim/aircraft/gear/acf_gear_retract,~=,0,any,description
+MASTER_WARN,Rotate/aircraft/systems/alert_m_warning_lt,==,1,any,description
+FIRE,Rotate/aircraft/systems/fire_cabin_fwd_fail;Rotate/aircraft/systems/fire_cabin_ctr_fail;Rotate/aircraft/systems/fire_cabin_aft_fail;Rotate/aircraft/systems/fire_cargo_fwd_fail;Rotate/aircraft/systems/fire_cargo_ctr_fail;Rotate/aircraft/systems/fire_cargo_aft_fail,>,0.01,any,description
+OIL_LOW_P,Rotate/aircraft/systems/eng_oil_press_psi,<,15,any,description
+FUEL_LOW_P,sim/cockpit2/engine/indicators/fuel_pressure_psi,<,20,any,description
+ANTI_ICE,Rotate/aircraft/controls/anti_ice_eng_1;Rotate/aircraft/controls/anti_ice_eng_2;Rotate/aircraft/controls/anti_ice_eng_3;Rotate/aircraft/controls/anti_ice_tail;Rotate/aircraft/controls/anti_ice_wing;Rotate/aircraft/controls/anti_ice_wshld_l;Rotate/aircraft/controls/anti_ice_wshld_r,==,1,any,description
+ENG_STARTER,sim/cockpit2/engine/actuators/starter_hit,>,0.01,any,description
+APU,Rotate/aircraft/systems/elec_apu_avail_lt,==,1,any,description
+MASTER_CAUTION,Rotate/aircraft/systems/alert_m_caution_lt,==,1,any,description
+VACUUM,sim/cockpit/misc/vacuum;sim/cockpit/misc/vacuum2,<,4,any,description
+HYDRO_LOW_P,Rotate/aircraft/systems/hyd_sys_1_press_psi;Rotate/aircraft/systems/hyd_sys_2_press_psi;Rotate/aircraft/systems/hyd_sys_3_press_psi,<,2500,all,description
+AUX_FUEL_PUMP,Rotate/aircraft/controls/tank_aux_trans_l;Rotate/aircraft/controls/tank_aux_trans_r;Rotate/aircraft/controls/tank_aux_trans_tail,>,0,any,description
+PARKING_BRAKE,Rotate/aircraft/controls/park_brake,==,1,any,description
+VOLT_LOW,Rotate/aircraft/systems/elec_bat_chgr_volt,<,5,any,description
+DOORS,Rotate/aircraft/systems/main_cargo_door_ratio;Rotate/aircraft/systems/fwd_r_cargo_door_ratio;Rotate/aircraft/systems/ctr_r_cargo_door_ratio;Rotate/aircraft/systems/aft_l_cargo_door_ratio,>,0.9,any,description
