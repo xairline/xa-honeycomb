@@ -37,7 +37,8 @@ jobs:
             go-mod-
       - run: |
           go mod tidy
-          VERSION=${GITHUB_REF##*/} make mac
+          export VERSION=${GITHUB_REF##*/} 
+          make mac
           go build -o build/xa-honeycomb/honeycomb "-X main.version=${VERSION}" honeycomb.go
           rm -f ${{ github.workspace }}/build/xa-honeycomb/mac_arm.xpl ${{ github.workspace }}/build/xa-honeycomb/mac_amd.xpl
           TAG=${GITHUB_REF##*/}
