@@ -8,11 +8,7 @@ func (s *xplaneService) flightLoop(
 	ref interface{},
 ) float32 {
 
-	//if int(counter/100)%2 == 0 {
-	//	s.Logger.Debugf("flightLoop: %v, %v, %v, %v", elapsedSinceLastCall, elapsedTimeSinceLastFlightLoop, counter, ref)
-	//	honeycomb.LED_STATE_CHANGED = true
-	//	s.Logger.Debugf("FORCE LED_STATE_CHANGED: %v", honeycomb.LED_STATE_CHANGED)
-	//}
+	s.updateLeds()
 
-	return -1
+	return 0.1
 }

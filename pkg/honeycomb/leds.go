@@ -40,7 +40,7 @@ var (
 	ANUNCIATOR_W1     byte = 0
 	LANDING_GEAR_W    byte = 0
 	AUTO_PILOT_W      byte = 0
-	LED_STATE_CHANGED bool = false
+	LED_STATE_CHANGED      = false
 )
 
 func setBit(val byte, bit byte) byte {
@@ -270,14 +270,20 @@ func OffLEDRightGearRed() {
 
 func OnLedGearGreen() {
 	OnLEDLeftGearGreen()
+	OffLEDLeftGearRed()
 	OnLEDNoseGearGreen()
+	OffLEDNoseGearRed()
 	OnLEDRightGearGreen()
+	OffLEDRightGearRed()
 }
 
 func OnLedGearRed() {
 	OnLEDLeftGearRed()
+	OffLEDLeftGearGreen()
 	OnLEDNoseGearRed()
+	OffLEDNoseGearGreen()
 	OnLEDRightGearRed()
+	OffLEDRightGearGreen()
 }
 
 func OnLEDMasterWarning() {
@@ -399,4 +405,107 @@ func OffLEDAP() {
 	AUTO_PILOT_W_BEFORE := AUTO_PILOT_W
 	AUTO_PILOT_W = clearBit(AUTO_PILOT_W, LED_AP)
 	LED_STATE_CHANGED = AUTO_PILOT_W_BEFORE != AUTO_PILOT_W
+}
+
+// DebugPrintLEDStates prints the current state of all LEDs
+func (b *bravoService) DebugPrintLEDStates() {
+	b.Logger.Debug("ANUNCIATOR_W2 LEDs:")
+	if ANUNCIATOR_W2&LED_FUEL_PUMP != 0 {
+		b.Logger.Debug("- Fuel Pump is ON")
+	}
+	if ANUNCIATOR_W2&LED_PARKING_BRAKE != 0 {
+		b.Logger.Debug("- Parking Brake is ON")
+	}
+	if ANUNCIATOR_W2&LED_LOW_VOLTS != 0 {
+		b.Logger.Debug("- Low Volts is ON")
+	}
+	if ANUNCIATOR_W2&LED_DOOR != 0 {
+		b.Logger.Debug("- Door is ON")
+	}
+
+	b.Logger.Debug("ANUNCIATOR_W1 LEDs:")
+	if ANUNCIATOR_W1&LED_LOW_OIL_PRESS != 0 {
+		b.Logger.Debug("- Low Oil Pressure is ON")
+	}
+	if ANUNCIATOR_W1&LED_LOW_FUEL_PRESS != 0 {
+		b.Logger.Debug("- Low Fuel Pressure is ON")
+	}
+	if ANUNCIATOR_W1&LED_ANTI_ICE != 0 {
+		b.Logger.Debug("- Anti-Ice is ON")
+	}
+	if ANUNCIATOR_W1&LED_STARTER != 0 {
+		b.Logger.Debug("- Starter is ON")
+	}
+	if ANUNCIATOR_W1&LED_APU != 0 {
+		b.Logger.Debug("- APU is ON")
+	}
+	if ANUNCIATOR_W1&LED_MASTER_CAUTION != 0 {
+		b.Logger.Debug("- Master Caution is ON")
+	}
+	if ANUNCIATOR_W1&LED_VACUUM != 0 {
+		b.Logger.Debug("- Vacuum is ON")
+	}
+	if ANUNCIATOR_W1&LED_LOW_HYD_PRESS != 0 {
+		b.Logger.Debug("- Low Hydraulic Pressure is ON")
+	}
+
+	b.Logger.Debug("LANDING_GEAR_W LEDs:")
+	if LANDING_GEAR_W&LED_LEFT_GEAR_GREEN != 0 {
+		b.Logger.Debug("- Left Gear Green is ON")
+	}
+	if LANDING_GEAR_W&LED_LEFT_GEAR_RED != 0 {
+		b.Logger.Debug("- Left Gear Red is ON")
+	}
+	if LANDING_GEAR_W&LED_NOSE_GEAR_GREEN != 0 {
+		b.Logger.Debug("- Nose Gear Green is ON")
+	}
+	if LANDING_GEAR_W&LED_NOSE_GEAR_RED != 0 {
+		b.Logger.Debug("- Nose Gear Red is ON")
+	}
+	if LANDING_GEAR_W&LED_RIGHT_GEAR_GREEN != 0 {
+		b.Logger.Debug("- Right Gear Green is ON")
+	}
+	if LANDING_GEAR_W&LED_RIGHT_GEAR_RED != 0 {
+		b.Logger.Debug("- Right Gear Red is ON")
+	}
+	if LANDING_GEAR_W&LED_MASTER_WARNING != 0 {
+		b.Logger.Debug("- Master Warning is ON")
+	}
+	if LANDING_GEAR_W&LED_ENGINE_FIRE != 0 {
+		b.Logger.Debug("- Engine Fire is ON")
+	}
+
+	b.Logger.Debug("AUTO_PILOT_W LEDs:")
+	if AUTO_PILOT_W&LED_HEADING != 0 {
+		b.Logger.Debug("- Heading is ON")
+	}
+	if AUTO_PILOT_W&LED_NAV != 0 {
+		b.Logger.Debug("- Navigation is ON")
+	}
+	if AUTO_PILOT_W&LED_APR != 0 {
+		b.Logger.Debug("- Approach is ON")
+	}
+	if AUTO_PILOT_W&LED_REV != 0 {
+		b.Logger.Debug("- Reverse is ON")
+	}
+	if AUTO_PILOT_W&LED_ALT != 0 {
+		b.Logger.Debug("- Altitude is ON")
+	}
+	if AUTO_PILOT_W&LED_VS != 0 {
+		b.Logger.Debug("- Vertical Speed is ON")
+	}
+	if AUTO_PILOT_W&LED_IAS != 0 {
+		b.Logger.Debug("- Indicated Airspeed is ON")
+	}
+	if AUTO_PILOT_W&LED_AP != 0 {
+		b.Logger.Debug("- Autopilot is ON")
+	}
+}
+
+func AllOff() {
+	ANUNCIATOR_W2 = 0
+	ANUNCIATOR_W1 = 0
+	LANDING_GEAR_W = 0
+	AUTO_PILOT_W = 0
+	LED_STATE_CHANGED = true
 }

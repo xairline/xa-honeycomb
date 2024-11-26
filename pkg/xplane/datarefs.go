@@ -9,17 +9,23 @@ import (
 	"strings"
 )
 
-type profile struct {
-	rules string
-	on    func()
-	off   func()
-}
-
 func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 	s.Logger.Infof("Setup Datarefs for: %s", airplaneICAO)
+
+	s.Logger.Infof("Loading defalt profile for: %s", airplaneICAO)
+	defaultRecords := s.loadProfile("sample")
+	defaultRules := s.compileRules(defaultRecords)
+
+	s.Logger.Infof("Loading profile for: %s", airplaneICAO)
 	records := s.loadProfile(airplaneICAO)
 	rules := s.compileRules(records)
-	s.Logger.Debugf("res: %v", rules)
+
+	// merge default and airplane specific records
+	for name, led := range rules {
+		defaultRules[name] = led
+		s.Logger.Debugf("Replace record: %s", name)
+	}
+	s.leds = defaultRules
 }
 
 func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
@@ -70,6 +76,8 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 		return honeycomb.OnLEDParkingBrake, honeycomb.OffLEDParkingBrake
 	case "DOORS":
 		return honeycomb.OnLEDDoor, honeycomb.OffLEDDoor
+	case "AUX_FUEL_PUMP":
+		return honeycomb.OnLEDFuelPump, honeycomb.OffLEDFuelPump
 	default:
 		s.Logger.Warningf("No on/off functions found for: %s", name)
 		return nil, nil
@@ -93,8 +101,8 @@ func (s *xplaneService) loadProfile(airplaneICAO string) [][]string {
 	return records
 }
 
-func (s *xplaneService) compileRules(records [][]string) interface{} {
-	res := make(map[string]profile)
+func (s *xplaneService) compileRules(records [][]string) map[string]leds {
+	res := make(map[string]leds)
 	for i, record := range records {
 		if i == 0 {
 			continue
@@ -122,11 +130,24 @@ func (s *xplaneService) compileRules(records [][]string) interface{} {
 				rules_str += my_operator + dataref_str + record[2] + record[3]
 			}
 		}
-		res[name] = profile{
+		res[name] = leds{
 			rules: rules_str,
 			on:    onFunc,
 			off:   offFunc,
 		}
 	}
 	return res
+}
+func (s *xplaneService) updateLeds() {
+	for _, led := range s.leds {
+		if s.evaluateRules(led.rules) {
+			led.on()
+		} else {
+			led.off()
+		}
+	}
+}
+
+func (s *xplaneService) evaluateRules(rules string) bool {
+	return true
 }

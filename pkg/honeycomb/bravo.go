@@ -35,6 +35,7 @@ func (b *bravoService) UpdateLeds() {
 			default:
 				if LED_STATE_CHANGED {
 					b.Logger.Debugf("LED_STATE_CHANGED: %v", LED_STATE_CHANGED)
+					b.DebugPrintLEDStates()
 					b.hidReportBuffer[0] = 0x0
 					b.hidReportBuffer[1] = AUTO_PILOT_W
 					b.hidReportBuffer[2] = LANDING_GEAR_W
@@ -45,12 +46,15 @@ func (b *bravoService) UpdateLeds() {
 						b.Logger.Errorf("failed to open device: %v", err)
 						continue
 					}
-
-					if x, err := bravo.SendFeatureReport(b.hidReportBuffer); err != nil {
+					x, err := bravo.SendFeatureReport(b.hidReportBuffer)
+					if err != nil {
 						b.Logger.Errorf("failed to write to device: %v", err)
-						b.Logger.Infof("bytes written: %d\n", x)
+						b.Logger.Infof("bytes written: %d", x)
 					}
-					LED_STATE_CHANGED = false
+					b.Logger.Debugf("bytes written: %d", x)
+					if x == 65 {
+						LED_STATE_CHANGED = false
+					}
 					bravo.Close()
 					time.Sleep(100 * time.Millisecond) // Simulated delay
 				}
@@ -59,7 +63,7 @@ func (b *bravoService) UpdateLeds() {
 	}()
 }
 
-func (b bravoService) Exit() {
+func (b *bravoService) Exit() {
 	b.cancelFunc()
 
 	b.hidReportBuffer[0] = 0x0
@@ -73,7 +77,7 @@ func (b bravoService) Exit() {
 	}
 	if x, err := bravo.SendFeatureReport(b.hidReportBuffer); err != nil {
 		b.Logger.Errorf("failed to write to device: %v", err)
-		b.Logger.Infof("bytes written: %d\n", x)
+		b.Logger.Infof("bytes written: %d", x)
 	}
 
 	if err := bravo.Close(); err != nil {

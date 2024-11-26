@@ -18,6 +18,12 @@ import (
 
 var VERSION = "development"
 
+type leds struct {
+	rules string
+	on    func()
+	off   func()
+}
+
 type XplaneService interface {
 	// init
 	onPluginStateChanged(state extra.PluginState, plugin *extra.XPlanePlugin)
@@ -42,6 +48,7 @@ type xplaneService struct {
 	pluginPath      string
 	myMenuId        menus.MenuID
 	myMenuItemIndex int
+	leds            map[string]leds
 }
 
 var xplaneSvcLock = &sync.Mutex{}
@@ -66,6 +73,7 @@ func NewXplaneService(
 			BravoService: honeycomb.NewBravoService(logger),
 			Logger:       logger,
 			pluginPath:   pluginPath,
+			leds:         nil,
 		}
 		xplaneSvc.Plugin.SetPluginStateCallback(xplaneSvc.onPluginStateChanged)
 		xplaneSvc.Plugin.SetMessageHandler(xplaneSvc.messageHandler)
@@ -83,6 +91,6 @@ func (s *xplaneService) messageHandler(message plugins.Message) {
 		aircraftIACO := dataAccess.GetString(aircraftIACODrf)
 		s.Logger.Debugf("Plane ICAO: %s", aircraftIACO)
 		s.setupDataRefs(aircraftIACO)
-		honeycomb.OnLEDAlt()
+		honeycomb.AllOff()
 	}
 }
