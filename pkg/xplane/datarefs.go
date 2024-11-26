@@ -80,6 +80,16 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 		return honeycomb.OnLEDMasterCaution, honeycomb.OffLEDMasterCaution
 	case "FIRE":
 		return honeycomb.OnLEDEngineFire, honeycomb.OffLEDEngineFire
+	//[xa honeycomb - development] WARNING: No on/off functions found for: VOLT_LOW
+	//[xa honeycomb - development] WARNING: No on/off functions found for: OIL_LOW_P
+	//[xa honeycomb - development] WARNING: No on/off functions found for: FUEL_LOW_P
+	//[xa honeycomb - development] WARNING: No on/off functions found for: ANTI_ICE
+	//[xa honeycomb - development] WARNING: No on/off functions found for: ENG_STARTER
+	//[xa honeycomb - development] WARNING: No on/off functions found for: APU
+	//[xa honeycomb - development] WARNING: No on/off functions found for: VACUUM
+	//[xa honeycomb - development] WARNING: No on/off functions found for: HYDRO_LOW_P
+	//[xa honeycomb - development] WARNING: No on/off functions found for: PARKING_BRAKE
+	//[xa honeycomb - development] WARNING: No on/off functions found for: DOORS
 	default:
 		s.Logger.Warningf("No on/off functions found for: %s", name)
 		return nil, nil
