@@ -26,7 +26,7 @@ dev:
 	CGO_CFLAGS="-DAPL=1 -DIBM=0 -DLIN=0 -O2 -g" \
 	CGO_LDFLAGS="-F/System/Library/Frameworks/ -F${CURDIR}/Libraries/Mac -framework XPLM" \
 	go build -buildmode c-shared -o ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/mac.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" main.go
+		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=development" main.go
 	cp -r profiles ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/
 win:
 	CGO_CFLAGS="-DIBM=1 -static -O2 -g" \

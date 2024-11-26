@@ -10,46 +10,16 @@ import (
 )
 
 type profile struct {
-	dataref_strs []string
-	operator     string
-	value        string
-	conditions   string
-	on           func()
-	off          func()
+	rules string
+	on    func()
+	off   func()
 }
 
 func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 	s.Logger.Infof("Setup Datarefs for: %s", airplaneICAO)
-	// load datarefs for the airplane from csv
-	csvFilePath := path.Join(s.pluginPath, "profiles", fmt.Sprintf("%s.csv", airplaneICAO))
-	s.Logger.Debugf("Loading datarefs from: %s", csvFilePath)
-	f, err := os.Open(csvFilePath)
-	if err != nil {
-		s.Logger.Errorf("Error opening file: %v", err)
-	}
-	defer f.Close()
-	csvReader := csv.NewReader(f)
-	records, err := csvReader.ReadAll()
-	if err != nil {
-		s.Logger.Errorf("Error reading csv: %v", err)
-	}
-	res := make(map[string]profile)
-	for i, record := range records {
-		if i == 0 {
-			continue
-		}
-		name := record[0]
-		onFunc, offFunc := s.assignOnAndOffFuncs(name)
-		res[name] = profile{
-			dataref_strs: strings.Split(record[1], ";"),
-			operator:     record[2],
-			value:        record[3],
-			conditions:   record[4],
-			on:           onFunc,
-			off:          offFunc,
-		}
-	}
-	s.Logger.Debugf("res: %v", res)
+	records := s.loadProfile(airplaneICAO)
+	rules := s.compileRules(records)
+	s.Logger.Debugf("res: %v", rules)
 }
 
 func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
@@ -80,18 +50,83 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 		return honeycomb.OnLEDMasterCaution, honeycomb.OffLEDMasterCaution
 	case "FIRE":
 		return honeycomb.OnLEDEngineFire, honeycomb.OffLEDEngineFire
-	//[xa honeycomb - development] WARNING: No on/off functions found for: VOLT_LOW
-	//[xa honeycomb - development] WARNING: No on/off functions found for: OIL_LOW_P
-	//[xa honeycomb - development] WARNING: No on/off functions found for: FUEL_LOW_P
-	//[xa honeycomb - development] WARNING: No on/off functions found for: ANTI_ICE
-	//[xa honeycomb - development] WARNING: No on/off functions found for: ENG_STARTER
-	//[xa honeycomb - development] WARNING: No on/off functions found for: APU
-	//[xa honeycomb - development] WARNING: No on/off functions found for: VACUUM
-	//[xa honeycomb - development] WARNING: No on/off functions found for: HYDRO_LOW_P
-	//[xa honeycomb - development] WARNING: No on/off functions found for: PARKING_BRAKE
-	//[xa honeycomb - development] WARNING: No on/off functions found for: DOORS
+	case "VOLT_LOW":
+		return honeycomb.OnLEDLowVolts, honeycomb.OffLEDLowVolts
+	case "OIL_LOW_P":
+		return honeycomb.OnLEDLowOilPress, honeycomb.OffLEDLowOilPress
+	case "FUEL_LOW_P":
+		return honeycomb.OnLEDLowFuelPress, honeycomb.OffLEDLowFuelPress
+	case "ANTI_ICE":
+		return honeycomb.OnLEDAntiIce, honeycomb.OffLEDAntiIce
+	case "ENG_STARTER":
+		return honeycomb.OnLEDStarter, honeycomb.OffLEDStarter
+	case "APU":
+		return honeycomb.OnLEDApu, honeycomb.OffLEDApu
+	case "VACUUM":
+		return honeycomb.OnLEDVacuum, honeycomb.OffLEDVacuum
+	case "HYDRO_LOW_P":
+		return honeycomb.OnLEDLowHydPress, honeycomb.OffLEDLowHydPress
+	case "PARKING_BRAKE":
+		return honeycomb.OnLEDParkingBrake, honeycomb.OffLEDParkingBrake
+	case "DOORS":
+		return honeycomb.OnLEDDoor, honeycomb.OffLEDDoor
 	default:
 		s.Logger.Warningf("No on/off functions found for: %s", name)
 		return nil, nil
 	}
+}
+
+func (s *xplaneService) loadProfile(airplaneICAO string) [][]string {
+	// load datarefs for the airplane from csv
+	csvFilePath := path.Join(s.pluginPath, "profiles", fmt.Sprintf("%s.csv", airplaneICAO))
+	s.Logger.Debugf("Loading datarefs from: %s", csvFilePath)
+	f, err := os.Open(csvFilePath)
+	if err != nil {
+		s.Logger.Errorf("Error opening file: %v", err)
+	}
+	defer f.Close()
+	csvReader := csv.NewReader(f)
+	records, err := csvReader.ReadAll()
+	if err != nil {
+		s.Logger.Errorf("Error reading csv: %v", err)
+	}
+	return records
+}
+
+func (s *xplaneService) compileRules(records [][]string) interface{} {
+	res := make(map[string]profile)
+	for i, record := range records {
+		if i == 0 {
+			continue
+		}
+		name := record[0]
+		onFunc, offFunc := s.assignOnAndOffFuncs(name)
+		if onFunc == nil || offFunc == nil {
+			s.Logger.Debugf("No on/off functions found for: %s", name)
+			continue
+		}
+		dataref_strs := strings.Split(record[1], ";")
+		rules_str := dataref_strs[0] + record[2] + record[3]
+		rules_str = strings.ReplaceAll(rules_str, " or ", " || ")
+		rules_str = strings.ReplaceAll(rules_str, " and ", " && ")
+		rules_str = strings.ReplaceAll(rules_str, " x", fmt.Sprintf(" %s", dataref_strs[0]))
+		if len(dataref_strs) > 1 {
+			for i, dataref_str := range dataref_strs {
+				if i == 0 {
+					continue
+				}
+				my_operator := "&&"
+				if record[4] == "any" {
+					my_operator = "||"
+				}
+				rules_str += my_operator + dataref_str + record[2] + record[3]
+			}
+		}
+		res[name] = profile{
+			rules: rules_str,
+			on:    onFunc,
+			off:   offFunc,
+		}
+	}
+	return res
 }
