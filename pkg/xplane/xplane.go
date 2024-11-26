@@ -49,6 +49,7 @@ type xplaneService struct {
 	myMenuId        menus.MenuID
 	myMenuItemIndex int
 	leds            map[string]leds
+	datarefs        map[string][]dataAccess.DataRef
 }
 
 var xplaneSvcLock = &sync.Mutex{}
@@ -74,6 +75,7 @@ func NewXplaneService(
 			Logger:       logger,
 			pluginPath:   pluginPath,
 			leds:         nil,
+			datarefs:     nil,
 		}
 		xplaneSvc.Plugin.SetPluginStateCallback(xplaneSvc.onPluginStateChanged)
 		xplaneSvc.Plugin.SetMessageHandler(xplaneSvc.messageHandler)

@@ -3,6 +3,7 @@ package xplane
 import (
 	"encoding/csv"
 	"fmt"
+	"github.com/xairline/goplane/xplm/dataAccess"
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
 	"os"
 	"path"
@@ -26,6 +27,7 @@ func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 		s.Logger.Debugf("Replace record: %s", name)
 	}
 	s.leds = defaultRules
+	s.datarefs = make(map[string][]dataAccess.DataRef)
 }
 
 func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
@@ -114,7 +116,7 @@ func (s *xplaneService) compileRules(records [][]string) map[string]leds {
 			continue
 		}
 		dataref_strs := strings.Split(record[1], ";")
-		rules_str := dataref_strs[0] + record[2] + record[3]
+		rules_str := fmt.Sprintf("%s:%s:%s", dataref_strs[0], record[2], record[3])
 		rules_str = strings.ReplaceAll(rules_str, " or ", " || ")
 		rules_str = strings.ReplaceAll(rules_str, " and ", " && ")
 		rules_str = strings.ReplaceAll(rules_str, " x", fmt.Sprintf(" %s", dataref_strs[0]))
@@ -123,13 +125,18 @@ func (s *xplaneService) compileRules(records [][]string) map[string]leds {
 				if i == 0 {
 					continue
 				}
-				my_operator := "&&"
-				if record[4] == "any" {
-					my_operator = "||"
-				}
-				rules_str += my_operator + dataref_str + record[2] + record[3]
+
+				rules_str += "," + fmt.Sprintf("%s:%s:%s", dataref_str, record[2], record[3])
 			}
+
 		}
+		my_operator := "&&"
+		if record[4] == "any" {
+			my_operator = "||"
+		}
+		rules_str = strings.ReplaceAll(rules_str, " || ", ",")
+		rules_str = strings.ReplaceAll(rules_str, " && ", ",")
+		rules_str += "," + my_operator
 		res[name] = leds{
 			rules: rules_str,
 			on:    onFunc,
@@ -139,8 +146,8 @@ func (s *xplaneService) compileRules(records [][]string) map[string]leds {
 	return res
 }
 func (s *xplaneService) updateLeds() {
-	for _, led := range s.leds {
-		if s.evaluateRules(led.rules) {
+	for name, led := range s.leds {
+		if s.evaluateRules(name, led.rules) {
 			led.on()
 		} else {
 			led.off()
@@ -148,6 +155,32 @@ func (s *xplaneService) updateLeds() {
 	}
 }
 
-func (s *xplaneService) evaluateRules(rules string) bool {
+func (s *xplaneService) evaluateRules(name, rules string) bool {
+	rules_parsed := strings.Split(rules, ",")
+	var rules_expr []string
+	var rules_operators string
+	if len(rules_parsed) >= 3 {
+		rules_expr = rules_parsed[0 : len(rules_parsed)-2]
+		rules_operators = rules_parsed[len(rules_parsed)-1]
+	} else {
+		rules_expr = append(rules_expr, rules_parsed[0])
+		rules_operators = rules_parsed[1]
+	}
+
+	if s.datarefs[name] == nil {
+		s.datarefs[name] = make([]dataAccess.DataRef, len(rules_parsed)-1)
+		for _, rule := range rules_expr {
+			dataref_str := strings.Split(rule, ":")[0]
+			dr, found := dataAccess.FindDataRef(dataref_str)
+			if !found {
+				s.Logger.Errorf("Dataref not found: %s", rules)
+				return false
+			}
+			s.datarefs[name] = append(s.datarefs[name], dr)
+		}
+
+	}
+	s.Logger.Debugf("Evaluating rules: %+v, opeartor: %s", s.datarefs, rules_operators)
+
 	return true
 }
