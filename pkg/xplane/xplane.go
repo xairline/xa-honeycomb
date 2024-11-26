@@ -12,6 +12,7 @@ import (
 	"github.com/xairline/goplane/xplm/utilities"
 	"github.com/xairline/xa-honeycomb/pkg"
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
+	"path/filepath"
 	"sync"
 )
 
@@ -38,6 +39,7 @@ type xplaneService struct {
 	BravoService    honeycomb.BravoService
 	Logger          pkg.Logger
 	debug           bool
+	pluginPath      string
 	myMenuId        menus.MenuID
 	myMenuItemIndex int
 }
@@ -55,10 +57,15 @@ func NewXplaneService(
 		logger.Info("Xplane SVC: initializing")
 		xplaneSvcLock.Lock()
 		defer xplaneSvcLock.Unlock()
+
+		systemPath := utilities.GetSystemPath()
+		pluginPath := filepath.Join(systemPath, "Resources", "plugins", "xa-honeycomb")
+
 		xplaneSvc := &xplaneService{
 			Plugin:       extra.NewPlugin("xa honeycomb - "+VERSION, "com.github.xairline.xa-honeycomb", "honeycomb bridge"),
 			BravoService: honeycomb.NewBravoService(logger),
 			Logger:       logger,
+			pluginPath:   pluginPath,
 		}
 		xplaneSvc.Plugin.SetPluginStateCallback(xplaneSvc.onPluginStateChanged)
 		xplaneSvc.Plugin.SetMessageHandler(xplaneSvc.messageHandler)

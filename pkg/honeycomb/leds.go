@@ -233,6 +233,18 @@ func OffLEDRightGearRed() {
 	LED_STATE_CHANGED = true
 }
 
+func OnLedGearGreen() {
+	OnLEDLeftGearGreen()
+	OnLEDNoseGearGreen()
+	OnLEDRightGearGreen()
+}
+
+func OnLedGearRed() {
+	OnLEDLeftGearRed()
+	OnLEDNoseGearRed()
+	OnLEDRightGearRed()
+}
+
 func OnLEDMasterWarning() {
 	LANDING_GEAR_W = setBit(LANDING_GEAR_W, LED_MASTER_WARNING)
 	LED_STATE_CHANGED = true
