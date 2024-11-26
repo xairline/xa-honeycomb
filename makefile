@@ -10,14 +10,14 @@ mac:
 	CGO_CFLAGS="-DAPL=1 -DIBM=0 -DLIN=0 -O2 -g" \
 	CGO_LDFLAGS="-F/System/Library/Frameworks/ -F${CURDIR}/Libraries/Mac -framework XPLM" \
 	go build -buildmode c-shared -o build/xa-honeycomb/mac_arm.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/services.VERSION=${VERSION}"  main.go
+		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}"  main.go
 	GOOS=darwin \
 	GOARCH=amd64 \
 	CGO_ENABLED=1 \
 	CGO_CFLAGS="-DAPL=1 -DIBM=0 -DLIN=0 -O2 -g" \
 	CGO_LDFLAGS="-F/System/Library/Frameworks/ -F${CURDIR}/Libraries/Mac -framework XPLM" \
 	go build -buildmode c-shared -o build/xa-honeycomb/mac_amd.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/services.VERSION=${VERSION}" main.go
+		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" main.go
 	lipo build/xa-honeycomb/mac_arm.xpl build/xa-honeycomb/mac_amd.xpl -create -output build/xa-honeycomb/mac.xpl
 dev:
 	GOOS=darwin \
@@ -26,7 +26,7 @@ dev:
 	CGO_CFLAGS="-DAPL=1 -DIBM=0 -DLIN=0 -O2 -g" \
 	CGO_LDFLAGS="-F/System/Library/Frameworks/ -F${CURDIR}/Libraries/Mac -framework XPLM" \
 	go build -buildmode c-shared -o ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/mac.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/services.VERSION=${VERSION}" main.go
+		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" main.go
 	cp -r profiles ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/
 win:
 	CGO_CFLAGS="-DIBM=1 -static -O2 -g" \
@@ -37,7 +37,7 @@ win:
 	CC=x86_64-w64-mingw32-gcc \
 	CXX=x86_64-w64-mingw32-g++ \
 	go build --buildmode c-shared -o build/xa-honeycomb/win.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/services.VERSION=${VERSION}"  main.go
+		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}"  main.go
 lin:
 	GOOS=linux \
 	GOARCH=amd64 \
@@ -46,7 +46,7 @@ lin:
 	CGO_CFLAGS="-DLIN=1 -O2 -g" \
 	CGO_LDFLAGS="-shared -rdynamic -nodefaultlibs -undefined_warning" \
 	go build -buildmode c-shared -o build/xa-honeycomb/lin.xpl  \
-		-ldflags="-X github.com/xairline/xa-honeycomb/services.VERSION=${VERSION}" main.go
+		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" main.go
 
 all: mac win lin
 mac-test:
@@ -63,7 +63,7 @@ PLUG_DIR=$(XPL_ROOT)/Resources/plugins/xa-honeycomb
 msys2:
 	@if [ -z "$(XPL_ROOT)" ]; then echo "Environment is not setup"; exit 1; fi
 	go build --buildmode c-shared -o build/xa-honeycomb/win.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/services.VERSION=${VERSION}" main.go
+		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" main.go
 	[ -d "$(PLUG_DIR)" ] && cp -p build/xa-honeycomb/win.xpl "$(PLUG_DIR)/."
 
 msys2-test:
