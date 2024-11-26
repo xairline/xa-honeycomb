@@ -1,34 +1,34 @@
 package xplane
 
 import (
-	"encoding/csv"
 	"fmt"
+	"github.com/stretchr/testify/assert/yaml"
 	"github.com/xairline/goplane/xplm/dataAccess"
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
 	"os"
 	"path"
+	"reflect"
 	"strings"
 )
 
-// TODO: mess
 func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 	s.Logger.Infof("Setup Datarefs for: %s", airplaneICAO)
 
 	s.Logger.Infof("Loading defalt profile for: %s", airplaneICAO)
-	defaultRecords := s.loadProfile("sample")
-	defaultRules := s.compileRules(defaultRecords)
+	defaultProfile := s.loadProfile("default")
+	s.compileRules(&defaultProfile)
 
-	s.Logger.Infof("Loading profile for: %s", airplaneICAO)
-	records := s.loadProfile(airplaneICAO)
-	rules := s.compileRules(records)
-
-	// merge default and airplane specific records
-	for name, led := range rules {
-		defaultRules[name] = led
-		s.Logger.Debugf("Replace record: %s", name)
-	}
-	s.leds = defaultRules
-	s.datarefs = make(map[string][]dataAccess.DataRef)
+	//s.Logger.Infof("Loading profile for: %s", airplaneICAO)
+	//records := s.loadProfile(airplaneICAO)
+	//rules := s.compileRules(records)
+	//
+	//// merge default and airplane specific records
+	//for name, led := range rules {
+	//	defaultRules[name] = led
+	//	s.Logger.Debugf("Replace record: %s", name)
+	//}
+	//s.leds = defaultRules
+	//s.datarefs = make(map[string][]dataAccess.DataRef)
 }
 
 func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
@@ -87,65 +87,69 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 	}
 }
 
-func (s *xplaneService) loadProfile(airplaneICAO string) [][]string {
+func (s *xplaneService) loadProfile(airplaneICAO string) Profile {
 	// load datarefs for the airplane from csv
-	csvFilePath := path.Join(s.pluginPath, "profiles", fmt.Sprintf("%s.csv", airplaneICAO))
+	csvFilePath := path.Join(s.pluginPath, "profiles", fmt.Sprintf("%s.yaml", airplaneICAO))
 	s.Logger.Debugf("Loading datarefs from: %s", csvFilePath)
-	f, err := os.Open(csvFilePath)
+	f, err := os.ReadFile(csvFilePath)
 	if err != nil {
 		s.Logger.Errorf("Error opening file: %v", err)
 	}
-	defer f.Close()
-	csvReader := csv.NewReader(f)
-	records, err := csvReader.ReadAll()
+	var res Profile
+	err = yaml.Unmarshal(f, &res)
 	if err != nil {
-		s.Logger.Errorf("Error reading csv: %v", err)
-	}
-	return records
-}
-
-func (s *xplaneService) compileRules(records [][]string) map[string]leds {
-	res := make(map[string]leds)
-	for i, record := range records {
-		if i == 0 {
-			continue
-		}
-		name := record[0]
-		onFunc, offFunc := s.assignOnAndOffFuncs(name)
-		if onFunc == nil || offFunc == nil {
-			s.Logger.Debugf("No on/off functions found for: %s", name)
-			continue
-		}
-		dataref_strs := strings.Split(record[1], ";")
-		rules_str := fmt.Sprintf("%s:%s:%s", dataref_strs[0], record[2], record[3])
-		rules_str = strings.ReplaceAll(rules_str, " or ", " || ")
-		rules_str = strings.ReplaceAll(rules_str, " and ", " && ")
-		rules_str = strings.ReplaceAll(rules_str, " x", fmt.Sprintf(" %s", dataref_strs[0]))
-		if len(dataref_strs) > 1 {
-			for i, dataref_str := range dataref_strs {
-				if i == 0 {
-					continue
-				}
-
-				rules_str += "," + fmt.Sprintf("%s:%s:%s", dataref_str, record[2], record[3])
-			}
-
-		}
-		my_operator := "&&"
-		if record[4] == "any" {
-			my_operator = "||"
-		}
-		rules_str = strings.ReplaceAll(rules_str, " || ", ",")
-		rules_str = strings.ReplaceAll(rules_str, " && ", ",")
-		rules_str += "," + my_operator
-		res[name] = leds{
-			rules: rules_str,
-			on:    onFunc,
-			off:   offFunc,
-		}
+		s.Logger.Errorf("Error reading file: %v", err)
 	}
 	return res
 }
+
+func (s *xplaneService) compileRules(p *Profile) {
+	val := reflect.ValueOf(p).Elem() // Get the actual struct value
+	typ := val.Type()
+	for i := 0; i < val.NumField(); i++ {
+		field := typ.Field(i) // Get the field metadata
+		fieldName := field.Name
+
+		// Get the field value as a reflect.Value
+		fieldVal := val.Field(i)
+
+		// Perform type assertion to profile
+		fieldValue, ok := fieldVal.Interface().(profile)
+		if !ok {
+			s.Logger.Errorf("Field %s is not of type profile", fieldName)
+			continue
+		}
+
+		// Modify the fieldValue
+		switch fieldValue.ProfileType {
+		case "dataref":
+			for j := range fieldValue.Datarefs {
+				dataref := &fieldValue.Datarefs[j] // Get a pointer to the actual element
+				myDataref, found := dataAccess.FindDataRef(dataref.Dataref_str)
+				if !found {
+					s.Logger.Errorf("Dataref not found: %s", dataref.Dataref_str)
+				}
+				dataref.Dataref = myDataref
+				// TODO: add expr eval here
+			}
+			fieldValue.on, fieldValue.off = s.assignOnAndOffFuncs(fieldName)
+		case "data":
+			for j := range fieldValue.Data {
+				data := &fieldValue.Data[j] // Get a pointer to the actual element
+				myDataref, found := dataAccess.FindDataRef(data.Dataref_str)
+				if !found {
+					s.Logger.Errorf("Dataref not found: %s", data.Dataref_str)
+				}
+				data.Dataref = myDataref
+			}
+		}
+
+		// Assign the modified value back to the struct field
+		fieldVal.Set(reflect.ValueOf(fieldValue))
+	}
+	s.Logger.Debugf("Compiled rules: %+v", p)
+}
+
 func (s *xplaneService) updateLeds() {
 	for name, led := range s.leds {
 		if s.evaluateRules(name, led.rules) {
