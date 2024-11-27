@@ -197,6 +197,15 @@ func (s *xplaneService) updateLeds() {
 		field := typ.Field(i) // Get the field metadata
 		fieldName := field.Name
 
+		if fieldName == "GEAR" {
+			// special case for gear
+			dataref := s.profile.GEAR.Datarefs[0]
+			output := dataAccess.GetFloatArrayData(dataref.Dataref)
+			s.Logger.Debugf("Gear: %v", output)
+			s.updateGearLEDs(output)
+			continue
+		}
+
 		// Get the field value as a reflect.Value
 		fieldVal := val.Field(i)
 
@@ -215,7 +224,6 @@ func (s *xplaneService) updateLeds() {
 			continue
 		}
 
-		//s.Logger.Debugf("Updating LEDs - %s, conditions: %s", fieldName, fieldValue.Condition)
 		var result bool
 		if fieldValue.Condition == "or" {
 			result = false
@@ -229,7 +237,6 @@ func (s *xplaneService) updateLeds() {
 				result = false
 				break
 			}
-			//s.Logger.Debugf("  %s - Result: %v", dataref.Dataref_str, output)
 			if fieldValue.Condition == "or" {
 				result = result || output.(bool)
 			} else {
@@ -237,12 +244,52 @@ func (s *xplaneService) updateLeds() {
 				result = result && output.(bool)
 			}
 		}
-		//s.Logger.Debugf("Updating LEDs - %s, conditions: %s, result: %t", fieldName, fieldValue.Condition, result)
 		if result {
 			fieldValue.on()
 		} else {
 			fieldValue.off()
 		}
 
+	}
+}
+
+func (s *xplaneService) updateGearLEDs(output []float32) {
+	if output[0] >= 0.99 {
+		honeycomb.OnLEDNoseGearGreen()
+		honeycomb.OffLEDNoseGearRed()
+	}
+	if output[1] >= 0.99 {
+		honeycomb.OnLEDLeftGearGreen()
+		honeycomb.OffLEDLeftGearRed()
+	}
+	if output[2] >= 0.99 {
+		honeycomb.OnLEDRightGearGreen()
+		honeycomb.OffLEDRightGearRed()
+	}
+
+	if output[0] <= 0.01 {
+		honeycomb.OffLEDNoseGearGreen()
+		honeycomb.OffLEDNoseGearRed()
+	}
+	if output[1] <= 0.01 {
+		honeycomb.OffLEDLeftGearGreen()
+		honeycomb.OffLEDLeftGearRed()
+	}
+	if output[2] <= 0.01 {
+		honeycomb.OffLEDRightGearGreen()
+		honeycomb.OffLEDRightGearRed()
+	}
+
+	if output[0] > 0.01 && output[0] < 0.99 {
+		honeycomb.OffLEDNoseGearGreen()
+		honeycomb.OnLEDNoseGearRed()
+	}
+	if output[1] > 0.01 && output[1] < 0.99 {
+		honeycomb.OffLEDLeftGearGreen()
+		honeycomb.OnLEDLeftGearRed()
+	}
+	if output[2] > 0.01 && output[2] < 0.99 {
+		honeycomb.OffLEDRightGearGreen()
+		honeycomb.OnLEDRightGearRed()
 	}
 }
