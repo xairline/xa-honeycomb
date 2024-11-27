@@ -102,6 +102,7 @@ type xplaneService struct {
 	myMenuId        menus.MenuID
 	myMenuItemIndex int
 	profile         *Profile
+	apSelector      string
 }
 
 var xplaneSvcLock = &sync.Mutex{}
@@ -127,6 +128,7 @@ func NewXplaneService(
 			Logger:       logger,
 			pluginPath:   pluginPath,
 			profile:      nil,
+			apSelector:   "",
 		}
 		xplaneSvc.Plugin.SetPluginStateCallback(xplaneSvc.onPluginStateChanged)
 		xplaneSvc.Plugin.SetMessageHandler(xplaneSvc.messageHandler)

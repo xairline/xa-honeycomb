@@ -131,7 +131,7 @@ func (s *xplaneService) compileRules(p *Profile) error {
 
 		// Modify the fieldValue
 		switch fieldValue.ProfileType {
-		case "dataref":
+		case "led":
 			for j := range fieldValue.Datarefs {
 				dataref := &fieldValue.Datarefs[j] // Get a pointer to the actual element
 				myDataref, found := dataAccess.FindDataRef(dataref.Dataref_str)
@@ -211,7 +211,7 @@ func (s *xplaneService) updateLeds() {
 			s.Logger.Debugf("No datarefs found for: %s", fieldName)
 			continue
 		}
-		if fieldValue.ProfileType != "dataref" {
+		if fieldValue.ProfileType != "led" {
 			continue
 		}
 
