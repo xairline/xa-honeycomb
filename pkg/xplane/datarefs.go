@@ -146,11 +146,11 @@ func (s *xplaneService) compileRules(p *Profile) error {
 				case dataAccess.TypeFloat:
 					code = fmt.Sprintf("GetFloatData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
 				case dataAccess.TypeInt:
-					code = fmt.Sprintf("GetIntData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
+					code = fmt.Sprintf("GetIntData(myDataref) %s %d", dataref.Operator, int(dataref.Threshold))
 				case dataAccess.TypeFloatArray:
 					code = fmt.Sprintf("GetFloatArrayData(myDataref)[0] %s %f", dataref.Operator, dataref.Threshold)
 				case dataAccess.TypeIntArray:
-					code = fmt.Sprintf("GetIntArrayData(myDataref)[0] %s %f", dataref.Operator, dataref.Threshold)
+					code = fmt.Sprintf("GetIntArrayData(myDataref)[0] %s %d", dataref.Operator, int(dataref.Threshold))
 				default:
 					s.Logger.Errorf("Dataref type not supported: %v", datarefType)
 				}
@@ -220,7 +220,6 @@ func (s *xplaneService) updateLeds() {
 			continue
 		}
 		if fieldValue.ProfileType != "dataref" {
-			s.Logger.Debugf("Profile type is not dataref for: %s", fieldName)
 			continue
 		}
 
