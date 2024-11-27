@@ -230,8 +230,13 @@ func (s *xplaneService) updateLeds() {
 			continue
 		}
 
-		s.Logger.Debugf("Updating LEDs - %s", fieldName)
-		result := true
+		//s.Logger.Debugf("Updating LEDs - %s, conditions: %s", fieldName, fieldValue.Condition)
+		var result bool
+		if fieldValue.Condition == "or" {
+			result = false
+		} else {
+			result = true
+		}
 		for _, dataref := range fieldValue.Datarefs {
 			output, err := expr.Run(dataref.expr, dataref.env)
 			if err != nil {
@@ -239,13 +244,15 @@ func (s *xplaneService) updateLeds() {
 				result = false
 				break
 			}
-			s.Logger.Debugf("  %s - Result: %v", dataref.Dataref_str, output)
-			if fieldValue.Condition == "all" {
-				result = result && output.(bool)
-			} else {
+			//s.Logger.Debugf("  %s - Result: %v", dataref.Dataref_str, output)
+			if fieldValue.Condition == "or" {
 				result = result || output.(bool)
+			} else {
+				// all or nothing (single value)
+				result = result && output.(bool)
 			}
 		}
+		//s.Logger.Debugf("Updating LEDs - %s, conditions: %s, result: %t", fieldName, fieldValue.Condition, result)
 		if result {
 			fieldValue.on()
 		} else {
