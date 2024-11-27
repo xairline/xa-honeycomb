@@ -3,7 +3,8 @@ name: Release
 # Controls when the workflow will run
 on:
   push:
-    #    branches: [ main ]
+    branches:
+      - main
     tags:
       - 'v*'
   # Allows you to run this workflow manually from the Actions tab
@@ -38,7 +39,7 @@ jobs:
       - run: |
           go mod tidy
           export VERSION=${GITHUB_REF##*/} 
-          VERSION=${GITHUB_REF##*/} make mac
+          VERSION=${GITHUB_REF##*/} make mac win -j 2
           go build -o build/xa-honeycomb/honeycomb honeycomb.go
           rm -f ${{ github.workspace }}/build/xa-honeycomb/mac_arm.xpl ${{ github.workspace }}/build/xa-honeycomb/mac_amd.xpl
           TAG=${GITHUB_REF##*/}
