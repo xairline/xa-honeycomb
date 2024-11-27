@@ -224,6 +224,12 @@ func (s *xplaneService) updateLeds() {
 			continue
 		}
 
+		if fieldName == "AP" {
+			// special case for AP
+			s.updateApLEDs(&fieldValue)
+			continue
+		}
+
 		var result bool
 		if fieldValue.Condition == "or" {
 			result = false
@@ -291,5 +297,32 @@ func (s *xplaneService) updateGearLEDs(output []float32) {
 	if output[2] > 0.01 && output[2] < 0.99 {
 		honeycomb.OffLEDRightGearGreen()
 		honeycomb.OnLEDRightGearRed()
+	}
+}
+
+func (s *xplaneService) updateApLEDs(myProfile *profile) {
+	var result bool
+	if myProfile.Condition == "any" {
+		result = false
+	} else {
+		result = true
+	}
+	for _, dataref := range myProfile.Datarefs {
+		output, err := expr.Run(dataref.expr, dataref.env)
+		if err != nil {
+			s.Logger.Errorf("Error running expression: %v", err)
+			continue
+		}
+		if myProfile.Condition == "any" {
+			result = result || output.(bool)
+		} else {
+			// all or nothing (single value)
+			result = result && output.(bool)
+		}
+	}
+	if result {
+		honeycomb.OnLEDAP()
+	} else {
+		honeycomb.OffLEDAP()
 	}
 }
