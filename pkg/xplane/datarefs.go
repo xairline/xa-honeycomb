@@ -201,7 +201,6 @@ func (s *xplaneService) updateLeds() {
 			// special case for gear
 			dataref := s.profile.GEAR.Datarefs[0]
 			output := dataAccess.GetFloatArrayData(dataref.Dataref)
-			s.Logger.Debugf("Gear: %v", output)
 			s.updateGearLEDs(output)
 			continue
 		}
