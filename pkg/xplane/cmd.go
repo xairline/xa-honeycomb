@@ -40,15 +40,19 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 		switch s.apSelector {
 		case "ias":
 			myProfile = s.profile.AP_IAS
+			factor = 1
 		case "alt":
 			myProfile = s.profile.AP_ALT
 			factor = 100
 		case "vs":
 			myProfile = s.profile.AP_VS
+			factor = 1
 		case "hdg":
 			myProfile = s.profile.AP_HDG
+			factor = 1
 		case "crs":
 			myProfile = s.profile.AP_CRS
+			factor = 1
 		}
 		s.adjust(myProfile, direction, multiplier, factor)
 		s.Logger.Infof("Knob turn: %s, Mode: %s, Multiplier: %.1f", direction, s.apSelector, multiplier)

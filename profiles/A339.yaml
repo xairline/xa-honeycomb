@@ -2,7 +2,7 @@
 ap_hdg:
   profile_type: knob
   datarefs:
-    - dataref_str: "AirbusFBW/APHeading"
+    - dataref_str: "sim/cockpit2/autopilot/heading_dial_deg_mag_pilot"
 ap_alt:
   profile_type: knob
   datarefs:
@@ -10,11 +10,11 @@ ap_alt:
 ap_vs:
   profile_type: knob
   datarefs:
-    - dataref_str: "AirbusFBW/APVerticalSpeed"
+    - dataref_str: "sim/cockpit2/autopilot/vvi_dial_fpm"
 ap_ias:
   profile_type: knob
   datarefs:
-    - dataref_str: "AirbusFBW/APSpeed"
+    - dataref_str: "sim/cockpit2/autopilot/airspeed_dial_kts_mach"
 ap_crs:
   profile_type: knob
   # repurpose to qnh
