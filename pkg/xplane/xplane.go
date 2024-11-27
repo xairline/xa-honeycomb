@@ -84,9 +84,6 @@ type XplaneService interface {
 	onPluginStop()
 	// flight loop
 	flightLoop(elapsedSinceLastCall, elapsedTimeSinceLastFlightLoop float32, counter int, ref interface{}) float32
-	// cmd handlers
-	Increase(command utilities.CommandRef, phase utilities.CommandPhase, ref interface{}) int
-	Decrease(command utilities.CommandRef, phase utilities.CommandPhase, ref interface{}) int
 	// menu handler
 	menuHandler(menuRef interface{}, itemRef interface{})
 	// datarefs

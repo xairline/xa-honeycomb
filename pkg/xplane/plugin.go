@@ -50,8 +50,8 @@ func (s *xplaneService) onPluginStart() {
 	mode_crs := utilities.CreateCommand("Honeycomb Bravo/mode_crs", "Set the autopilot mode to CRS.")
 
 	// set up command handlers
-	utilities.RegisterCommandHandler(increaseCmd, s.Increase, true, nil)
-	utilities.RegisterCommandHandler(decreaseCmd, s.Decrease, true, nil)
+	utilities.RegisterCommandHandler(increaseCmd, s.changeApValue, true, "up")
+	utilities.RegisterCommandHandler(decreaseCmd, s.changeApValue, true, "down")
 	utilities.RegisterCommandHandler(mode_ias, s.changeAPMode, true, "ias")
 	utilities.RegisterCommandHandler(mode_alt, s.changeAPMode, true, "alt")
 	utilities.RegisterCommandHandler(mode_vs, s.changeAPMode, true, "vs")
