@@ -43,7 +43,6 @@ jobs:
           rm -f ${{ github.workspace }}/build/xa-honeycomb/mac_arm.xpl ${{ github.workspace }}/build/xa-honeycomb/mac_amd.xpl
           TAG=${GITHUB_REF##*/}
           cp ${{ github.workspace }}/skunkcrafts_updater.cfg ${{ github.workspace }}/build/xa-honeycomb/
-          cp ${{ github.workspace }}/LICENSE ${{ github.workspace }}/build/xa-honeycomb/
           cp -r ${{ github.workspace }}/profiles ${{ github.workspace }}/build/xa-honeycomb/
           sed -i '' "s/REPLACE_ME/${TAG}/g" ${{ github.workspace }}/build/xa-honeycomb/skunkcrafts_updater.cfg
           root=$(pwd)
