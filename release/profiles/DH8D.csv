@@ -1,0 +1,27 @@
+name,datarefs,operators,thresholds,conditions,description
+BUS_VOLTAGE,sim/cockpit/electrical/battery_array_on,~=,0,any,this led ligths up when master electric switch is on
+HDG,FJS/Q4XP/FMA/roll_act,==2, or x==4,any,description
+NAV,FJS/Q4XP/FMA/pitch_act,==18, or x==19,any,description
+APR,FJS/Q4XP/FMA/roll_act,>=8, and  x<=11,any,description
+REV,sim/cockpit2/autopilot/backcourse_status,>=,1,any,description
+ALT,FJS/Q4XP/FMA/pitch_act,==4, or x==5,any,description
+VS,FJS/Q4XP/FMA/pitch_act,==,3,any,description
+IAS,FJS/Q4XP/FMA/pitch_act,==,2,any,description
+AP,sim/cockpit2/autopilot/servos_on,>,0.01,any,description
+AP_STATE,sim/cockpit/autopilot/autopilot_state,~=,0,any,description
+GEAR,sim/flightmodel2/gear/deploy_ratio,~=,0,any,description
+RETRACTABLE_GEAR,sim/aircraft/gear/acf_gear_retract,~=,0,any,description
+MASTER_WARN,FJS/Q4XP/Annunciators/CautWarn_Lit,>,0.01,any,description
+FIRE,sim/flightmodel2/engines/is_on_fire,>,0.01,any,description
+OIL_LOW_P,sim/flightmodel/engine/ENGN_oil_press,<,0.75,any,description
+FUEL_LOW_P,sim/cockpit2/engine/indicators/fuel_pressure_psi,<,20,any,description
+ANTI_ICE,sim/cockpit/switches/anti_ice_prop_heat,==,1,any,description
+ENG_STARTER,sim/cockpit2/engine/actuators/starter_hit,>,0.01,any,description
+APU,sim/cockpit2/electrical/APU_running,>,0.01,any,description
+MASTER_CAUTION,FJS/Q4XP/Annunciators/CautWarn_Lit,>,0.01,any,description
+VACUUM,sim/cockpit/misc/vacuum;sim/cockpit/misc/vacuum2,<,1,any,description
+HYDRO_LOW_P,sim/operation/failures/hydraulic_pressure_ratio,<,3002,all,description
+AUX_FUEL_PUMP,sim/cockpit2/fuel/transfer_pump_right;sim/cockpit2/fuel/transfer_pump_left,>,0.01,any,description
+PARKING_BRAKE,sim/cockpit2/controls/parking_brake_ratio,==,1,any,description
+VOLT_LOW,sim/cockpit2/electrical/bus_load_amps,>,4,any,description
+DOORS,FJS/Q4XP/Manips/CabinDoors_Anim;FJS/Q4XP/Manips/CabinMainDoor_Anim;FJS/Q4XP/Manips/CargoDoor_Anim,>,0.1,any,description
