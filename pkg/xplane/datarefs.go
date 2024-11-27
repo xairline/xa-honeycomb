@@ -223,6 +223,22 @@ func (s *xplaneService) updateLeds() {
 			continue
 		}
 
+		if fieldName == "BUS_VOLTAGE" {
+			// special case for bus voltage
+			dataref := s.profile.BUS_VOLTAGE.Datarefs[0]
+			output, err := expr.Run(dataref.expr, dataref.env)
+			if err != nil {
+				s.Logger.Errorf("Error running expression: %v", err)
+				break
+			}
+			if !output.(bool) {
+				honeycomb.AllOff()
+				return
+			} else {
+				continue
+			}
+		}
+
 		var result bool
 		if fieldValue.Condition == "any" {
 			result = false
