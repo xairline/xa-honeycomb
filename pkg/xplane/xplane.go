@@ -69,7 +69,7 @@ type Profile struct {
 	ANTI_ICE           profile `yaml:"anti_ice,omitempty"`
 	ENG_STARTER        profile `yaml:"eng_starter,omitempty"`
 	APU                profile `yaml:"apu,omitempty"`
-	VACCUM             profile `yaml:"vacuum,omitempty"`
+	VACUUM             profile `yaml:"vacuum,omitempty"`
 	HYDRO_LOW_PRESSURE profile `yaml:"hydro_low_pressure,omitempty"`
 	AUX_FUEL_PUMP      profile `yaml:"aux_fuel_pump,omitempty"`
 	PARKING_BRAKE      profile `yaml:"parking_brake,omitempty"`

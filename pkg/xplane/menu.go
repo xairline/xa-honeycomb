@@ -6,15 +6,21 @@ import (
 )
 
 func (s *xplaneService) menuHandler(menuRef interface{}, itemRef interface{}) {
-	s.debug = !s.debug
+	itemId := itemRef.(int)
+	if itemId == 1 {
+		s.debug = !s.debug
+		if s.debug {
+			logging.MinLevel = logging.Debug_Level
+			menus.CheckMenuItem(s.myMenuId, s.myMenuItemIndex, menus.Menu_Checked)
+		} else {
+			logging.MinLevel = logging.Info_Level
+			menus.CheckMenuItem(s.myMenuId, s.myMenuItemIndex, menus.Menu_Unchecked)
+		}
 
-	if s.debug {
-		logging.MinLevel = logging.Debug_Level
-		menus.CheckMenuItem(s.myMenuId, s.myMenuItemIndex, menus.Menu_Checked)
-	} else {
-		logging.MinLevel = logging.Info_Level
-		menus.CheckMenuItem(s.myMenuId, s.myMenuItemIndex, menus.Menu_Unchecked)
 	}
-
+	if itemId == 0 {
+		s.Logger.Info("Reload Profile Clicked")
+		s.profile = nil
+	}
 	s.Logger.Infof("menu clicked: %v", itemRef)
 }

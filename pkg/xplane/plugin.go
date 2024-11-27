@@ -31,7 +31,10 @@ func (s *xplaneService) onPluginStart() {
 	menuId := menus.FindPluginsMenu()
 	menuContainerId := menus.AppendMenuItem(menuId, "XA Honeycomb", 0, false)
 	s.myMenuId = menus.CreateMenu("XA Honeycomb", menuId, menuContainerId, s.menuHandler, nil)
-	s.myMenuItemIndex = menus.AppendMenuItem(s.myMenuId, "Enable Debug", 0, true)
+	menus.AppendMenuItem(s.myMenuId, "Reload Profile", 0, true)
+	menus.AppendMenuSeparator(s.myMenuId)
+	s.myMenuItemIndex = menus.AppendMenuItem(s.myMenuId, "Enable Debug", 1, true)
+
 	if s.debug {
 		menus.CheckMenuItem(s.myMenuId, s.myMenuItemIndex, menus.Menu_Checked)
 	} else {
