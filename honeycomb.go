@@ -13,12 +13,9 @@ func main() {
 
 	bravoSvc := honeycomb.NewBravoService(Logger)
 
-	honeycomb.OnLEDAlt()
-	honeycomb.OnLEDMasterWarning()
+	honeycomb.OnLEDAP()
 	time.Sleep(5 * time.Second)
-	honeycomb.OffLEDAlt()
-	honeycomb.OnLEDFuelPump()
-	honeycomb.OnLEDLeftGearGreen()
+	honeycomb.OffLEDAP()
 	time.Sleep(5 * time.Second)
 
 	bravoSvc.Exit()

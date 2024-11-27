@@ -54,7 +54,9 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 	case "AP":
 		return honeycomb.OnLEDAP, honeycomb.OffLEDAP
 	case "BUS_VOLTAGE":
-		return honeycomb.OnLEDLowVolts, honeycomb.OffLEDLowVolts
+		return func() {
+			return
+		}, honeycomb.AllOff
 	case "GEAR":
 		return honeycomb.OnLedGearGreen, honeycomb.OnLedGearRed
 	case "MASTER_WARN":
@@ -197,14 +199,6 @@ func (s *xplaneService) updateLeds() {
 		field := typ.Field(i) // Get the field metadata
 		fieldName := field.Name
 
-		if fieldName == "GEAR" {
-			// special case for gear
-			dataref := s.profile.GEAR.Datarefs[0]
-			output := dataAccess.GetFloatArrayData(dataref.Dataref)
-			s.updateGearLEDs(output)
-			continue
-		}
-
 		// Get the field value as a reflect.Value
 		fieldVal := val.Field(i)
 
@@ -222,6 +216,14 @@ func (s *xplaneService) updateLeds() {
 			continue
 		}
 
+		if fieldName == "GEAR" {
+			// special case for gear
+			dataref := s.profile.GEAR.Datarefs[0]
+			output := dataAccess.GetFloatArrayData(dataref.Dataref)
+			s.updateGearLEDs(output)
+			continue
+		}
+
 		var result bool
 		if fieldValue.Condition == "or" {
 			result = false
@@ -235,7 +237,7 @@ func (s *xplaneService) updateLeds() {
 				result = false
 				break
 			}
-			if fieldValue.Condition == "or" {
+			if fieldValue.Condition == "any" {
 				result = result || output.(bool)
 			} else {
 				// all or nothing (single value)

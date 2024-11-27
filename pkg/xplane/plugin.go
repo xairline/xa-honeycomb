@@ -48,5 +48,6 @@ func (s *xplaneService) onPluginStart() {
 }
 
 func (s *xplaneService) onPluginStop() {
+	s.BravoService.Exit()
 	s.Logger.Info("Plugin stopped")
 }
