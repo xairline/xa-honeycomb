@@ -1,3 +1,28 @@
+##### AP KNOBS #####
+ap_hdg:
+  profile_type: knob
+  datarefs:
+    - dataref_str: "AirbusFBW/APHeading"
+ap_alt:
+  profile_type: knob
+  datarefs:
+    - dataref_str: "sim/cockpit2/autopilot/altitude_dial_ft"
+ap_vs:
+  profile_type: knob
+  datarefs:
+    - dataref_str: "AirbusFBW/APVerticalSpeed"
+ap_ias:
+  profile_type: knob
+  datarefs:
+    - dataref_str: "AirbusFBW/APSpeed"
+ap_crs:
+  profile_type: knob
+  # repurpose to qnh
+  datarefs:
+    - dataref_str: "AirbusFBW/APCourse"
+
+
+##### LEDS #####
 volt_low:
   profile_type: led
   datarefs:

@@ -15,6 +15,7 @@ import (
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
 	"path/filepath"
 	"sync"
+	"time"
 )
 
 var VERSION = "development"
@@ -49,6 +50,13 @@ type profile struct {
 }
 
 type Profile struct {
+	// AP Knobs
+	AP_HDG profile `yaml:"ap_hdg,omitempty"`
+	AP_VS  profile `yaml:"ap_vs,omitempty"`
+	AP_ALT profile `yaml:"ap_alt,omitempty"`
+	AP_IAS profile `yaml:"ap_ias,omitempty"`
+	AP_CRS profile `yaml:"ap_crs,omitempty"`
+	// LEDs
 	BUS_VOLTAGE        profile `yaml:"bus_voltage,omitempty"`
 	HDG                profile `yaml:"hdg,omitempty"`
 	NAV                profile `yaml:"nav,omitempty"`
@@ -100,6 +108,7 @@ type xplaneService struct {
 	myMenuItemIndex int
 	profile         *Profile
 	apSelector      string
+	lastKnobTime    time.Time
 }
 
 var xplaneSvcLock = &sync.Mutex{}
