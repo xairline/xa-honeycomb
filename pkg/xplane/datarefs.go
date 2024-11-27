@@ -23,12 +23,14 @@ func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 		planeProfile, err = s.loadProfile("default")
 		if err != nil {
 			s.Logger.Errorf("Error loading default profile: %v", err)
+			return
 		}
 	}
 	err = s.compileRules(&planeProfile)
 	if err != nil {
 		s.Logger.Errorf("Error compiling rules: %v", err)
 		s.profile = nil
+		return
 	}
 	s.profile = &planeProfile
 }
@@ -92,7 +94,7 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 func (s *xplaneService) loadProfile(airplaneICAO string) (Profile, error) {
 	// load datarefs for the airplane from csv
 	csvFilePath := path.Join(s.pluginPath, "profiles", fmt.Sprintf("%s.yaml", airplaneICAO))
-	s.Logger.Debugf("Loading datarefs from: %s", csvFilePath)
+	s.Logger.Infof("Loading datarefs from: %s", csvFilePath)
 	f, err := os.ReadFile(csvFilePath)
 	if err != nil {
 		s.Logger.Errorf("Error opening file: %v", err)
@@ -153,7 +155,7 @@ func (s *xplaneService) compileRules(p *Profile) error {
 					s.Logger.Errorf("Dataref type not supported: %v", datarefType)
 				}
 
-				s.Logger.Debugf("Compiling expression: %s", code)
+				s.Logger.Infof("Compiling expression: %s - %s: %s", code, fieldName, dataref.Dataref_str)
 				env := map[string]interface{}{
 					"GetFloatData":      dataAccess.GetFloatData,
 					"GetIntData":        dataAccess.GetIntData,
@@ -189,27 +191,6 @@ func (s *xplaneService) compileRules(p *Profile) error {
 }
 
 func (s *xplaneService) updateLeds() {
-	//s.Logger.Infof("Updating LEDs - DOOR")
-	//result := false
-	//for _, dataref := range s.profile.DOORS.Datarefs {
-	//	output, err := expr.Run(dataref.expr, dataref.env)
-	//	if err != nil {
-	//		s.Logger.Errorf("Error running expression: %v", err)
-	//		continue
-	//	}
-	//	s.Logger.Infof("Result: %v", output)
-	//	if s.profile.DOORS.Condition == "all" {
-	//		result = result && output.(bool)
-	//	} else {
-	//		result = result || output.(bool)
-	//	}
-	//}
-	//if result {
-	//	s.profile.DOORS.on()
-	//} else {
-	//	s.profile.DOORS.off()
-	//}
-	//s.Logger.Info("")
 	val := reflect.ValueOf(s.profile).Elem() // Get the actual struct value
 	typ := val.Type()
 	for i := 0; i < val.NumField(); i++ {
@@ -227,6 +208,10 @@ func (s *xplaneService) updateLeds() {
 		}
 		if fieldValue.Datarefs == nil {
 			s.Logger.Debugf("No datarefs found for: %s", fieldName)
+			continue
+		}
+		if fieldValue.ProfileType != "dataref" {
+			s.Logger.Debugf("Profile type is not dataref for: %s", fieldName)
 			continue
 		}
 

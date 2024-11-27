@@ -74,7 +74,7 @@ gear:
       threshold: 0
 
 retractable_gear:
-  profile_type: dataref
+  profile_type: data
   datarefs:
     - dataref_str: "sim/aircraft/gear/acf_gear_retract"
       operator: "!="

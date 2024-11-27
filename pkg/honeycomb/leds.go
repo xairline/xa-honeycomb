@@ -1,5 +1,7 @@
 package honeycomb
 
+import "strings"
+
 const (
 	LED_FUEL_PUMP     = 1
 	LED_PARKING_BRAKE = 2
@@ -409,97 +411,102 @@ func OffLEDAP() {
 
 // DebugPrintLEDStates prints the current state of all LEDs
 func (b *bravoService) DebugPrintLEDStates() {
-	b.Logger.Debug("ANUNCIATOR_W2 LEDs:")
+	var sb strings.Builder
+
+	sb.WriteString("\nANUNCIATOR_W2 LEDs:\n")
 	if ANUNCIATOR_W2&LED_FUEL_PUMP != 0 {
-		b.Logger.Debug("- Fuel Pump is ON")
+		sb.WriteString("- Fuel Pump is ON\n")
 	}
 	if ANUNCIATOR_W2&LED_PARKING_BRAKE != 0 {
-		b.Logger.Debug("- Parking Brake is ON")
+		sb.WriteString("- Parking Brake is ON\n")
 	}
 	if ANUNCIATOR_W2&LED_LOW_VOLTS != 0 {
-		b.Logger.Debug("- Low Volts is ON")
+		sb.WriteString("- Low Volts is ON\n")
 	}
 	if ANUNCIATOR_W2&LED_DOOR != 0 {
-		b.Logger.Debug("- Door is ON")
+		sb.WriteString("- Door is ON\n")
 	}
 
-	b.Logger.Debug("ANUNCIATOR_W1 LEDs:")
+	sb.WriteString("ANUNCIATOR_W1 LEDs:\n")
 	if ANUNCIATOR_W1&LED_LOW_OIL_PRESS != 0 {
-		b.Logger.Debug("- Low Oil Pressure is ON")
+		sb.WriteString("- Low Oil Pressure is ON\n")
 	}
 	if ANUNCIATOR_W1&LED_LOW_FUEL_PRESS != 0 {
-		b.Logger.Debug("- Low Fuel Pressure is ON")
+		sb.WriteString("- Low Fuel Pressure is ON\n")
 	}
 	if ANUNCIATOR_W1&LED_ANTI_ICE != 0 {
-		b.Logger.Debug("- Anti-Ice is ON")
+		sb.WriteString("- Anti-Ice is ON\n")
 	}
 	if ANUNCIATOR_W1&LED_STARTER != 0 {
-		b.Logger.Debug("- Starter is ON")
+		sb.WriteString("- Starter is ON\n")
 	}
 	if ANUNCIATOR_W1&LED_APU != 0 {
-		b.Logger.Debug("- APU is ON")
+		sb.WriteString("- APU is ON\n")
 	}
 	if ANUNCIATOR_W1&LED_MASTER_CAUTION != 0 {
-		b.Logger.Debug("- Master Caution is ON")
+		sb.WriteString("- Master Caution is ON\n")
 	}
 	if ANUNCIATOR_W1&LED_VACUUM != 0 {
-		b.Logger.Debug("- Vacuum is ON")
+		sb.WriteString("- Vacuum is ON\n")
 	}
 	if ANUNCIATOR_W1&LED_LOW_HYD_PRESS != 0 {
-		b.Logger.Debug("- Low Hydraulic Pressure is ON")
+		sb.WriteString("- Low Hydraulic Pressure is ON\n")
 	}
 
-	b.Logger.Debug("LANDING_GEAR_W LEDs:")
+	sb.WriteString("LANDING_GEAR_W LEDs:\n")
 	if LANDING_GEAR_W&LED_LEFT_GEAR_GREEN != 0 {
-		b.Logger.Debug("- Left Gear Green is ON")
+		sb.WriteString("- Left Gear Green is ON\n")
 	}
 	if LANDING_GEAR_W&LED_LEFT_GEAR_RED != 0 {
-		b.Logger.Debug("- Left Gear Red is ON")
+		sb.WriteString("- Left Gear Red is ON\n")
 	}
 	if LANDING_GEAR_W&LED_NOSE_GEAR_GREEN != 0 {
-		b.Logger.Debug("- Nose Gear Green is ON")
+		sb.WriteString("- Nose Gear Green is ON\n")
 	}
 	if LANDING_GEAR_W&LED_NOSE_GEAR_RED != 0 {
-		b.Logger.Debug("- Nose Gear Red is ON")
+		sb.WriteString("- Nose Gear Red is ON\n")
 	}
 	if LANDING_GEAR_W&LED_RIGHT_GEAR_GREEN != 0 {
-		b.Logger.Debug("- Right Gear Green is ON")
+		sb.WriteString("- Right Gear Green is ON\n")
 	}
 	if LANDING_GEAR_W&LED_RIGHT_GEAR_RED != 0 {
-		b.Logger.Debug("- Right Gear Red is ON")
+		sb.WriteString("- Right Gear Red is ON\n")
 	}
 	if LANDING_GEAR_W&LED_MASTER_WARNING != 0 {
-		b.Logger.Debug("- Master Warning is ON")
+		sb.WriteString("- Master Warning is ON\n")
 	}
 	if LANDING_GEAR_W&LED_ENGINE_FIRE != 0 {
-		b.Logger.Debug("- Engine Fire is ON")
+		sb.WriteString("- Engine Fire is ON\n")
 	}
 
-	b.Logger.Debug("AUTO_PILOT_W LEDs:")
+	sb.WriteString("AUTO_PILOT_W LEDs:\n")
 	if AUTO_PILOT_W&LED_HEADING != 0 {
-		b.Logger.Debug("- Heading is ON")
+		sb.WriteString("- Heading is ON\n")
 	}
 	if AUTO_PILOT_W&LED_NAV != 0 {
-		b.Logger.Debug("- Navigation is ON")
+		sb.WriteString("- Navigation is ON\n")
 	}
 	if AUTO_PILOT_W&LED_APR != 0 {
-		b.Logger.Debug("- Approach is ON")
+		sb.WriteString("- Approach is ON\n")
 	}
 	if AUTO_PILOT_W&LED_REV != 0 {
-		b.Logger.Debug("- Reverse is ON")
+		sb.WriteString("- Reverse is ON\n")
 	}
 	if AUTO_PILOT_W&LED_ALT != 0 {
-		b.Logger.Debug("- Altitude is ON")
+		sb.WriteString("- Altitude is ON\n")
 	}
 	if AUTO_PILOT_W&LED_VS != 0 {
-		b.Logger.Debug("- Vertical Speed is ON")
+		sb.WriteString("- Vertical Speed is ON\n")
 	}
 	if AUTO_PILOT_W&LED_IAS != 0 {
-		b.Logger.Debug("- Indicated Airspeed is ON")
+		sb.WriteString("- Indicated Airspeed is ON\n")
 	}
 	if AUTO_PILOT_W&LED_AP != 0 {
-		b.Logger.Debug("- Autopilot is ON")
+		sb.WriteString("- Autopilot is ON\n")
 	}
+
+	// Log the complete message at once
+	b.Logger.Debug(sb.String())
 }
 
 func AllOff() {

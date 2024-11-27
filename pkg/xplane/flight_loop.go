@@ -11,7 +11,7 @@ func (s *xplaneService) flightLoop(
 ) float32 {
 
 	if s.profile == nil {
-		s.Logger.Debugf("Profile is nil, try to load it again")
+		s.Logger.Info("Profile is nil, try to load it again")
 		aircraftIACODrf, found := dataAccess.FindDataRef("sim/aircraft/view/acf_ICAO")
 		if !found {
 			s.Logger.Errorf("Failed to find ICAO")

@@ -5,6 +5,13 @@ volt_low:
       operator: "<"
       threshold: -80
 
+gear:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "sim/flightmodel2/gear/deploy_ratio"
+      operator: "!="
+      threshold: 0
+
 bus_voltage:
   profile_type: dataref
   datarefs:
@@ -171,3 +178,21 @@ doors:
     - dataref_str: "AirbusFBW/BulkDoor"
       operator: ">"
       threshold: 0.9
+
+aux_fuel_pump:
+  profile_type: dataref
+  condition: "all"
+  datarefs:
+    - dataref_str: "sim/cockpit2/fuel/transfer_pump_right"
+      operator: ">"
+      threshold: 0.01
+    - dataref_str: "sim/cockpit2/fuel/transfer_pump_left"
+      operator: ">"
+      threshold: 0.01
+
+retractable_gear:
+  profile_type: data
+  datarefs:
+    - dataref_str: "sim/aircraft/gear/acf_gear_retract"
+      operator: "!="
+      threshold: 0
