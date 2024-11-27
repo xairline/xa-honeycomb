@@ -2,33 +2,35 @@ package xplane
 
 import (
 	"fmt"
+	"github.com/expr-lang/expr"
 	"github.com/stretchr/testify/assert/yaml"
 	"github.com/xairline/goplane/xplm/dataAccess"
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
 	"os"
 	"path"
 	"reflect"
-	"strings"
 )
 
 func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 	s.Logger.Infof("Setup Datarefs for: %s", airplaneICAO)
 
-	s.Logger.Infof("Loading defalt profile for: %s", airplaneICAO)
-	defaultProfile := s.loadProfile("default")
-	s.compileRules(&defaultProfile)
-
-	//s.Logger.Infof("Loading profile for: %s", airplaneICAO)
-	//records := s.loadProfile(airplaneICAO)
-	//rules := s.compileRules(records)
-	//
-	//// merge default and airplane specific records
-	//for name, led := range rules {
-	//	defaultRules[name] = led
-	//	s.Logger.Debugf("Replace record: %s", name)
-	//}
-	//s.leds = defaultRules
-	//s.datarefs = make(map[string][]dataAccess.DataRef)
+	s.Logger.Infof("Loading profile for: %s", airplaneICAO)
+	var planeProfile Profile
+	planeProfile, err := s.loadProfile(airplaneICAO)
+	if err != nil {
+		s.Logger.Errorf("Error loading profile: %v", err)
+		s.Logger.Infof("Loading defalt profile for: %s", airplaneICAO)
+		planeProfile, err = s.loadProfile("default")
+		if err != nil {
+			s.Logger.Errorf("Error loading default profile: %v", err)
+		}
+	}
+	err = s.compileRules(&planeProfile)
+	if err != nil {
+		s.Logger.Errorf("Error compiling rules: %v", err)
+		s.profile = nil
+	}
+	s.profile = &planeProfile
 }
 
 func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
@@ -61,9 +63,9 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 		return honeycomb.OnLEDEngineFire, honeycomb.OffLEDEngineFire
 	case "VOLT_LOW":
 		return honeycomb.OnLEDLowVolts, honeycomb.OffLEDLowVolts
-	case "OIL_LOW_P":
+	case "OIL_LOW_PRESSURE":
 		return honeycomb.OnLEDLowOilPress, honeycomb.OffLEDLowOilPress
-	case "FUEL_LOW_P":
+	case "FUEL_LOW_PRESSURE":
 		return honeycomb.OnLEDLowFuelPress, honeycomb.OffLEDLowFuelPress
 	case "ANTI_ICE":
 		return honeycomb.OnLEDAntiIce, honeycomb.OffLEDAntiIce
@@ -73,7 +75,7 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 		return honeycomb.OnLEDApu, honeycomb.OffLEDApu
 	case "VACUUM":
 		return honeycomb.OnLEDVacuum, honeycomb.OffLEDVacuum
-	case "HYDRO_LOW_P":
+	case "HYDRO_LOW_PRESSURE":
 		return honeycomb.OnLEDLowHydPress, honeycomb.OffLEDLowHydPress
 	case "PARKING_BRAKE":
 		return honeycomb.OnLEDParkingBrake, honeycomb.OffLEDParkingBrake
@@ -87,24 +89,128 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 	}
 }
 
-func (s *xplaneService) loadProfile(airplaneICAO string) Profile {
+func (s *xplaneService) loadProfile(airplaneICAO string) (Profile, error) {
 	// load datarefs for the airplane from csv
 	csvFilePath := path.Join(s.pluginPath, "profiles", fmt.Sprintf("%s.yaml", airplaneICAO))
 	s.Logger.Debugf("Loading datarefs from: %s", csvFilePath)
 	f, err := os.ReadFile(csvFilePath)
 	if err != nil {
 		s.Logger.Errorf("Error opening file: %v", err)
+		return Profile{}, err
 	}
 	var res Profile
 	err = yaml.Unmarshal(f, &res)
 	if err != nil {
 		s.Logger.Errorf("Error reading file: %v", err)
+		return Profile{}, err
 	}
-	return res
+	return res, nil
 }
 
-func (s *xplaneService) compileRules(p *Profile) {
+func (s *xplaneService) compileRules(p *Profile) error {
 	val := reflect.ValueOf(p).Elem() // Get the actual struct value
+	typ := val.Type()
+	for i := 0; i < val.NumField(); i++ {
+		field := typ.Field(i) // Get the field metadata
+		fieldName := field.Name
+
+		// Get the field value as a reflect.Value
+		fieldVal := val.Field(i)
+
+		// Perform type assertion to profile
+		fieldValue, ok := fieldVal.Interface().(profile)
+		if !ok {
+			s.Logger.Errorf("Field %s is not of type profile", fieldName)
+			return fmt.Errorf("Field %s is not of type profile", fieldName)
+			continue
+		}
+
+		// Modify the fieldValue
+		switch fieldValue.ProfileType {
+		case "dataref":
+			for j := range fieldValue.Datarefs {
+				dataref := &fieldValue.Datarefs[j] // Get a pointer to the actual element
+				myDataref, found := dataAccess.FindDataRef(dataref.Dataref_str)
+				if !found {
+					s.Logger.Errorf("Dataref not found: %s", dataref.Dataref_str)
+					return nil
+				}
+				dataref.Dataref = myDataref
+
+				datarefType := dataAccess.GetDataRefTypes(myDataref)
+
+				var code string
+				switch datarefType {
+				case dataAccess.TypeFloat:
+					code = fmt.Sprintf("GetFloatData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
+				case dataAccess.TypeInt:
+					code = fmt.Sprintf("GetIntData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
+				case dataAccess.TypeFloatArray:
+					code = fmt.Sprintf("GetFloatArrayData(myDataref)[0] %s %f", dataref.Operator, dataref.Threshold)
+				case dataAccess.TypeIntArray:
+					code = fmt.Sprintf("GetIntArrayData(myDataref)[0] %s %f", dataref.Operator, dataref.Threshold)
+				default:
+					s.Logger.Errorf("Dataref type not supported: %v", datarefType)
+				}
+
+				s.Logger.Debugf("Compiling expression: %s", code)
+				env := map[string]interface{}{
+					"GetFloatData":      dataAccess.GetFloatData,
+					"GetIntData":        dataAccess.GetIntData,
+					"GetFloatArrayData": dataAccess.GetFloatArrayData,
+					"GetIntArrayData":   dataAccess.GetIntArrayData,
+					"myDataref":         myDataref,
+				}
+				program, err := expr.Compile(code, expr.Env(env))
+				if err != nil {
+					s.Logger.Errorf("Error compiling expression: %v", err)
+					return err
+				}
+				dataref.expr = program
+				dataref.env = env
+			}
+			fieldValue.on, fieldValue.off = s.assignOnAndOffFuncs(fieldName)
+		case "data":
+			for j := range fieldValue.Data {
+				data := &fieldValue.Data[j] // Get a pointer to the actual element
+				myDataref, found := dataAccess.FindDataRef(data.Dataref_str)
+				if !found {
+					s.Logger.Errorf("Dataref not found: %s", data.Dataref_str)
+					return fmt.Errorf("Dataref not found: %s", data.Dataref_str)
+				}
+				data.Dataref = myDataref
+			}
+		}
+
+		// Assign the modified value back to the struct field
+		fieldVal.Set(reflect.ValueOf(fieldValue))
+	}
+	return nil
+}
+
+func (s *xplaneService) updateLeds() {
+	//s.Logger.Infof("Updating LEDs - DOOR")
+	//result := false
+	//for _, dataref := range s.profile.DOORS.Datarefs {
+	//	output, err := expr.Run(dataref.expr, dataref.env)
+	//	if err != nil {
+	//		s.Logger.Errorf("Error running expression: %v", err)
+	//		continue
+	//	}
+	//	s.Logger.Infof("Result: %v", output)
+	//	if s.profile.DOORS.Condition == "all" {
+	//		result = result && output.(bool)
+	//	} else {
+	//		result = result || output.(bool)
+	//	}
+	//}
+	//if result {
+	//	s.profile.DOORS.on()
+	//} else {
+	//	s.profile.DOORS.off()
+	//}
+	//s.Logger.Info("")
+	val := reflect.ValueOf(s.profile).Elem() // Get the actual struct value
 	typ := val.Type()
 	for i := 0; i < val.NumField(); i++ {
 		field := typ.Field(i) // Get the field metadata
@@ -119,73 +225,32 @@ func (s *xplaneService) compileRules(p *Profile) {
 			s.Logger.Errorf("Field %s is not of type profile", fieldName)
 			continue
 		}
-
-		// Modify the fieldValue
-		switch fieldValue.ProfileType {
-		case "dataref":
-			for j := range fieldValue.Datarefs {
-				dataref := &fieldValue.Datarefs[j] // Get a pointer to the actual element
-				myDataref, found := dataAccess.FindDataRef(dataref.Dataref_str)
-				if !found {
-					s.Logger.Errorf("Dataref not found: %s", dataref.Dataref_str)
-				}
-				dataref.Dataref = myDataref
-				// TODO: add expr eval here
-			}
-			fieldValue.on, fieldValue.off = s.assignOnAndOffFuncs(fieldName)
-		case "data":
-			for j := range fieldValue.Data {
-				data := &fieldValue.Data[j] // Get a pointer to the actual element
-				myDataref, found := dataAccess.FindDataRef(data.Dataref_str)
-				if !found {
-					s.Logger.Errorf("Dataref not found: %s", data.Dataref_str)
-				}
-				data.Dataref = myDataref
-			}
+		if fieldValue.Datarefs == nil {
+			s.Logger.Debugf("No datarefs found for: %s", fieldName)
+			continue
 		}
 
-		// Assign the modified value back to the struct field
-		fieldVal.Set(reflect.ValueOf(fieldValue))
-	}
-	s.Logger.Debugf("Compiled rules: %+v", p)
-}
-
-func (s *xplaneService) updateLeds() {
-	for name, led := range s.leds {
-		if s.evaluateRules(name, led.rules) {
-			led.on()
+		s.Logger.Debugf("Updating LEDs - %s", fieldName)
+		result := true
+		for _, dataref := range fieldValue.Datarefs {
+			output, err := expr.Run(dataref.expr, dataref.env)
+			if err != nil {
+				s.Logger.Errorf("Error running expression: %v", err)
+				result = false
+				break
+			}
+			s.Logger.Debugf("  %s - Result: %v", dataref.Dataref_str, output)
+			if fieldValue.Condition == "all" {
+				result = result && output.(bool)
+			} else {
+				result = result || output.(bool)
+			}
+		}
+		if result {
+			fieldValue.on()
 		} else {
-			led.off()
-		}
-	}
-}
-
-func (s *xplaneService) evaluateRules(name, rules string) bool {
-	rules_parsed := strings.Split(rules, ",")
-	var rules_expr []string
-	var rules_operators string
-	if len(rules_parsed) >= 3 {
-		rules_expr = rules_parsed[0 : len(rules_parsed)-2]
-		rules_operators = rules_parsed[len(rules_parsed)-1]
-	} else {
-		rules_expr = append(rules_expr, rules_parsed[0])
-		rules_operators = rules_parsed[1]
-	}
-
-	if s.datarefs[name] == nil {
-		s.datarefs[name] = make([]dataAccess.DataRef, len(rules_parsed)-1)
-		for _, rule := range rules_expr {
-			dataref_str := strings.Split(rule, ":")[0]
-			dr, found := dataAccess.FindDataRef(dataref_str)
-			if !found {
-				s.Logger.Errorf("Dataref not found: %s", rules)
-				return false
-			}
-			s.datarefs[name] = append(s.datarefs[name], dr)
+			fieldValue.off()
 		}
 
 	}
-	s.Logger.Debugf("Evaluating rules: %+v, opeartor: %s", s.datarefs, rules_operators)
-
-	return true
 }

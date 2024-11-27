@@ -5,6 +5,7 @@ package xplane
 //go:generate mockgen -destination=./__mocks__/xplane.go -package=mocks -source=xplane.go
 
 import (
+	"github.com/expr-lang/expr/vm"
 	"github.com/xairline/goplane/extra"
 	"github.com/xairline/goplane/xplm/dataAccess"
 	"github.com/xairline/goplane/xplm/menus"
@@ -32,6 +33,8 @@ type profile struct {
 		Dataref     dataAccess.DataRef
 		Operator    string  `yaml:"operator,omitempty"`
 		Threshold   float32 `yaml:"threshold,omitempty"`
+		expr        *vm.Program
+		env         map[string]interface{}
 	} `yaml:"datarefs,omitempty"`
 	Commands []struct {
 		Command_str string `yaml:"command_str,omitempty"`
@@ -98,8 +101,7 @@ type xplaneService struct {
 	pluginPath      string
 	myMenuId        menus.MenuID
 	myMenuItemIndex int
-	leds            map[string]leds
-	datarefs        map[string][]dataAccess.DataRef
+	profile         *Profile
 }
 
 var xplaneSvcLock = &sync.Mutex{}
@@ -124,8 +126,7 @@ func NewXplaneService(
 			BravoService: honeycomb.NewBravoService(logger),
 			Logger:       logger,
 			pluginPath:   pluginPath,
-			leds:         nil,
-			datarefs:     nil,
+			profile:      nil,
 		}
 		xplaneSvc.Plugin.SetPluginStateCallback(xplaneSvc.onPluginStateChanged)
 		xplaneSvc.Plugin.SetMessageHandler(xplaneSvc.messageHandler)
@@ -136,13 +137,7 @@ func NewXplaneService(
 func (s *xplaneService) messageHandler(message plugins.Message) {
 	if message.MessageId == plugins.MSG_PLANE_LOADED {
 		s.Logger.Info("Plane loaded")
-		aircraftIACODrf, found := dataAccess.FindDataRef("sim/aircraft/view/acf_ICAO")
-		if !found {
-			s.Logger.Errorf("Failed to find ICAO")
-		}
-		aircraftIACO := dataAccess.GetString(aircraftIACODrf)
-		s.Logger.Debugf("Plane ICAO: %s", aircraftIACO)
-		s.setupDataRefs(aircraftIACO)
+		s.profile = nil
 		honeycomb.AllOff()
 	}
 }

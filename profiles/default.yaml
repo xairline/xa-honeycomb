@@ -4,6 +4,7 @@ bus_voltage:
     - dataref_str: "sim/cockpit2/electrical/bus_voltage_ac"
       operator: ">"
       threshold: 0.01
+
 ap_state:
   profile_type: data
   data:
@@ -69,14 +70,14 @@ gear:
   profile_type: dataref
   datarefs:
     - dataref_str: "sim/flightmodel2/gear/deploy_ratio"
-      operator: "~="
+      operator: "!="
       threshold: 0
 
 retractable_gear:
   profile_type: dataref
   datarefs:
     - dataref_str: "sim/aircraft/gear/acf_gear_retract"
-      operator: "~="
+      operator: "!="
       threshold: 0
 
 master_warn:
@@ -93,14 +94,14 @@ fire:
       operator: ">"
       threshold: 0.01
 
-oil_low_p:
+oil_low_pressure:
   profile_type: dataref
   datarefs:
     - dataref_str: "sim/cockpit2/annunciators/oil_pressure_low"
       operator: "<"
       threshold: 0.075
 
-fuel_low_p:
+fuel_low_pressure:
   profile_type: dataref
   datarefs:
     - dataref_str: "sim/cockpit2/annunciators/fuel_pressure_low"
@@ -142,7 +143,7 @@ vacuum:
       operator: "<"
       threshold: 1
 
-hydro_low_p:
+hydro_low_pressure:
   profile_type: dataref
   datarefs:
     - dataref_str: "sim/cockpit2/annunciators/hydraulic_pressure"

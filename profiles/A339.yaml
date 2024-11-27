@@ -1,0 +1,173 @@
+volt_low:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "sim/cockpit2/electrical/battery_amps"
+      operator: "<"
+      threshold: -80
+
+bus_voltage:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/DCBusVoltages"
+      operator: ">"
+      threshold: 0.01
+
+hdg:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/APLateralMode"
+      operator: "=="
+      threshold: 101
+
+nav:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/APLateralMode"
+      operator: "=="
+      threshold: 2
+
+apr:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/APPRilluminated"
+      operator: ">="
+      threshold: 1
+
+rev:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/ENGRevArray"
+      operator: ">="
+      threshold: 1
+
+alt:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/ALTmanaged"
+      operator: "=="
+      threshold: 0
+
+vs:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/APVerticalMode"
+      operator: "=="
+      threshold: 107
+
+ias:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/SPDmanaged"
+      operator: ">="
+      threshold: 1
+
+ap:
+  profile_type: dataref
+  condition: "any"
+  datarefs:
+    - dataref_str: "AirbusFBW/AP1Engage"
+      operator: ">"
+      threshold: 0.01
+    - dataref_str: "AirbusFBW/AP2Engage"
+      operator: ">"
+      threshold: 0.01
+
+master_warn:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/MasterWarn"
+      operator: ">"
+      threshold: 0.01
+
+fire:
+  profile_type: dataref
+  condition: "any"
+  datarefs:
+    - dataref_str: "AirbusFBW/OHPLightsATA26"
+      operator: ">"
+      threshold: 0.01
+    - dataref_str: "AirbusFBW/OHPLightsATA70"
+      operator: ">"
+      threshold: 0.01
+
+oil_low_pressure:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/ENGOilPressArray"
+      operator: "<"
+      threshold: 0.075
+
+fuel_low_pressure:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/ENGFuelFlowArray"
+      operator: "<"
+      threshold: 0.075
+
+anti_ice:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/OHPLightsATA30"
+      operator: ">"
+      threshold: 0.01
+
+eng_starter:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/StartValveArray"
+      operator: ">"
+      threshold: 0.01
+
+apu:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/APUAvail"
+      operator: ">"
+      threshold: 0.01
+
+master_caution:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/MasterCaut"
+      operator: ">"
+      threshold: 0.01
+
+vacuum:
+  profile_type: dataref
+  condition: "any"
+  datarefs:
+    - dataref_str: "sim/cockpit/misc/vacuum"
+      operator: "<"
+      threshold: 1
+    - dataref_str: "sim/cockpit/misc/vacuum2"
+      operator: "<"
+      threshold: 1
+
+hydro_low_pressure:
+  profile_type: dataref
+  condition: "all"
+  datarefs:
+    - dataref_str: "AirbusFBW/HydSysPressArray"
+      operator: "<"
+      threshold: 2500
+
+parking_brake:
+  profile_type: dataref
+  datarefs:
+    - dataref_str: "AirbusFBW/ParkBrake"
+      operator: "=="
+      threshold: 1
+
+doors:
+  profile_type: dataref
+  condition: "any"
+  datarefs:
+    - dataref_str: "AirbusFBW/PaxDoorArray"
+      operator: ">"
+      threshold: 0.9
+    - dataref_str: "AirbusFBW/CargoDoorArray"
+      operator: ">"
+      threshold: 0.9
+    - dataref_str: "AirbusFBW/BulkDoor"
+      operator: ">"
+      threshold: 0.9

@@ -3,6 +3,7 @@ module github.com/xairline/xa-honeycomb
 go 1.20
 
 require (
+	github.com/expr-lang/expr v1.16.9
 	github.com/sstallion/go-hid v0.14.1
 	github.com/stretchr/testify v1.10.0
 	github.com/xairline/goplane v1.301.5
