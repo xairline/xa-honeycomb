@@ -5,6 +5,7 @@ import (
 	"github.com/expr-lang/expr"
 	"github.com/stretchr/testify/assert/yaml"
 	"github.com/xairline/goplane/xplm/dataAccess"
+	"github.com/xairline/xa-honeycomb/pkg"
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
 	"os"
 	"path"
@@ -14,15 +15,15 @@ import (
 func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 	s.Logger.Infof("Setup Datarefs for: %s", airplaneICAO)
 
-	s.Logger.Infof("Loading profile for: %s", airplaneICAO)
-	var planeProfile Profile
+	s.Logger.Infof("Loading BravoProfile for: %s", airplaneICAO)
+	var planeProfile pkg.Profile
 	planeProfile, err := s.loadProfile(airplaneICAO)
 	if err != nil {
-		s.Logger.Errorf("Error loading profile: %v", err)
-		s.Logger.Infof("Loading defalt profile for: %s", airplaneICAO)
+		s.Logger.Errorf("Error loading BravoProfile: %v", err)
+		s.Logger.Infof("Loading defalt BravoProfile for: %s", airplaneICAO)
 		planeProfile, err = s.loadProfile("default")
 		if err != nil {
-			s.Logger.Errorf("Error loading default profile: %v", err)
+			s.Logger.Errorf("Error loading default BravoProfile: %v", err)
 			return
 		}
 	}
@@ -93,25 +94,25 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 	}
 }
 
-func (s *xplaneService) loadProfile(airplaneICAO string) (Profile, error) {
+func (s *xplaneService) loadProfile(airplaneICAO string) (pkg.Profile, error) {
 	// load datarefs for the airplane from csv
 	csvFilePath := path.Join(s.pluginPath, "profiles", fmt.Sprintf("%s.yaml", airplaneICAO))
 	s.Logger.Infof("Loading datarefs from: %s", csvFilePath)
 	f, err := os.ReadFile(csvFilePath)
 	if err != nil {
 		s.Logger.Errorf("Error opening file: %v", err)
-		return Profile{}, err
+		return pkg.Profile{}, err
 	}
-	var res Profile
+	var res pkg.Profile
 	err = yaml.Unmarshal(f, &res)
 	if err != nil {
 		s.Logger.Errorf("Error reading file: %v", err)
-		return Profile{}, err
+		return pkg.Profile{}, err
 	}
 	return res, nil
 }
 
-func (s *xplaneService) compileRules(p *Profile) error {
+func (s *xplaneService) compileRules(p *pkg.Profile) error {
 	val := reflect.ValueOf(p).Elem() // Get the actual struct value
 	typ := val.Type()
 	for i := 0; i < val.NumField(); i++ {
@@ -121,11 +122,11 @@ func (s *xplaneService) compileRules(p *Profile) error {
 		// Get the field value as a reflect.Value
 		fieldVal := val.Field(i)
 
-		// Perform type assertion to profile
-		fieldValue, ok := fieldVal.Interface().(profile)
+		// Perform type assertion to BravoProfile
+		fieldValue, ok := fieldVal.Interface().(pkg.BravoProfile)
 		if !ok {
-			s.Logger.Errorf("Field %s is not of type profile", fieldName)
-			return fmt.Errorf("Field %s is not of type profile", fieldName)
+			s.Logger.Errorf("Field %s is not of type BravoProfile", fieldName)
+			return fmt.Errorf("Field %s is not of type BravoProfile", fieldName)
 			continue
 		}
 
@@ -170,10 +171,10 @@ func (s *xplaneService) compileRules(p *Profile) error {
 					s.Logger.Errorf("Error compiling expression: %v", err)
 					return err
 				}
-				dataref.expr = program
-				dataref.env = env
+				dataref.Expr = program
+				dataref.Env = env
 			}
-			fieldValue.on, fieldValue.off = s.assignOnAndOffFuncs(fieldName)
+			fieldValue.On, fieldValue.Off = s.assignOnAndOffFuncs(fieldName)
 		case "data":
 			for j := range fieldValue.Data {
 				data := &fieldValue.Data[j] // Get a pointer to the actual element
@@ -200,10 +201,10 @@ func (s *xplaneService) updateLeds() {
 		fieldName := field.Name
 		// Get the field value as a reflect.Value
 		fieldVal := val.Field(i)
-		// Perform type assertion to profile
-		fieldValue, ok := fieldVal.Interface().(profile)
+		// Perform type assertion to BravoProfile
+		fieldValue, ok := fieldVal.Interface().(pkg.BravoProfile)
 		if !ok {
-			s.Logger.Errorf("Field %s is not of type profile", fieldName)
+			s.Logger.Errorf("Field %s is not of type BravoProfile", fieldName)
 			continue
 		}
 
@@ -218,7 +219,7 @@ func (s *xplaneService) updateLeds() {
 		if fieldName == "GEAR" {
 			// special case for gear
 			dataref := s.profile.GEAR.Datarefs[0]
-			output := dataAccess.GetFloatArrayData(dataref.Dataref)
+			output := dataAccess.GetFloatArrayData(dataref.Dataref.(dataAccess.DataRef))
 			s.updateGearLEDs(output)
 			continue
 		}
@@ -226,7 +227,7 @@ func (s *xplaneService) updateLeds() {
 		if fieldName == "BUS_VOLTAGE" {
 			// special case for bus voltage
 			dataref := s.profile.BUS_VOLTAGE.Datarefs[0]
-			output, err := expr.Run(dataref.expr, dataref.env)
+			output, err := expr.Run(dataref.Expr, dataref.Env)
 			if err != nil {
 				s.Logger.Errorf("BUS_VOLTAGE - Error running expression: %v", err)
 				break
@@ -246,10 +247,10 @@ func (s *xplaneService) updateLeds() {
 			result = true
 		}
 		for _, dataref := range fieldValue.Datarefs {
-			if dataref.expr == nil {
+			if dataref.Expr == nil {
 				continue
 			}
-			output, err := expr.Run(dataref.expr, dataref.env)
+			output, err := expr.Run(dataref.Expr, dataref.Env)
 			if err != nil {
 				s.Logger.Errorf("Error running expression: %v", err)
 				result = false
@@ -263,9 +264,9 @@ func (s *xplaneService) updateLeds() {
 			}
 		}
 		if result {
-			fieldValue.on()
+			fieldValue.On()
 		} else {
-			fieldValue.off()
+			fieldValue.Off()
 		}
 
 	}

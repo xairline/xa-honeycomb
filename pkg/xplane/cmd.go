@@ -3,6 +3,7 @@ package xplane
 import (
 	"github.com/xairline/goplane/xplm/dataAccess"
 	"github.com/xairline/goplane/xplm/utilities"
+	"github.com/xairline/xa-honeycomb/pkg"
 	"time"
 )
 
@@ -35,7 +36,7 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 			s.Logger.Debugf("Decrease: %v, Phase: %v, AP Mode: %s, Multiplier: %.1f", command, phase, s.apSelector, multiplier)
 			direction = -1
 		}
-		var myProfile profile
+		var myProfile pkg.BravoProfile
 		var factor float64
 		switch s.apSelector {
 		case "ias":
@@ -70,7 +71,7 @@ func (s *xplaneService) changeAPMode(command utilities.CommandRef, phase utiliti
 	return 0
 }
 
-func (s *xplaneService) adjust(myProfile profile, direction int, multiplier float64, factor float64) {
+func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multiplier float64, factor float64) {
 	if myProfile.Commands != nil {
 		//TODO: Implement this
 		s.Logger.Error("Not implemented")

@@ -3,11 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/xairline/xa-honeycomb/pkg"
+	"os"
 )
 
 // App struct
 type App struct {
-	ctx context.Context
+	ctx      context.Context
+	profiles map[string]pkg.Profile
 }
 
 // NewApp creates a new App application struct
@@ -23,5 +26,7 @@ func (a *App) startup(ctx context.Context) {
 
 // Greet returns a greeting for the given name
 func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
+	// get current dir of the app
+	exePath, _ := os.Getwd()
+	return fmt.Sprintf("Hello %s, It's show time!", exePath)
 }
