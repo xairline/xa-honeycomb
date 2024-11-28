@@ -1,3 +1,4 @@
+name: default
 bus_voltage:
   profile_type: led
   datarefs:

@@ -208,7 +208,7 @@ func (s *xplaneService) updateLeds() {
 			continue
 		}
 
-		if fieldValue.Datarefs == nil {
+		if fieldValue.Datarefs == nil && fieldValue.Commands == nil {
 			s.Logger.Debugf("No datarefs found for: %s", fieldName)
 			continue
 		}

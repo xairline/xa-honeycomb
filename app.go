@@ -12,8 +12,9 @@ import (
 
 // App struct
 type App struct {
-	ctx      context.Context
-	profiles []pkg.Profile
+	ctx          context.Context
+	profiles     []pkg.Profile
+	profileFiles []string
 }
 
 // NewApp creates a new App application struct
@@ -26,11 +27,12 @@ func NewApp() *App {
 		return nil
 	}
 	var profiles []pkg.Profile
+	var profileFiles []string
 	// Loop through the entries
 	for _, entry := range entries {
 		if !entry.IsDir() && strings.Contains(entry.Name(), ".yaml") { // Skip directories, list only files
-			fmt.Println(entry.Name()) // Prints file name only
-			f, err := os.ReadFile(path.Join(profilesFolder, entry.Name()))
+			fileName := path.Join(profilesFolder, entry.Name())
+			f, err := os.ReadFile(fileName)
 			if err != nil {
 				fmt.Printf("Error opening file: %v", err)
 				return nil
@@ -42,10 +44,12 @@ func NewApp() *App {
 				return nil
 			}
 			profiles = append(profiles, res)
+			profileFiles = append(profileFiles, fileName)
 		}
 	}
 	return &App{
-		profiles: profiles,
+		profiles:     profiles,
+		profileFiles: profileFiles,
 	}
 }
 
@@ -56,13 +60,23 @@ func (a *App) startup(ctx context.Context) {
 }
 
 // Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
+func (a *App) Greet(name string) pkg.Profile {
 	// get current dir of the app
+	for _, profile := range a.profiles {
+		if profile.Name == name {
+			return profile
+		}
+	}
 
-	return fmt.Sprintf("Hello %v, It's show time!", a.profiles)
+	return pkg.Profile{}
 }
 
-func (a *App) GetProfiles() string {
-	return "default,A339"
-	//return fmt.Sprintf("%v", a.profiles)
+func (a *App) GetProfiles() []pkg.Profile {
+	//return "default,A339"
+	return a.profiles
+}
+
+func (a *App) GetProfileFiles() []string {
+	//return "default,A339"
+	return a.profileFiles
 }

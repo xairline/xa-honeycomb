@@ -1,3 +1,4 @@
+name: Rotate MD-11
 ##### AP KNOBS #####
 ap_hdg:
   profile_type: knob
