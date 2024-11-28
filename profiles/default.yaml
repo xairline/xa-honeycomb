@@ -1,7 +1,7 @@
 bus_voltage:
   profile_type: led
   datarefs:
-    - dataref_str: "sim/cockpit2/electrical/bus_voltage_ac"
+    - dataref_str: "sim/cockpit2/electrical/bus_volts"
       operator: ">"
       threshold: 0.01
 

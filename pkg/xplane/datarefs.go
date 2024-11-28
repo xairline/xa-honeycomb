@@ -137,7 +137,7 @@ func (s *xplaneService) compileRules(p *Profile) error {
 				myDataref, found := dataAccess.FindDataRef(dataref.Dataref_str)
 				if !found {
 					s.Logger.Errorf("Dataref not found: %s", dataref.Dataref_str)
-					return nil
+					continue
 				}
 				dataref.Dataref = myDataref
 
@@ -180,7 +180,7 @@ func (s *xplaneService) compileRules(p *Profile) error {
 				myDataref, found := dataAccess.FindDataRef(data.Dataref_str)
 				if !found {
 					s.Logger.Errorf("Dataref not found: %s", data.Dataref_str)
-					return fmt.Errorf("Dataref not found: %s", data.Dataref_str)
+					continue
 				}
 				data.Dataref = myDataref
 			}
@@ -228,7 +228,7 @@ func (s *xplaneService) updateLeds() {
 			dataref := s.profile.BUS_VOLTAGE.Datarefs[0]
 			output, err := expr.Run(dataref.expr, dataref.env)
 			if err != nil {
-				s.Logger.Errorf("Error running expression: %v", err)
+				s.Logger.Errorf("BUS_VOLTAGE - Error running expression: %v", err)
 				break
 			}
 			if !output.(bool) {
@@ -246,6 +246,9 @@ func (s *xplaneService) updateLeds() {
 			result = true
 		}
 		for _, dataref := range fieldValue.Datarefs {
+			if dataref.expr == nil {
+				continue
+			}
 			output, err := expr.Run(dataref.expr, dataref.env)
 			if err != nil {
 				s.Logger.Errorf("Error running expression: %v", err)
