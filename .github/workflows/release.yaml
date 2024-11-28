@@ -35,6 +35,7 @@ jobs:
           key: go-mod-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             go-mod-
+
       - name: Build wails
         uses: dAppServer/wails-build-action@main
         id: build
@@ -49,10 +50,6 @@ jobs:
         with:
           name: Wails Build macOS bravo
 
-      - name: Display Artifact Contents
-        run: |
-          echo "Contents of the artifact:"
-          ls -R
       - run: |
           go mod tidy
           export VERSION=${GITHUB_REF##*/} 
@@ -63,7 +60,8 @@ jobs:
           cp -r ${{ github.workspace }}/profiles ${{ github.workspace }}/build/xa-honeycomb/
           sed -i '' "s/REPLACE_ME/${TAG}/g" ${{ github.workspace }}/build/xa-honeycomb/skunkcrafts_updater.cfg
           
-          cp -r build/bin/bravo ${{ github.workspace }}/build/xa-honeycomb/
+          mv build/bin/bravo build/bin/bravo.exe
+          cp -r build/bin/bravo.exe ${{ github.workspace }}/build/xa-honeycomb/
           cp -r build/bin/bravo.app ${{ github.workspace }}/build/xa-honeycomb/
           
           root=$(pwd)
