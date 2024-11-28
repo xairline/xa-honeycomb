@@ -61,3 +61,8 @@ func (a *App) Greet(name string) string {
 
 	return fmt.Sprintf("Hello %v, It's show time!", a.profiles)
 }
+
+func (a *App) GetProfiles() string {
+	return "default,A339"
+	//return fmt.Sprintf("%v", a.profiles)
+}

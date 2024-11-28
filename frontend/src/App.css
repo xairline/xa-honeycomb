@@ -1,6 +1,8 @@
 #app {
+    overflow: hidden;
     height: 100vh;
-    text-align: center;
+    width: 100vw;
+    position: fixed;
 }
 
 #logo {

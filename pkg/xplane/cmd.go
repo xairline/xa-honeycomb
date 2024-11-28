@@ -73,8 +73,13 @@ func (s *xplaneService) changeAPMode(command utilities.CommandRef, phase utiliti
 
 func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multiplier float64, factor float64) {
 	if myProfile.Commands != nil {
-		//TODO: Implement this
-		s.Logger.Error("Not implemented")
+		var cmd utilities.CommandRef
+		if direction > 0 {
+			cmd = utilities.FindCommand(myProfile.Commands[0].Command_str)
+		} else {
+			cmd = utilities.FindCommand(myProfile.Commands[1].Command_str)
+		}
+		utilities.CommandOnce(cmd)
 	}
 	myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[0].Dataref_str)
 	if !found {
