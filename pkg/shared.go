@@ -31,8 +31,14 @@ type BravoProfile struct {
 	Off         func()    `json:"-"`
 }
 
+type Metadata struct {
+	Name        string `yaml:"name,omitempty" json:"name,omitempty"`
+	Description string `yaml:"description,omitempty" json:"description,omitempty"`
+	Enabled     bool   `yaml:"enabled,omitempty" json:"enabled,omitempty"`
+}
+
 type Profile struct {
-	Name string `yaml:"name" json:"name"`
+	Metadata Metadata `yaml:"metadata" json:"metadata"`
 	// AP Knobs
 	AP_HDG BravoProfile `yaml:"ap_hdg,omitempty" json:"ap_hdg,omitempty"`
 	AP_VS  BravoProfile `yaml:"ap_vs,omitempty" json:"ap_vs,omitempty"`

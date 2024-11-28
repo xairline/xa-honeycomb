@@ -1,4 +1,7 @@
-name: default
+metadata:
+  name: default
+  description: Default profile for Honeycomb Alpha and Bravo
+  enabled: true
 bus_voltage:
   profile_type: led
   datarefs:

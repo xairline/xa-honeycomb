@@ -118,7 +118,7 @@ func (s *xplaneService) compileRules(p *pkg.Profile) error {
 	for i := 0; i < val.NumField(); i++ {
 		field := typ.Field(i) // Get the field metadata
 		fieldName := field.Name
-		if fieldName == "Name" {
+		if fieldName == "Metadata" {
 			continue
 		}
 
@@ -202,7 +202,7 @@ func (s *xplaneService) updateLeds() {
 	for i := 0; i < val.NumField(); i++ {
 		field := typ.Field(i) // Get the field metadata
 		fieldName := field.Name
-		if fieldName == "Name" {
+		if fieldName == "Metadata" {
 			continue
 		}
 		// Get the field value as a reflect.Value

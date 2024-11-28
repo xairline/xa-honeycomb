@@ -83,8 +83,24 @@ export namespace pkg {
 	
 	
 	
+	export class Metadata {
+	    name?: string;
+	    description?: string;
+	    enabled?: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Metadata(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.description = source["description"];
+	        this.enabled = source["enabled"];
+	    }
+	}
 	export class Profile {
-	    name: string;
+	    metadata: Metadata;
 	    ap_hdg?: BravoProfile;
 	    ap_vs?: BravoProfile;
 	    ap_alt?: BravoProfile;
@@ -123,7 +139,7 @@ export namespace pkg {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.name = source["name"];
+	        this.metadata = this.convertValues(source["metadata"], Metadata);
 	        this.ap_hdg = this.convertValues(source["ap_hdg"], BravoProfile);
 	        this.ap_vs = this.convertValues(source["ap_vs"], BravoProfile);
 	        this.ap_alt = this.convertValues(source["ap_alt"], BravoProfile);

@@ -74,7 +74,7 @@ func (a *App) startup(ctx context.Context) {
 func (a *App) GetProfile(name string) pkg.Profile {
 	// get current dir of the app
 	for _, profile := range a.profiles {
-		if profile.Name == name {
+		if profile.Metadata.Name == name {
 			return profile
 		}
 	}

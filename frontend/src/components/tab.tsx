@@ -67,7 +67,7 @@ export default function MyTabs(props: TabPanelProps) {
       </Tabs>
       <TabPanel value={value.toString()} index="one">
         {keys.map((key, index) => {
-          if (key !== "name") {
+          if (key !== "metadata") {
             // @ts-ignore
             if (props.profile[key].profile_type === "led") {
 
@@ -81,7 +81,7 @@ export default function MyTabs(props: TabPanelProps) {
       </TabPanel>
       <TabPanel value={value.toString()} index="two">
         {keys.map((key, index) => {
-          if (key !== "name") {
+          if (key !== "metadata") {
             // @ts-ignore
             if (props.profile[key].profile_type === "knob") {
 

@@ -19,7 +19,7 @@ function App() {
     index: number,
   ) => {
     setSelectedIndex(index);
-    GetProfile(profilesData[index].name).then(profile);
+    GetProfile(profilesData[index].metadata.name || "").then(profile);
   };
 
   useEffect(() => {
@@ -42,7 +42,7 @@ function App() {
                     <ListItemIcon>
                       <InboxIcon/>
                     </ListItemIcon>
-                    <ListItemText primary={profile.name}/>
+                    <ListItemText primary={profile.metadata.name}/>
                   </ListItemButton>
                 )
               })}
