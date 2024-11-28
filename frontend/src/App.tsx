@@ -1,16 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import {GetProfiles, Greet} from "../wailsjs/go/main/App";
+import {GetProfile, GetProfiles} from "../wailsjs/go/main/App";
 import {Box, Grid, List, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import {pkg} from "../wailsjs/go/models";
 import InboxIcon from '@mui/icons-material/Inbox';
+import MyTabs from "./components/tab";
 
 function App() {
-  const [resultText, setResultText] = useState({} as pkg.Profile);
-  const [resultText2, setResultText2] = useState([] as pkg.Profile[]);
+  const [profileData, setProfileData] = useState({} as pkg.Profile);
+  const [profilesData, setProfilesData] = useState([] as pkg.Profile[]);
   const [name, setName] = useState('');
-  const updateResultText = (result: pkg.Profile) => setResultText(result);
-  const updateResultText2 = (result: pkg.Profile[]) => setResultText2(result);
+  const profile = (result: pkg.Profile) => setProfileData(result);
+  const profiles = (result: pkg.Profile[]) => setProfilesData(result);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
 
   const handleListItemClick = (
@@ -18,17 +19,11 @@ function App() {
     index: number,
   ) => {
     setSelectedIndex(index);
-    console.log(resultText2[index].name);
-    Greet(resultText2[index].name).then(updateResultText);
+    GetProfile(profilesData[index].name).then(profile);
   };
 
-  function greet() {
-    Greet(name).then(updateResultText);
-    GetProfiles().then(updateResultText2);
-  }
-
   useEffect(() => {
-    GetProfiles().then(updateResultText2);
+    GetProfiles().then(profiles);
   }, []);
 
 
@@ -38,7 +33,7 @@ function App() {
         <Grid item xs={4} style={{border: "white", overflow: "hidden"}}>
           <Box sx={{width: '100%', overflow: "hidden", bgcolor: "#022e35", height: "100vh"}}>
             < List component="nav" aria-label="main mailbox folders">
-              {resultText2.map((profile, index) => {
+              {profilesData.map((profile, index) => {
                 return (
                   <ListItemButton
                     selected={selectedIndex === index}
@@ -58,9 +53,7 @@ function App() {
         <Grid item xs={12} sx={{width: '100vw', overflow: "hidden", height: "100vh"}}>
           <Grid item xs={16}
                 sx={{width: '100vw', overflow: "hidden", bgcolor: "#222e35", height: "80vh"}}>
-            <p>
-              {JSON.stringify(resultText)}
-            </p>
+            <MyTabs profile={profileData}/>
           </Grid>
           <Grid item xs={16}
                 sx={{width: '100vw', overflow: "hidden", bgcolor: "#122e35", height: "20vh"}}>

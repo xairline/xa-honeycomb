@@ -70,8 +70,8 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) pkg.Profile {
+// GetProfile returns a greeting for the given name
+func (a *App) GetProfile(name string) pkg.Profile {
 	// get current dir of the app
 	for _, profile := range a.profiles {
 		if profile.Name == name {
