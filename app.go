@@ -7,6 +7,7 @@ import (
 	"github.com/xairline/xa-honeycomb/pkg"
 	"os"
 	"path"
+	"runtime"
 	"strings"
 )
 
@@ -21,7 +22,10 @@ type App struct {
 func NewApp() *App {
 	exePath, _ := os.Executable()
 	fmt.Println("exePath:", exePath)
-	profilesFolder := path.Join(exePath, "..", "..", "..", "..", "profiles") // list all yaml files under profiles folder
+	profilesFolder := path.Join(exePath, "..", "..", "..", "..", "profiles")
+	if runtime.GOOS != "darwin" {
+		profilesFolder = path.Join(exePath, "profiles")
+	}
 	entries, err := os.ReadDir(profilesFolder)
 	if err != nil {
 		fmt.Println("Error:", err)
