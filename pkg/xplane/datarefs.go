@@ -118,6 +118,9 @@ func (s *xplaneService) compileRules(p *pkg.Profile) error {
 	for i := 0; i < val.NumField(); i++ {
 		field := typ.Field(i) // Get the field metadata
 		fieldName := field.Name
+		if fieldName == "Name" {
+			continue
+		}
 
 		// Get the field value as a reflect.Value
 		fieldVal := val.Field(i)
