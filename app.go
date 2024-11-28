@@ -19,12 +19,19 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	exePath, _ := os.Getwd()
-	profilesFolder := path.Join(exePath, "profiles") // list all yaml files under profiles folder
+	exePath, _ := os.Executable()
+	fmt.Println("exePath:", exePath)
+	profilesFolder := path.Join(exePath, "..", "..", "..", "..", "profiles") // list all yaml files under profiles folder
 	entries, err := os.ReadDir(profilesFolder)
 	if err != nil {
 		fmt.Println("Error:", err)
-		return nil
+		exePath, _ = os.Getwd()
+		profilesFolder = path.Join(exePath, "profiles")
+		entries, err = os.ReadDir(profilesFolder)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return nil
+		}
 	}
 	var profiles []pkg.Profile
 	var profileFiles []string
