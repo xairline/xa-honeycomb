@@ -29,10 +29,10 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 		direction := 0
 		// Log the adjustment
 		if ref.(string) == "up" {
-			s.Logger.Infof("Increase: %v, Phase: %v, AP Mode: %s, Multiplier: %.1f", command, phase, s.apSelector, multiplier)
+			s.Logger.Debugf("Increase: %v, Phase: %v, AP Mode: %s, Multiplier: %.1f", command, phase, s.apSelector, multiplier)
 			direction = 1
 		} else {
-			s.Logger.Infof("Decrease: %v, Phase: %v, AP Mode: %s, Multiplier: %.1f", command, phase, s.apSelector, multiplier)
+			s.Logger.Debugf("Decrease: %v, Phase: %v, AP Mode: %s, Multiplier: %.1f", command, phase, s.apSelector, multiplier)
 			direction = -1
 		}
 		var myProfile profile

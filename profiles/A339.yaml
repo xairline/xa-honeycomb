@@ -196,13 +196,47 @@ doors:
   datarefs:
     - dataref_str: "AirbusFBW/PaxDoorArray"
       operator: ">"
-      threshold: 0.9
+      threshold: 0.01
+      index: 0
+    - dataref_str: "AirbusFBW/PaxDoorArray"
+      operator: ">"
+      threshold: 0.01
+      index: 1
+    - dataref_str: "AirbusFBW/PaxDoorArray"
+      operator: ">"
+      threshold: 0.01
+      index: 2
+    - dataref_str: "AirbusFBW/PaxDoorArray"
+      operator: ">"
+      threshold: 0.01
+      index: 3
+    - dataref_str: "AirbusFBW/PaxDoorArray"
+      operator: ">"
+      threshold: 0.01
+      index: 4
+    - dataref_str: "AirbusFBW/PaxDoorArray"
+      operator: ">"
+      threshold: 0.01
+      index: 5
+    - dataref_str: "AirbusFBW/PaxDoorArray"
+      operator: ">"
+      threshold: 0.01
+      index: 6
+    - dataref_str: "AirbusFBW/PaxDoorArray"
+      operator: ">"
+      threshold: 0.01
+      index: 7
     - dataref_str: "AirbusFBW/CargoDoorArray"
       operator: ">"
-      threshold: 0.9
+      threshold: 0.01
+      index: 0
+    - dataref_str: "AirbusFBW/CargoDoorArray"
+      operator: ">"
+      threshold: 0.01
+      index: 1
     - dataref_str: "AirbusFBW/BulkDoor"
       operator: ">"
-      threshold: 0.9
+      threshold: 0.01
 
 aux_fuel_pump:
   profile_type: led

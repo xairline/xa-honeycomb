@@ -150,9 +150,9 @@ func (s *xplaneService) compileRules(p *Profile) error {
 				case dataAccess.TypeInt:
 					code = fmt.Sprintf("GetIntData(myDataref) %s %d", dataref.Operator, int(dataref.Threshold))
 				case dataAccess.TypeFloatArray:
-					code = fmt.Sprintf("GetFloatArrayData(myDataref)[0] %s %f", dataref.Operator, dataref.Threshold)
+					code = fmt.Sprintf("GetFloatArrayData(myDataref)[%d] %s %f", dataref.Index, dataref.Operator, dataref.Threshold)
 				case dataAccess.TypeIntArray:
-					code = fmt.Sprintf("GetIntArrayData(myDataref)[0] %s %d", dataref.Operator, int(dataref.Threshold))
+					code = fmt.Sprintf("GetIntArrayData(myDataref)[%d] %s %d", dataref.Index, dataref.Operator, int(dataref.Threshold))
 				default:
 					s.Logger.Errorf("Dataref type not supported: %v", datarefType)
 				}

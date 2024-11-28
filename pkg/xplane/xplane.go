@@ -34,6 +34,7 @@ type profile struct {
 		Dataref     dataAccess.DataRef
 		Operator    string  `yaml:"operator,omitempty"`
 		Threshold   float32 `yaml:"threshold,omitempty"`
+		Index       int     `yaml:"index,omitempty"`
 		expr        *vm.Program
 		env         map[string]interface{}
 	} `yaml:"datarefs,omitempty"`
