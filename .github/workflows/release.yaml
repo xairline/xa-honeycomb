@@ -42,7 +42,7 @@ jobs:
           build-name: bravo
           build-platform: darwin/universal,windows/amd64
           nsis: false
-          go-version: '1.21'
+          go-version: '1.23'
       - run: |
           go mod tidy
           export VERSION=${GITHUB_REF##*/} 
