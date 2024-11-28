@@ -3,8 +3,8 @@ name: Release
 # Controls when the workflow will run
 on:
   push:
-    branches:
-      - main
+#    branches:
+#      - main
     tags:
       - 'v*'
   # Allows you to run this workflow manually from the Actions tab
@@ -31,12 +31,6 @@ jobs:
       - run: |
           brew install FiloSottile/musl-cross/musl-cross
           brew install mingw-w64
-          git clone https://github.com/gentoo/eudev.git
-          cd eudev
-          export CC=x86_64-linux-musl-gcc
-          ./configure CC=$CC --host=x86_64-linux-musl --disable-shared --prefix=/path/to/install
-          make
-          make install
       - uses: actions/cache@v2
         with:
           path: ~/go/pkg/mod
