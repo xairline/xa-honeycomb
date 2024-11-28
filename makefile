@@ -45,7 +45,7 @@ lin:
 	CC=/usr/local/bin/x86_64-linux-musl-cc \
 	CGO_CFLAGS="-DLIN=1 -O2 -g" \
 	CGO_LDFLAGS="-shared -rdynamic -nodefaultlibs -undefined_warning" \
-	go build -buildmode c-shared -o build/xa-honeycomb/lin.xpl  \
+	go build -tags libusb -buildmode c-shared -o build/xa-honeycomb/lin.xpl  \
 		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" main.go
 
 all: mac win lin
