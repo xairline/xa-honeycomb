@@ -1,7 +1,8 @@
 metadata:
-  description: Default profile for Honeycomb Alpha and Bravo
-  enabled: true
   name: Toliss A339
+  description: Profile for the Toliss A339
+  enabled: true
+
 ##### AP KNOBS #####
 ap_hdg:
   profile_type: knob

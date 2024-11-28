@@ -1,6 +1,6 @@
 metadata:
   name: Rotate MD-11
-  description: Default profile for Honeycomb Alpha and Bravo
+  description: Profile for the Rotate MD-11
   enabled: true
 ##### AP KNOBS #####
 ap_hdg:
