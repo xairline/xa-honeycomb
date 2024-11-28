@@ -138,10 +138,32 @@ fuel_low_pressure:
 
 anti_ice:
   profile_type: led
+  condition: "any"
   datarefs:
     - dataref_str: "AirbusFBW/OHPLightsATA30"
       operator: ">"
       threshold: 0.01
+      index: 0
+    - dataref_str: "AirbusFBW/OHPLightsATA30"
+      operator: ">"
+      threshold: 0.01
+      index: 1
+    - dataref_str: "AirbusFBW/OHPLightsATA30"
+      operator: ">"
+      threshold: 0.01
+      index: 2
+    - dataref_str: "AirbusFBW/OHPLightsATA30"
+      operator: ">"
+      threshold: 0.01
+      index: 3
+    - dataref_str: "AirbusFBW/OHPLightsATA30"
+      operator: ">"
+      threshold: 0.01
+      index: 4
+    - dataref_str: "AirbusFBW/OHPLightsATA30"
+      operator: ">"
+      threshold: 0.01
+      index: 5
 
 eng_starter:
   profile_type: led
