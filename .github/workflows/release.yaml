@@ -63,6 +63,7 @@ jobs:
           mv build/bin/bravo build/bin/bravo.exe
           cp -r build/bin/bravo.exe ${{ github.workspace }}/build/xa-honeycomb/
           cp -r build/bin/bravo.app ${{ github.workspace }}/build/xa-honeycomb/
+          chmod -R 755 ${{ github.workspace }}/build/xa-honeycomb/bravo.app
           
           root=$(pwd)
           cd ${{ github.workspace }}/build/ && zip -r xa-honeycomb.zip xa-honeycomb && cd $root
