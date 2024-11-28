@@ -1,22 +1,6 @@
-module github.com/xairline/xa-honeycomb
+module bravo
 
-go 1.20
-
-require (
-	github.com/expr-lang/expr v1.16.9
-	github.com/sstallion/go-hid v0.14.1
-	github.com/stretchr/testify v1.10.0
-	github.com/xairline/goplane v1.301.5
-)
-
-require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-errors/errors v1.0.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/objx v0.5.2 // indirect
-	golang.org/x/sys v0.16.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
-)
+go 1.18
 
 require github.com/wailsapp/wails/v2 v2.8.1
 
@@ -46,6 +30,7 @@ require (
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/net v0.20.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 )
 

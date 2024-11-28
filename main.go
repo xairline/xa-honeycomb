@@ -1,31 +1,36 @@
-//go:build !test
-
 package main
 
 import (
-	"github.com/xairline/goplane/extra/logging"
-	"github.com/xairline/goplane/xplm/plugins"
-	"github.com/xairline/goplane/xplm/utilities"
-	"github.com/xairline/xa-honeycomb/pkg/xplane"
-	"path/filepath"
+	"embed"
+
+	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
+//go:embed all:frontend/dist
+var assets embed.FS
+
 func main() {
-}
+	// Create an instance of the app structure
+	app := NewApp()
 
-func init() {
-	xplaneLogger := xplane.NewXplaneLogger()
-	plugins.EnableFeature("XPLM_USE_NATIVE_PATHS", true)
-	logging.MinLevel = logging.Info_Level
+	// Create application with options
+	err := wails.Run(&options.App{
+		Title:  "bravo",
+		Width:  1024,
+		Height: 768,
+		AssetServer: &assetserver.Options{
+			Assets: assets,
+		},
+		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
+		OnStartup:        app.startup,
+		Bind: []interface{}{
+			app,
+		},
+	})
 
-	logging.PluginName = "xa honeycomb - " + xplane.VERSION
-	// get plugin path
-	systemPath := utilities.GetSystemPath()
-	pluginPath := filepath.Join(systemPath, "Resources", "plugins", "xa-honeycomb")
-	xplaneLogger.Infof("Plugin path: %s", pluginPath)
-
-	// entrypoint
-	xplane.NewXplaneService(
-		xplaneLogger,
-	)
+	if err != nil {
+		println("Error:", err.Error())
+	}
 }
