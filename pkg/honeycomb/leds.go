@@ -520,6 +520,8 @@ func (b *bravoService) DebugPrintLEDStates() {
 }
 
 func AllOff() {
+	LED_STATE_CHANGED_LOCK.Lock()
+	defer LED_STATE_CHANGED_LOCK.Unlock()
 	ANUNCIATOR_W2 = 0
 	ANUNCIATOR_W1 = 0
 	LANDING_GEAR_W = 0

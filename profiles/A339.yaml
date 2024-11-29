@@ -251,5 +251,10 @@ data:
   bus_voltage:
     datarefs:
       - dataref_str: "AirbusFBW/DCBusVoltages"
+        index: 0
+        operator: ">"
+        threshold: 0.01
+      - dataref_str: "AirbusFBW/DCBusVoltages"
+        index: 1
         operator: ">"
         threshold: 0.01
