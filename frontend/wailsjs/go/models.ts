@@ -34,6 +34,7 @@ export namespace pkg {
 	    condition?: string;
 	    datarefs?: Dataref[];
 	    commands?: Command[];
+	    value?: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new BravoProfile(source);
@@ -44,6 +45,7 @@ export namespace pkg {
 	        this.condition = source["condition"];
 	        this.datarefs = this.convertValues(source["datarefs"], Dataref);
 	        this.commands = this.convertValues(source["commands"], Command);
+	        this.value = source["value"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -69,6 +71,7 @@ export namespace pkg {
 	    bus_voltage?: BravoProfile;
 	    retractable_gear?: BravoProfile;
 	    ap_state?: BravoProfile;
+	    ap_vs_step?: BravoProfile;
 	
 	    static createFrom(source: any = {}) {
 	        return new Data(source);
@@ -79,6 +82,7 @@ export namespace pkg {
 	        this.bus_voltage = this.convertValues(source["bus_voltage"], BravoProfile);
 	        this.retractable_gear = this.convertValues(source["retractable_gear"], BravoProfile);
 	        this.ap_state = this.convertValues(source["ap_state"], BravoProfile);
+	        this.ap_vs_step = this.convertValues(source["ap_vs_step"], BravoProfile);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
