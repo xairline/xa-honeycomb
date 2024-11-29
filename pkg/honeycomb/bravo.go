@@ -33,7 +33,12 @@ func (b *bravoService) UpdateLeds() {
 				b.Logger.Infof("UpdateLeds: Context canceled, exiting goroutine")
 				return
 			default:
-				if LED_STATE_CHANGED {
+				LED_STATE_CHANGED_LOCK.Lock()
+				ledStateChanged := LED_STATE_CHANGED
+				LED_STATE_CHANGED = false
+				LED_STATE_CHANGED_LOCK.Unlock()
+
+				if ledStateChanged {
 					b.Logger.Debugf("LED_STATE_CHANGED: %v", LED_STATE_CHANGED)
 					b.DebugPrintLEDStates()
 					b.hidReportBuffer[0] = 0x0
@@ -52,8 +57,10 @@ func (b *bravoService) UpdateLeds() {
 						b.Logger.Infof("bytes written: %d", x)
 					}
 					b.Logger.Debugf("bytes written: %d", x)
-					if x == 65 {
-						LED_STATE_CHANGED = false
+					if x != 65 {
+						LED_STATE_CHANGED_LOCK.Lock()
+						LED_STATE_CHANGED = true
+						LED_STATE_CHANGED_LOCK.Unlock()
 					}
 					bravo.Close()
 					time.Sleep(100 * time.Millisecond) // Simulated delay
