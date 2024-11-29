@@ -45,8 +45,8 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 		case "alt":
 			myProfile = s.profile.Knobs.AP_ALT
 
-			altStep := s.valueOf(&s.profile.Data.AP_ALT_STEP)
-			if altStep != 0 {
+			altStep, foundAltStep := s.valueOf(&s.profile.Data.AP_ALT_STEP)
+			if foundAltStep {
 				step = altStep
 			} else {
 				step = 100
@@ -54,8 +54,8 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 		case "vs":
 			myProfile = s.profile.Knobs.AP_VS
 
-			vsStep := s.valueOf(&s.profile.Data.AP_VS_STEP)
-			if vsStep != 0 {
+			vsStep, foundVsStep := s.valueOf(&s.profile.Data.AP_VS_STEP)
+			if foundVsStep {
 				step = vsStep
 			} else {
 				step = 1

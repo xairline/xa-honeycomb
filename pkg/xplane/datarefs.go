@@ -344,27 +344,35 @@ func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
 	return nil
 }
 
-// Returns the value extracted from the given `BravoProfile`
-func (s *xplaneService) valueOf(bp *pkg.BravoProfile) float64 {
+// Extract a value from the given data `BravoProfile`
+// Returns:
+// 1. The value if found, or 0.0
+// 2. Whether a value was found or not
+func (s *xplaneService) valueOf(bp *pkg.BravoProfile) (float64, bool) {
 	if len(bp.Datarefs) > 0 {
 		// TODO support something like "condition" that can aggregate multiple datarefs or array datarefs
 		// e.g. "max" or "min" or "sum" or "avg"
 		myDataref := bp.Datarefs[0]
+		if myDataref.Dataref == nil {
+			return 0.0, false
+		}
 		datarefType := dataAccess.GetDataRefTypes(myDataref.Dataref.(dataAccess.DataRef))
 		switch datarefType {
 		case dataAccess.TypeFloat:
-			return float64(dataAccess.GetFloatData(myDataref.Dataref.(dataAccess.DataRef)))
+			return float64(dataAccess.GetFloatData(myDataref.Dataref.(dataAccess.DataRef))), true
 		case dataAccess.TypeInt:
-			return float64(dataAccess.GetIntData(myDataref.Dataref.(dataAccess.DataRef)))
+			return float64(dataAccess.GetIntData(myDataref.Dataref.(dataAccess.DataRef))), true
 		case dataAccess.TypeFloatArray:
-			return float64(dataAccess.GetFloatArrayData(myDataref.Dataref.(dataAccess.DataRef))[0])
+			return float64(dataAccess.GetFloatArrayData(myDataref.Dataref.(dataAccess.DataRef))[0]), true
 		case dataAccess.TypeIntArray:
-			return float64(dataAccess.GetIntArrayData(myDataref.Dataref.(dataAccess.DataRef))[0])
+			return float64(dataAccess.GetIntArrayData(myDataref.Dataref.(dataAccess.DataRef))[0]), true
 		default:
 			s.Logger.Errorf("Dataref type not supported: %v", datarefType)
-			return 0.0
+			return 0.0, false
 		}
+	} else if bp.Value != nil {
+		return float64(*bp.Value), true
 	} else {
-		return float64(bp.Value)
+		return 0.0, false
 	}
 }
