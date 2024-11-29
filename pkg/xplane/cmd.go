@@ -93,23 +93,25 @@ func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multip
 		}
 		utilities.CommandOnce(cmd)
 	}
-	myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[0].DatarefStr)
-	if !found {
-		s.Logger.Errorf("Dataref not found: %s", myProfile.Datarefs[0].DatarefStr)
-		return
-	}
-	currentValueType := dataAccess.GetDataRefTypes(myDataref)
-	switch currentValueType {
-	case dataAccess.TypeFloat:
-		currentValue := dataAccess.GetFloatData(myDataref)
-		newValue := currentValue + float32(float64(direction)*multiplier*step)
-		s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
-		dataAccess.SetFloatData(myDataref, newValue)
-	case dataAccess.TypeInt:
-		currentValue := dataAccess.GetIntData(myDataref)
-		newValue := currentValue + int(float64(direction)*multiplier*step)
-		s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
-		dataAccess.SetIntData(myDataref, newValue)
-	}
 
+	if len(myProfile.Datarefs) > 0 {
+		myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[0].DatarefStr)
+		if !found {
+			s.Logger.Errorf("Dataref not found: %s", myProfile.Datarefs[0].DatarefStr)
+			return
+		}
+		currentValueType := dataAccess.GetDataRefTypes(myDataref)
+		switch currentValueType {
+		case dataAccess.TypeFloat:
+			currentValue := dataAccess.GetFloatData(myDataref)
+			newValue := currentValue + float32(float64(direction)*multiplier*step)
+			s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
+			dataAccess.SetFloatData(myDataref, newValue)
+		case dataAccess.TypeInt:
+			currentValue := dataAccess.GetIntData(myDataref)
+			newValue := currentValue + int(float64(direction)*multiplier*step)
+			s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
+			dataAccess.SetIntData(myDataref, newValue)
+		}
+	}
 }
