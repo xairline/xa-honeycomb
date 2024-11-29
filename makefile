@@ -2,7 +2,7 @@ mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
 clean:
-	rm -r dist || true || rm ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/mac.xpl
+	rm -rf dist || true || rm ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/mac.xpl
 mac:
 	GOOS=darwin \
 	GOARCH=arm64 \
