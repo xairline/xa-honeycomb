@@ -21,7 +21,6 @@ knobs:
     datarefs:
       - dataref_str: "AirbusFBW/BaroKnobRotationCapt"
 
-
 leds:
   volt_low:
     datarefs:
