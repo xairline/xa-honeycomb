@@ -264,7 +264,6 @@ func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
 			if !ok {
 				s.Logger.Errorf("Field %s is not of type BravoProfile", fieldName)
 				return fmt.Errorf("Field %s is not of type BravoProfile", fieldName)
-				continue
 			}
 
 			// Modify the fieldValue
