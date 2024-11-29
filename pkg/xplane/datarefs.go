@@ -134,17 +134,16 @@ func (s *xplaneService) compileRules(p *pkg.Profile) error {
 		}
 
 		// Modify the fieldValue
-		switch fieldValue.ProfileType {
-		case "led":
-			for j := range fieldValue.Datarefs {
-				dataref := &fieldValue.Datarefs[j] // Get a pointer to the actual element
-				myDataref, found := dataAccess.FindDataRef(dataref.Dataref_str)
-				if !found {
-					s.Logger.Errorf("Dataref not found: %s", dataref.Dataref_str)
-					continue
-				}
-				dataref.Dataref = myDataref
+		for j := range fieldValue.Datarefs {
+			dataref := &fieldValue.Datarefs[j] // Get a pointer to the actual element
+			myDataref, found := dataAccess.FindDataRef(dataref.Dataref_str)
+			if !found {
+				s.Logger.Errorf("Dataref not found: %s", dataref.Dataref_str)
+				continue
+			}
+			dataref.Dataref = myDataref
 
+			if dataref.Operator != "" {
 				datarefType := dataAccess.GetDataRefTypes(myDataref)
 
 				var code string
@@ -177,17 +176,10 @@ func (s *xplaneService) compileRules(p *pkg.Profile) error {
 				dataref.Expr = program
 				dataref.Env = env
 			}
+		}
+
+		if fieldValue.ProfileType == "led" {
 			fieldValue.On, fieldValue.Off = s.assignOnAndOffFuncs(fieldName)
-		case "data":
-			for j := range fieldValue.Data {
-				data := &fieldValue.Data[j] // Get a pointer to the actual element
-				myDataref, found := dataAccess.FindDataRef(data.Dataref_str)
-				if !found {
-					s.Logger.Errorf("Dataref not found: %s", data.Dataref_str)
-					continue
-				}
-				data.Dataref = myDataref
-			}
 		}
 
 		// Assign the modified value back to the struct field

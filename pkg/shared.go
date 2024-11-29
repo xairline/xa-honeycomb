@@ -16,17 +16,12 @@ type Dataref struct {
 	Expr        *vm.Program
 	Env         map[string]interface{}
 }
-type Data struct {
-	Dataref_str string `yaml:"dataref_str,omitempty" json:"dataref_str,omitempty"`
-	Dataref     interface{}
-}
 
 type BravoProfile struct {
 	ProfileType string    `yaml:"profile_type,omitempty" json:"profile_type,omitempty"`
 	Condition   string    `yaml:"condition,omitempty" json:"condition,omitempty"`
 	Datarefs    []Dataref `yaml:"datarefs,omitempty" json:"datarefs,omitempty"`
 	Commands    []Command `yaml:"commands,omitempty" json:"commands,omitempty"`
-	Data        []Data    `yaml:"data,omitempty" json:"data,omitempty"`
 	On          func()    `json:"-"`
 	Off         func()    `json:"-"`
 }
