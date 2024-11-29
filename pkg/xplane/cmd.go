@@ -68,7 +68,7 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 			step = 1
 		}
 		s.adjust(myProfile, direction, multiplier, step)
-		s.Logger.Infof("Knob turn: %d, Mode: %s, Multiplier: %.1f, Steo: %.1f", direction, s.apSelector, multiplier, step)
+		s.Logger.Infof("Knob turn: %d, Mode: %s, Multiplier: %.1f, Step: %.1f", direction, s.apSelector, multiplier, step)
 		// Update the last interaction time
 		s.lastKnobTime = now
 	}
