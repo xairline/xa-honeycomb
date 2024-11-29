@@ -27,6 +27,18 @@ func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 			return
 		}
 	}
+	if planeProfile.Metadata == nil {
+		planeProfile.Metadata = &pkg.Metadata{}
+	}
+	if planeProfile.Data == nil {
+		planeProfile.Data = &pkg.Data{}
+	}
+	if planeProfile.Knobs == nil {
+		planeProfile.Knobs = &pkg.Knobs{}
+	}
+	if planeProfile.Leds == nil {
+		planeProfile.Leds = &pkg.Leds{}
+	}
 	err = s.CompileRules(&planeProfile)
 	if err != nil {
 		s.Logger.Errorf("Error compiling rules: %v", err)
