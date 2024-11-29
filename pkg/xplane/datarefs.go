@@ -343,3 +343,28 @@ func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
 
 	return nil
 }
+
+// Returns the value extracted from the given `BravoProfile`
+func (s *xplaneService) valueOf(bp *pkg.BravoProfile) float64 {
+	if len(bp.Datarefs) > 0 {
+		// TODO support something like "condition" that can aggregate multiple datarefs or array datarefs
+		// e.g. "max" or "min" or "sum" or "avg"
+		myDataref := bp.Datarefs[0]
+		datarefType := dataAccess.GetDataRefTypes(myDataref.Dataref.(dataAccess.DataRef))
+		switch datarefType {
+		case dataAccess.TypeFloat:
+			return float64(dataAccess.GetFloatData(myDataref.Dataref.(dataAccess.DataRef)))
+		case dataAccess.TypeInt:
+			return float64(dataAccess.GetIntData(myDataref.Dataref.(dataAccess.DataRef)))
+		case dataAccess.TypeFloatArray:
+			return float64(dataAccess.GetFloatArrayData(myDataref.Dataref.(dataAccess.DataRef))[0])
+		case dataAccess.TypeIntArray:
+			return float64(dataAccess.GetIntArrayData(myDataref.Dataref.(dataAccess.DataRef))[0])
+		default:
+			s.Logger.Errorf("Dataref type not supported: %v", datarefType)
+			return 0.0
+		}
+	} else {
+		return float64(bp.Value)
+	}
+}

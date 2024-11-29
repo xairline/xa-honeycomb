@@ -37,26 +37,32 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 			direction = -1
 		}
 		var myProfile pkg.BravoProfile
-		var factor float64
+		var step float64
 		switch s.apSelector {
 		case "ias":
 			myProfile = s.profile.Knobs.AP_IAS
-			factor = 1
+			step = 1
 		case "alt":
 			myProfile = s.profile.Knobs.AP_ALT
-			factor = 100
+			step = 100
 		case "vs":
 			myProfile = s.profile.Knobs.AP_VS
-			factor = 1
+
+			vsStep := s.valueOf(&s.profile.Data.AP_VS_STEP)
+			if vsStep != 0 {
+				step = vsStep
+			} else {
+				step = 1
+			}
 		case "hdg":
 			myProfile = s.profile.Knobs.AP_HDG
-			factor = 1
+			step = 1
 		case "crs":
 			myProfile = s.profile.Knobs.AP_CRS
-			factor = 1
+			step = 1
 		}
-		s.adjust(myProfile, direction, multiplier, factor)
-		s.Logger.Infof("Knob turn: %s, Mode: %s, Multiplier: %.1f", direction, s.apSelector, multiplier)
+		s.adjust(myProfile, direction, multiplier, step)
+		s.Logger.Infof("Knob turn: %d, Mode: %s, Multiplier: %.1f, Steo: %.1f", direction, s.apSelector, multiplier, step)
 		// Update the last interaction time
 		s.lastKnobTime = now
 	}
@@ -71,7 +77,7 @@ func (s *xplaneService) changeAPMode(command utilities.CommandRef, phase utiliti
 	return 0
 }
 
-func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multiplier float64, factor float64) {
+func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multiplier float64, step float64) {
 	if myProfile.Commands != nil {
 		var cmd utilities.CommandRef
 		if direction > 0 {
@@ -90,12 +96,12 @@ func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multip
 	switch currentValueType {
 	case dataAccess.TypeFloat:
 		currentValue := dataAccess.GetFloatData(myDataref)
-		newValue := currentValue + float32(float64(direction)*multiplier*factor)
+		newValue := currentValue + float32(float64(direction)*multiplier*step)
 		s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
 		dataAccess.SetFloatData(myDataref, newValue)
 	case dataAccess.TypeInt:
 		currentValue := dataAccess.GetIntData(myDataref)
-		newValue := currentValue + int(float64(direction)*multiplier*factor)
+		newValue := currentValue + int(float64(direction)*multiplier*step)
 		s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
 		dataAccess.SetIntData(myDataref, newValue)
 	}
