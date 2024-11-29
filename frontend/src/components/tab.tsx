@@ -3,21 +3,11 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import {pkg} from '../../wailsjs/go/models';
-import {List, ListItemButton, ListItemIcon, ListSubheader, Typography} from "@mui/material";
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
-import SendIcon from '@mui/icons-material/Send';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import StarBorder from '@mui/icons-material/StarBorder';
-import Collapse from '@mui/material/Collapse';
+import {AppBar, Typography} from "@mui/material";
+import NestedList from "./list";
 
 interface TabPanelProps {
   profile: pkg.Profile;
-  children?: React.ReactNode;
-  value?: string;
-  index?: string;
 }
 
 function TabPanel(props: { children?: React.ReactNode; value: string; index: string }) {
@@ -43,106 +33,81 @@ function TabPanel(props: { children?: React.ReactNode; value: string; index: str
 export default function MyTabs(props: TabPanelProps) {
   const [value, setValue] = React.useState(0);
   const keys = Object.keys(props.profile);
-  const [open, setOpen] = React.useState(true);
+  const [apLightsProfile, setApLightsProfile] = React.useState({} as pkg.Profile);
+  const [apKnobsProfile, setApKnobsProfile] = React.useState({} as pkg.Profile);
 
-  const handleClick = () => {
-    setOpen(!open);
-  };
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+    let apLightsProfileCopy: any = {
+      metadata: props.profile.metadata,
+      ap: props.profile.ap,
+      hdg: props.profile.hdg,
+      nav: props.profile.nav,
+      apr: props.profile.apr,
+      rev: props.profile.rev,
+      alt: props.profile.alt,
+      vs: props.profile.vs,
+      ias: props.profile.ias,
+    }
+    let apKnobsProfileCopy: any = {
+      metadata: props.profile.metadata,
+      ap_hdg: props.profile.ap_hdg,
+      ap_vs: props.profile.ap_vs,
+      ap_alt: props.profile.ap_alt,
+      ap_ias: props.profile.ap_ias,
+      ap_crs: props.profile.ap_crs,
+
+    }
+    setApLightsProfile(apLightsProfileCopy);
+    setApKnobsProfile(apKnobsProfileCopy);
   };
 
   return (
-    <Box sx={{width: '100%'}}>
-      <Tabs
-        value={value}
-        onChange={handleChange}
-        textColor="secondary"
-        indicatorColor="secondary"
-        aria-label="secondary tabs example"
-      >
-        <Tab value="one" label="LED"/>
-        <Tab value="two" label="Knob"/>
-        <Tab value="three" label="Autopilot"/>
-      </Tabs>
-      <TabPanel value={value.toString()} index="one">
-        {keys.map((key, index) => {
-          if (key !== "metadata") {
-            // @ts-ignore
-            if (props.profile[key].profile_type === "led") {
+    <Box sx={{width: '100%', overflow: "auto"}}>
+      <AppBar position="static">
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          textColor="inherit"
+        >
+          <Tab value="one" label="AP Lights"/>
+          <Tab value="two" label="Lights 1"/>
+          <Tab value="three" label="Lights 2"/>
+          <Tab value="four" label="AP Knobs"/>
+          <Tab value="five" label="Button*" disabled={true}/>
+        </Tabs>
+      </AppBar>
+      <Box>
+        <TabPanel value={value.toString()} index="one">
+          <NestedList profile={apLightsProfile}/>
+        </TabPanel>
+        <TabPanel value={value.toString()} index="two">
+          {keys.map((key, index) => {
+            if (key !== "metadata") {
+              // @ts-ignore
+              if (props.profile[key].profile_type === "knob") {
 
-              return (
-                // @ts-ignore
-                <Typography key={index}>{key}: {JSON.stringify(props.profile[key])}</Typography>
-              )
+
+                return (
+                  <>
+                    <Typography key={index}>{key}-{
+                      // @ts-ignore
+                      JSON.stringify(props.profile[key])
+                    }</Typography>
+                  </>
+                )
+              }
             }
-          }
-        })}
-      </TabPanel>
-      <TabPanel value={value.toString()} index="two">
-        {keys.map((key, index) => {
-          if (key !== "metadata") {
-            // @ts-ignore
-            if (props.profile[key].profile_type === "knob") {
+          })}
+        </TabPanel>
+        <TabPanel value={value.toString()} index="three">
 
-
-              return (
-
-                <>
-                  <Typography key={index}>{key}-{
-                    // @ts-ignore
-                    JSON.stringify(props.profile[key])
-                  }</Typography>
-                  <List
-                    sx={{width: '100%', maxWidth: 360, bgcolor: 'background.paper'}}
-                    component="nav"
-                    aria-labelledby="nested-list-subheader"
-                    subheader={
-                      <ListSubheader component="div" id="nested-list-subheader">
-                        Nested List Items
-                      </ListSubheader>
-                    }
-                  >
-                    <ListItemButton>
-                      <ListItemIcon>
-                        <SendIcon/>
-                      </ListItemIcon>
-                      <ListItemText primary="Sent mail"/>
-                    </ListItemButton>
-                    <ListItemButton>
-                      <ListItemIcon>
-                        <DraftsIcon/>
-                      </ListItemIcon>
-                      <ListItemText primary="Drafts"/>
-                    </ListItemButton>
-                    <ListItemButton onClick={handleClick}>
-                      <ListItemIcon>
-                        <InboxIcon/>
-                      </ListItemIcon>
-                      <ListItemText primary="Inbox"/>
-                      {open ? <ExpandLess/> : <ExpandMore/>}
-                    </ListItemButton>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                      <List component="div" disablePadding>
-                        <ListItemButton sx={{pl: 4}}>
-                          <ListItemIcon>
-                            <StarBorder/>
-                          </ListItemIcon>
-                          <ListItemText primary="Starred"/>
-                        </ListItemButton>
-                      </List>
-                    </Collapse>
-                  </List></>
-
-
-              )
-            }
-          }
-        })}
-      </TabPanel>
-      <TabPanel value={value.toString()} index="three">
-        Content for Item Three
-      </TabPanel>
+        </TabPanel>
+        <TabPanel value={value.toString()} index="four">
+          <NestedList profile={apKnobsProfile}/>
+        </TabPanel>
+      </Box>
     </Box>
   );
 }

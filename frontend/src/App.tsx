@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import {GetProfile, GetProfiles} from "../wailsjs/go/main/App";
-import {Box, Grid, List, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import {pkg} from "../wailsjs/go/models";
-import InboxIcon from '@mui/icons-material/Inbox';
 import MyTabs from "./components/tab";
+import Profiles from "./components/profiles";
 
 function App() {
   const [profileData, setProfileData] = useState({} as pkg.Profile);
@@ -31,28 +31,11 @@ function App() {
     <div id="App">
       <Grid container spacing={0} columns={16} style={{height: "100vh", overflow: "hidden"}}>
         <Grid item xs={4} style={{border: "white", overflow: "hidden"}}>
-          <Box sx={{width: '100%', overflow: "hidden", bgcolor: "#022e35", height: "100vh"}}>
-            < List component="nav" aria-label="main mailbox folders">
-              {profilesData.map((profile, index) => {
-                return (
-                  <ListItemButton
-                    selected={selectedIndex === index}
-                    onClick={(event) => handleListItemClick(event, index)}
-                  >
-                    <ListItemIcon>
-                      <InboxIcon/>
-                    </ListItemIcon>
-                    <ListItemText primary={profile.metadata.name}/>
-                  </ListItemButton>
-                )
-              })}
-            </List>
-
-          </Box>
+          <Profiles profiles={profilesData} selectedIndex={selectedIndex} handleListItemClick={handleListItemClick}/>
         </Grid>
         <Grid item xs={12} sx={{width: '100vw', overflow: "hidden", height: "100vh"}}>
           <Grid item xs={16}
-                sx={{width: '100vw', overflow: "hidden", bgcolor: "#222e35", height: "80vh"}}>
+                sx={{width: '100vw', overflow: "auto", bgcolor: "#222e35", height: "80vh"}}>
             <MyTabs profile={profileData}/>
           </Grid>
           <Grid item xs={16}
