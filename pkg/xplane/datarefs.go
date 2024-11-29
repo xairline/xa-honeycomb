@@ -123,6 +123,18 @@ func (s *xplaneService) CompileRules(p *pkg.Profile) error {
 }
 
 func (s *xplaneService) updateLeds() {
+
+	// special case for bus voltage
+	dataref := s.profile.Data.BUS_VOLTAGE.Datarefs[0]
+	output, err := expr.Run(dataref.Expr, dataref.Env)
+	if err != nil {
+		s.Logger.Errorf("BUS_VOLTAGE - Error running expression: %v", err)
+	}
+	if !output.(bool) {
+		honeycomb.AllOff()
+		return
+	}
+
 	val := reflect.ValueOf(s.profile.Leds).Elem() // Get the actual struct value
 	typ := val.Type()
 	for i := 0; i < val.NumField(); i++ {
@@ -140,22 +152,6 @@ func (s *xplaneService) updateLeds() {
 		if fieldValue.Datarefs == nil && fieldValue.Commands == nil {
 			s.Logger.Debugf("No datarefs found for: %s", fieldName)
 			continue
-		}
-
-		if fieldName == "BUS_VOLTAGE" {
-			// special case for bus voltage
-			dataref := s.profile.Data.BUS_VOLTAGE.Datarefs[0]
-			output, err := expr.Run(dataref.Expr, dataref.Env)
-			if err != nil {
-				s.Logger.Errorf("BUS_VOLTAGE - Error running expression: %v", err)
-				break
-			}
-			if !output.(bool) {
-				honeycomb.AllOff()
-				return
-			} else {
-				continue
-			}
 		}
 
 		if fieldName == "GEAR" {
