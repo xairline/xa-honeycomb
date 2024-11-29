@@ -8,7 +8,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
 import {pkg} from "../../wailsjs/go/models";
-import {Badge} from "@mui/material";
+import {Badge, Divider} from "@mui/material";
 import {LightbulbOutlined} from "@mui/icons-material";
 import Dataref = pkg.Dataref;
 import Command = pkg.Command;
@@ -70,10 +70,9 @@ export default function NestedList(props: ListProps) {
                           </ListItemIcon>
                           <ListItemText primary={
                             // @ts-ignore
-                            dataref.dataref_str
-                          }>
+                            `${dataref.dataref_str} ${dataref.operator} ${dataref.threshold}`
+                          }/>
 
-                          </ListItemText>
                         </ListItemButton>
                       )
                     }
@@ -93,9 +92,7 @@ export default function NestedList(props: ListProps) {
                           <ListItemText primary={
                             // @ts-ignore
                             command.command_str
-                          }>
-
-                          </ListItemText>
+                          }/>
                         </ListItemButton>
                       )
                     }
@@ -104,6 +101,8 @@ export default function NestedList(props: ListProps) {
                 }
               </List>
             </Collapse>
+            <Divider/>
+
           </>
         )
       })}
