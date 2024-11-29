@@ -85,6 +85,7 @@ export default function Profiles(props: TabPanelProps) {
                     inputProps={{
                       'aria-labelledby': 'switch-list-label-wifi',
                     }}
+                    disabled={true}
                   />
                 </ListItemIcon>
                 <ListItemText primary={profile.metadata.name} style={{marginLeft: "12px"}}/>

@@ -32,13 +32,13 @@ function TabPanel(props: { children?: React.ReactNode; value: string; index: str
 }
 
 export default function MyTabs(props: TabPanelProps) {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState("one");
   const keys = Object.keys(props.profile);
   const [apLightsProfile, setApLightsProfile] = React.useState({} as pkg.Profile);
   const [apKnobsProfile, setApKnobsProfile] = React.useState({} as pkg.Profile);
 
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
 
     let apLightsProfileCopy: any = {
       metadata: props.profile.metadata,
@@ -63,10 +63,11 @@ export default function MyTabs(props: TabPanelProps) {
     setApLightsProfile(apLightsProfileCopy);
     setApKnobsProfile(apKnobsProfileCopy);
     setValue(newValue);
+    console.log(newValue)
   };
 
   useEffect(() => {
-    handleChange({} as React.SyntheticEvent, 1);
+    handleChange({} as React.SyntheticEvent, "one");
   }, [props.profile]);
 
   return (

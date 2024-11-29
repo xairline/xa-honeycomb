@@ -41,12 +41,12 @@ const (
 
 // Global variables for state
 var (
-	ANUNCIATOR_W2     byte = 0
-	ANUNCIATOR_W1     byte = 0
-	LANDING_GEAR_W    byte = 0
-	AUTO_PILOT_W      byte = 0
-	LED_STATE_CHANGED      = false
-	LED_STATE_CHANGED_LOCK = &sync.Mutex{}
+	ANUNCIATOR_W2          byte = 0
+	ANUNCIATOR_W1          byte = 0
+	LANDING_GEAR_W         byte = 0
+	AUTO_PILOT_W           byte = 0
+	LED_STATE_CHANGED           = false
+	LED_STATE_CHANGED_LOCK      = &sync.Mutex{}
 )
 
 func setBit(val byte, bit byte) byte {
@@ -59,8 +59,8 @@ func clearBit(val byte, bit byte) byte {
 
 func UpdateLEDStateChanged(val bool) {
 	LED_STATE_CHANGED_LOCK.Lock()
+	defer LED_STATE_CHANGED_LOCK.Unlock()
 	LED_STATE_CHANGED = LED_STATE_CHANGED || val
-	LED_STATE_CHANGED_LOCK.Unlock()
 }
 
 func OnLEDFuelPump() {
