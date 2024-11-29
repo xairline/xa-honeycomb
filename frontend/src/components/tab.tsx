@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useEffect} from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
@@ -38,7 +39,7 @@ export default function MyTabs(props: TabPanelProps) {
 
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+
     let apLightsProfileCopy: any = {
       metadata: props.profile.metadata,
       ap: props.profile.ap,
@@ -61,7 +62,12 @@ export default function MyTabs(props: TabPanelProps) {
     }
     setApLightsProfile(apLightsProfileCopy);
     setApKnobsProfile(apKnobsProfileCopy);
+    setValue(newValue);
   };
+
+  useEffect(() => {
+    handleChange({} as React.SyntheticEvent, 1);
+  }, [props.profile]);
 
   return (
     <Box sx={{width: '100%', overflow: "auto"}}>
