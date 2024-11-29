@@ -3,7 +3,22 @@ metadata:
   description: Laminar Cessna 172 Skyhawk
   enabled: true
 
-
+knobs:
+  ap_hdg:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/heading_dial_deg_mag_pilot"
+  ap_alt:
+    datarefs:
+      - dataref_str: "sim/cockpit/autopilot/current_altitude"
+  ap_vs:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/vvi_dial_fpm"
+  # ap_ias:
+  #   datarefs:
+  #     - dataref_str: "sim/cockpit2/autopilot/airspeed_dial_kts_mach"
+  ap_crs:
+    datarefs:
+      - dataref_str: "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot"
 
 leds:
   hdg:
@@ -46,11 +61,11 @@ leds:
         operator: ">="
         threshold: 1
 
-  ias:
-    datarefs:
-      - dataref_str: "sim/cockpit2/autopilot/autothrottle_on"
-        operator: "=="
-        threshold: 1
+  # ias:
+  #   datarefs:
+  #     - dataref_str: "sim/cockpit2/autopilot/autothrottle_on"
+  #       operator: "=="
+  #       threshold: 1
 
   ap:
     datarefs:
@@ -118,11 +133,11 @@ leds:
         operator: ">"
         threshold: 0
 
-  hydro_low_pressure:
-    datarefs:
-      - dataref_str: "sim/cockpit2/annunciators/hydraulic_pressure"
-        operator: ">="
-        threshold: 1
+  # hydro_low_pressure:
+  #   datarefs:
+  #     - dataref_str: "sim/cockpit2/annunciators/hydraulic_pressure"
+  #       operator: ">="
+  #       threshold: 1
 
   aux_fuel_pump:
     datarefs:
@@ -166,7 +181,8 @@ data:
         operator: "!="
         threshold: 0
 
-  ap_state:
-    profile_type: data
+  ap_vs_step:
     datarefs:
-      - dataref_str: "sim/cockpit2/autopilot/autopilot_state"
+      - dataref_str: "sim/aircraft/autopilot/vvi_step_ft"
+  ap_alt_step:
+    value: 20
