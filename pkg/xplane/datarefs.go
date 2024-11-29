@@ -27,7 +27,7 @@ func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 			return
 		}
 	}
-	err = s.compileRules(&planeProfile)
+	err = s.CompileRules(&planeProfile)
 	if err != nil {
 		s.Logger.Errorf("Error compiling rules: %v", err)
 		s.profile = nil
@@ -112,89 +112,22 @@ func (s *xplaneService) loadProfile(airplaneICAO string) (pkg.Profile, error) {
 	return res, nil
 }
 
-func (s *xplaneService) compileRules(p *pkg.Profile) error {
-	val := reflect.ValueOf(p).Elem() // Get the actual struct value
-	typ := val.Type()
-	for i := 0; i < val.NumField(); i++ {
-		field := typ.Field(i) // Get the field metadata
-		fieldName := field.Name
-		if fieldName == "Metadata" {
-			continue
-		}
-
-		// Get the field value as a reflect.Value
-		fieldVal := val.Field(i)
-
-		// Perform type assertion to BravoProfile
-		fieldValue, ok := fieldVal.Interface().(pkg.BravoProfile)
-		if !ok {
-			s.Logger.Errorf("Field %s is not of type BravoProfile", fieldName)
-			return fmt.Errorf("Field %s is not of type BravoProfile", fieldName)
-			continue
-		}
-
-		// Modify the fieldValue
-		switch fieldValue.ProfileType {
-		case "led", "data":
-			for j := range fieldValue.Datarefs {
-				dataref := &fieldValue.Datarefs[j] // Get a pointer to the actual element
-				myDataref, found := dataAccess.FindDataRef(dataref.Dataref_str)
-				if !found {
-					s.Logger.Errorf("Dataref not found: %s", dataref.Dataref_str)
-					continue
-				}
-				dataref.Dataref = myDataref
-
-				datarefType := dataAccess.GetDataRefTypes(myDataref)
-
-				var code string
-				switch datarefType {
-				case dataAccess.TypeFloat:
-					code = fmt.Sprintf("GetFloatData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
-				case dataAccess.TypeInt:
-					code = fmt.Sprintf("GetIntData(myDataref) %s %d", dataref.Operator, int(dataref.Threshold))
-				case dataAccess.TypeFloatArray:
-					code = fmt.Sprintf("GetFloatArrayData(myDataref)[%d] %s %f", dataref.Index, dataref.Operator, dataref.Threshold)
-				case dataAccess.TypeIntArray:
-					code = fmt.Sprintf("GetIntArrayData(myDataref)[%d] %s %d", dataref.Index, dataref.Operator, int(dataref.Threshold))
-				default:
-					s.Logger.Errorf("Dataref type not supported: %v", datarefType)
-				}
-
-				s.Logger.Infof("Compiling expression: %s - %s: %s", code, fieldName, dataref.Dataref_str)
-				env := map[string]interface{}{
-					"GetFloatData":      dataAccess.GetFloatData,
-					"GetIntData":        dataAccess.GetIntData,
-					"GetFloatArrayData": dataAccess.GetFloatArrayData,
-					"GetIntArrayData":   dataAccess.GetIntArrayData,
-					"myDataref":         myDataref,
-				}
-				program, err := expr.Compile(code, expr.Env(env))
-				if err != nil {
-					s.Logger.Errorf("Error compiling expression: %v", err)
-					return err
-				}
-				dataref.Expr = program
-				dataref.Env = env
-			}
-			fieldValue.On, fieldValue.Off = s.assignOnAndOffFuncs(fieldName)
-		}
-
-		// Assign the modified value back to the struct field
-		fieldVal.Set(reflect.ValueOf(fieldValue))
+func (s *xplaneService) CompileRules(p *pkg.Profile) error {
+	err := s.compileRules(p.Leds, p.Data)
+	if err != nil {
+		s.Logger.Errorf("Error compiling rules for leds: %v", err)
+		return err
 	}
+	s.Logger.Infof("Rules compiled successfully")
 	return nil
 }
 
 func (s *xplaneService) updateLeds() {
-	val := reflect.ValueOf(s.profile).Elem() // Get the actual struct value
+	val := reflect.ValueOf(s.profile.Leds).Elem() // Get the actual struct value
 	typ := val.Type()
 	for i := 0; i < val.NumField(); i++ {
 		field := typ.Field(i) // Get the field metadata
 		fieldName := field.Name
-		if fieldName == "Metadata" {
-			continue
-		}
 		// Get the field value as a reflect.Value
 		fieldVal := val.Field(i)
 		// Perform type assertion to BravoProfile
@@ -208,32 +141,10 @@ func (s *xplaneService) updateLeds() {
 			s.Logger.Debugf("No datarefs found for: %s", fieldName)
 			continue
 		}
-		if fieldValue.ProfileType != "led" {
-			continue
-		}
-
-		if fieldName == "GEAR" {
-			// special case for gear
-			retractable_gear_dataref := s.profile.RETRACTABLE_GEAR.Datarefs[0]
-			retractable_gear_output, retractable_gear_err := expr.Run(retractable_gear_dataref.Expr, retractable_gear_dataref.Env)
-			if retractable_gear_err != nil {
-				s.Logger.Errorf("GEAR - Error running retractable_gear expression: %v", retractable_gear_err)
-				continue
-			}
-
-			if retractable_gear_output.(bool) {
-				dataref := s.profile.GEAR.Datarefs[0]
-				output := dataAccess.GetFloatArrayData(dataref.Dataref.(dataAccess.DataRef))
-				s.updateGearLEDs(output)
-			} else {
-				s.updateGearLEDs([]float32{0, 0, 0})
-			}
-			continue
-		}
 
 		if fieldName == "BUS_VOLTAGE" {
 			// special case for bus voltage
-			dataref := s.profile.BUS_VOLTAGE.Datarefs[0]
+			dataref := s.profile.Data.BUS_VOLTAGE.Datarefs[0]
 			output, err := expr.Run(dataref.Expr, dataref.Env)
 			if err != nil {
 				s.Logger.Errorf("BUS_VOLTAGE - Error running expression: %v", err)
@@ -245,6 +156,25 @@ func (s *xplaneService) updateLeds() {
 			} else {
 				continue
 			}
+		}
+
+		if fieldName == "GEAR" {
+			// special case for gear
+			retractable_gear_dataref := s.profile.Data.RETRACTABLE_GEAR.Datarefs[0]
+			retractable_gear_output, retractable_gear_err := expr.Run(retractable_gear_dataref.Expr, retractable_gear_dataref.Env)
+			if retractable_gear_err != nil {
+				s.Logger.Errorf("GEAR - Error running retractable_gear expression: %v", retractable_gear_err)
+				continue
+			}
+
+			if retractable_gear_output.(bool) {
+				dataref := s.profile.Leds.GEAR.Datarefs[0]
+				output := dataAccess.GetFloatArrayData(dataref.Dataref.(dataAccess.DataRef))
+				s.updateGearLEDs(output)
+			} else {
+				s.updateGearLEDs([]float32{0, 0, 0})
+			}
+			continue
 		}
 
 		var result bool
@@ -318,4 +248,83 @@ func (s *xplaneService) updateGearLEDs(output []float32) {
 		honeycomb.OffLEDRightGearGreen()
 		honeycomb.OnLEDRightGearRed()
 	}
+}
+
+func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
+	var vals []reflect.Value
+	vals = append(vals, reflect.ValueOf(l).Elem(), reflect.ValueOf(d).Elem())
+	for index, _ := range vals {
+		val := vals[index]
+		typ := val.Type()
+		s.Logger.Infof("Compiling rules for: %s", typ.Name())
+		for i := 0; i < val.NumField(); i++ {
+			field := typ.Field(i) // Get the field metadata
+			fieldName := field.Name
+			s.Logger.Infof("-- Compiling rules for: %s", fieldName)
+			// Get the field value as a reflect.Value
+			fieldVal := val.Field(i)
+			// Perform type assertion to BravoProfile
+			fieldValue, ok := fieldVal.Interface().(pkg.BravoProfile)
+			if !ok {
+				s.Logger.Errorf("Field %s is not of type BravoProfile", fieldName)
+				return fmt.Errorf("Field %s is not of type BravoProfile", fieldName)
+				continue
+			}
+
+			// Modify the fieldValue
+			if fieldValue.Datarefs != nil {
+				for j := range fieldValue.Datarefs {
+					dataref := &fieldValue.Datarefs[j]
+					s.Logger.Infof("---- Compiling dataref: %s", dataref.DatarefStr)
+					// Get a pointer to the actual element
+					myDataref, found := dataAccess.FindDataRef(dataref.DatarefStr)
+					if !found {
+						s.Logger.Errorf("Dataref not found: %s", dataref.DatarefStr)
+						continue
+					}
+					dataref.Dataref = myDataref
+
+					datarefType := dataAccess.GetDataRefTypes(myDataref)
+
+					var code string
+					switch datarefType {
+					case dataAccess.TypeFloat:
+						code = fmt.Sprintf("GetFloatData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
+					case dataAccess.TypeInt:
+						code = fmt.Sprintf("GetIntData(myDataref) %s %d", dataref.Operator, int(dataref.Threshold))
+					case dataAccess.TypeFloatArray:
+						code = fmt.Sprintf("GetFloatArrayData(myDataref)[%d] %s %f", dataref.Index, dataref.Operator, dataref.Threshold)
+					case dataAccess.TypeIntArray:
+						code = fmt.Sprintf("GetIntArrayData(myDataref)[%d] %s %d", dataref.Index, dataref.Operator, int(dataref.Threshold))
+					default:
+						s.Logger.Errorf("Dataref type not supported: %v", datarefType)
+					}
+
+					s.Logger.Infof("---- Compiling expression: %s - %s: %s", code, fieldName, dataref.DatarefStr)
+					env := map[string]interface{}{
+						"GetFloatData":      dataAccess.GetFloatData,
+						"GetIntData":        dataAccess.GetIntData,
+						"GetFloatArrayData": dataAccess.GetFloatArrayData,
+						"GetIntArrayData":   dataAccess.GetIntArrayData,
+						"myDataref":         myDataref,
+					}
+					program, err := expr.Compile(code, expr.Env(env))
+					if err != nil {
+						s.Logger.Errorf("Error compiling expression: %v", err)
+						return err
+					}
+					dataref.Expr = program
+					dataref.Env = env
+				}
+				fieldValue.On, fieldValue.Off = s.assignOnAndOffFuncs(fieldName)
+			}
+
+			// Assign the modified value back to the struct field
+			fieldVal.Set(reflect.ValueOf(fieldValue))
+			s.Logger.Infof("-- Rules compiled successfully for: %s", fieldName)
+		}
+		s.Logger.Infof("Rules compiled successfully: %s", typ.Name())
+	}
+
+	return nil
 }

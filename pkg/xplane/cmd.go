@@ -40,19 +40,19 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 		var factor float64
 		switch s.apSelector {
 		case "ias":
-			myProfile = s.profile.AP_IAS
+			myProfile = s.profile.Knobs.AP_IAS
 			factor = 1
 		case "alt":
-			myProfile = s.profile.AP_ALT
+			myProfile = s.profile.Knobs.AP_ALT
 			factor = 100
 		case "vs":
-			myProfile = s.profile.AP_VS
+			myProfile = s.profile.Knobs.AP_VS
 			factor = 1
 		case "hdg":
-			myProfile = s.profile.AP_HDG
+			myProfile = s.profile.Knobs.AP_HDG
 			factor = 1
 		case "crs":
-			myProfile = s.profile.AP_CRS
+			myProfile = s.profile.Knobs.AP_CRS
 			factor = 1
 		}
 		s.adjust(myProfile, direction, multiplier, factor)
@@ -75,15 +75,15 @@ func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multip
 	if myProfile.Commands != nil {
 		var cmd utilities.CommandRef
 		if direction > 0 {
-			cmd = utilities.FindCommand(myProfile.Commands[0].Command_str)
+			cmd = utilities.FindCommand(myProfile.Commands[0].CommandStr)
 		} else {
-			cmd = utilities.FindCommand(myProfile.Commands[1].Command_str)
+			cmd = utilities.FindCommand(myProfile.Commands[1].CommandStr)
 		}
 		utilities.CommandOnce(cmd)
 	}
-	myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[0].Dataref_str)
+	myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[0].DatarefStr)
 	if !found {
-		s.Logger.Errorf("Dataref not found: %s", myProfile.Datarefs[0].Dataref_str)
+		s.Logger.Errorf("Dataref not found: %s", myProfile.Datarefs[0].DatarefStr)
 		return
 	}
 	currentValueType := dataAccess.GetDataRefTypes(myDataref)

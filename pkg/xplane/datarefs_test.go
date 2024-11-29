@@ -58,7 +58,7 @@ func TestSetupDataRefs(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create a test CSV file
-	airplaneICAO := "B738"
+	airplaneICAO := "A339"
 
 	// Create a mock logger
 	mockLogger := new(MockLogger)

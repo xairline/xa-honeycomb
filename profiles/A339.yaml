@@ -3,282 +3,253 @@ metadata:
   description: Profile for the Toliss A339
   enabled: true
 
-##### AP KNOBS #####
-ap_hdg:
-  profile_type: knob
-  datarefs:
-    - dataref_str: "sim/cockpit2/autopilot/heading_dial_deg_mag_pilot"
-ap_alt:
-  profile_type: knob
-  datarefs:
-    - dataref_str: "sim/cockpit2/autopilot/altitude_dial_ft"
-ap_vs:
-  profile_type: knob
-  datarefs:
-    - dataref_str: "AirbusFBW/FCUVSKnobRotation"
-ap_ias:
-  profile_type: knob
-  datarefs:
-    - dataref_str: "sim/cockpit2/autopilot/airspeed_dial_kts_mach"
-ap_crs:
-  profile_type: knob
-  # repurpose to qnh
-  datarefs:
-    - dataref_str: "AirbusFBW/BaroKnobRotationCapt"
+knobs:
+  ap_hdg:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/heading_dial_deg_mag_pilot"
+  ap_alt:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/altitude_dial_ft"
+  ap_vs:
+    datarefs:
+      - dataref_str: "AirbusFBW/FCUVSKnobRotation"
+  ap_ias:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/airspeed_dial_kts_mach"
+  ap_crs:
+    # repurpose to qnh
+    datarefs:
+      - dataref_str: "AirbusFBW/BaroKnobRotationCapt"
 
 
-##### LEDS #####
-volt_low:
-  profile_type: led
-  datarefs:
-    - dataref_str: "sim/cockpit2/electrical/battery_amps"
-      operator: "<"
-      threshold: -80
+leds:
+  volt_low:
+    datarefs:
+      - dataref_str: "sim/cockpit2/electrical/battery_amps"
+        operator: "<"
+        threshold: -80
 
-gear:
-  profile_type: led
-  datarefs:
-    - dataref_str: "sim/flightmodel2/gear/deploy_ratio"
-      operator: "!="
-      threshold: 0
+  gear:
+    datarefs:
+      - dataref_str: "sim/flightmodel2/gear/deploy_ratio"
+        operator: "!="
+        threshold: 0
 
-bus_voltage:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/DCBusVoltages"
-      operator: ">"
-      threshold: 0.01
+  hdg:
+    datarefs:
+      - dataref_str: "AirbusFBW/APLateralMode"
+        operator: "=="
+        threshold: 101
 
-hdg:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/APLateralMode"
-      operator: "=="
-      threshold: 101
+  nav:
+    datarefs:
+      - dataref_str: "AirbusFBW/APLateralMode"
+        operator: "=="
+        threshold: 2
 
-nav:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/APLateralMode"
-      operator: "=="
-      threshold: 2
+  apr:
+    datarefs:
+      - dataref_str: "AirbusFBW/APPRilluminated"
+        operator: ">="
+        threshold: 1
 
-apr:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/APPRilluminated"
-      operator: ">="
-      threshold: 1
+  rev:
+    datarefs:
+      - dataref_str: "AirbusFBW/ENGRevArray"
+        operator: ">="
+        threshold: 1
 
-rev:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/ENGRevArray"
-      operator: ">="
-      threshold: 1
+  alt:
+    datarefs:
+      - dataref_str: "AirbusFBW/ALTmanaged"
+        operator: "=="
+        threshold: 1
 
-alt:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/ALTmanaged"
-      operator: "=="
-      threshold: 1
+  vs:
+    datarefs:
+      - dataref_str: "AirbusFBW/APVerticalMode"
+        operator: "=="
+        threshold: 107
 
-vs:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/APVerticalMode"
-      operator: "=="
-      threshold: 107
+  ias:
+    datarefs:
+      - dataref_str: "AirbusFBW/SPDmanaged"
+        operator: ">="
+        threshold: 1
 
-ias:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/SPDmanaged"
-      operator: ">="
-      threshold: 1
+  ap:
+    condition: "any"
+    datarefs:
+      - dataref_str: "AirbusFBW/AP1Engage"
+        operator: ">"
+        threshold: 0.01
+      - dataref_str: "AirbusFBW/AP2Engage"
+        operator: ">"
+        threshold: 0.01
 
-ap:
-  profile_type: led
-  condition: "any"
-  datarefs:
-    - dataref_str: "AirbusFBW/AP1Engage"
-      operator: ">"
-      threshold: 0.01
-    - dataref_str: "AirbusFBW/AP2Engage"
-      operator: ">"
-      threshold: 0.01
+  master_warn:
+    datarefs:
+      - dataref_str: "AirbusFBW/MasterWarn"
+        operator: ">"
+        threshold: 0.01
 
-master_warn:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/MasterWarn"
-      operator: ">"
-      threshold: 0.01
+  fire:
+    condition: "any"
+    datarefs:
+      - dataref_str: "AirbusFBW/OHPLightsATA26"
+        operator: ">"
+        threshold: 0.01
+      - dataref_str: "AirbusFBW/OHPLightsATA70"
+        operator: ">"
+        threshold: 0.01
 
-fire:
-  profile_type: led
-  condition: "any"
-  datarefs:
-    - dataref_str: "AirbusFBW/OHPLightsATA26"
-      operator: ">"
-      threshold: 0.01
-    - dataref_str: "AirbusFBW/OHPLightsATA70"
-      operator: ">"
-      threshold: 0.01
+  oil_low_pressure:
+    datarefs:
+      - dataref_str: "AirbusFBW/ENGOilPressArray"
+        operator: "<"
+        threshold: 0.075
 
-oil_low_pressure:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/ENGOilPressArray"
-      operator: "<"
-      threshold: 0.075
+  fuel_low_pressure:
+    datarefs:
+      - dataref_str: "AirbusFBW/ENGFuelFlowArray"
+        operator: "<"
+        threshold: 0.075
 
-fuel_low_pressure:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/ENGFuelFlowArray"
-      operator: "<"
-      threshold: 0.075
+  anti_ice:
+    condition: "any"
+    datarefs:
+      - dataref_str: "AirbusFBW/OHPLightsATA30"
+        operator: ">"
+        threshold: 0.01
+        index: 0
+      - dataref_str: "AirbusFBW/OHPLightsATA30"
+        operator: ">"
+        threshold: 0.01
+        index: 1
+      - dataref_str: "AirbusFBW/OHPLightsATA30"
+        operator: ">"
+        threshold: 0.01
+        index: 2
+      - dataref_str: "AirbusFBW/OHPLightsATA30"
+        operator: ">"
+        threshold: 0.01
+        index: 3
+      - dataref_str: "AirbusFBW/OHPLightsATA30"
+        operator: ">"
+        threshold: 0.01
+        index: 4
+      - dataref_str: "AirbusFBW/OHPLightsATA30"
+        operator: ">"
+        threshold: 0.01
+        index: 5
 
-anti_ice:
-  profile_type: led
-  condition: "any"
-  datarefs:
-    - dataref_str: "AirbusFBW/OHPLightsATA30"
-      operator: ">"
-      threshold: 0.01
-      index: 0
-    - dataref_str: "AirbusFBW/OHPLightsATA30"
-      operator: ">"
-      threshold: 0.01
-      index: 1
-    - dataref_str: "AirbusFBW/OHPLightsATA30"
-      operator: ">"
-      threshold: 0.01
-      index: 2
-    - dataref_str: "AirbusFBW/OHPLightsATA30"
-      operator: ">"
-      threshold: 0.01
-      index: 3
-    - dataref_str: "AirbusFBW/OHPLightsATA30"
-      operator: ">"
-      threshold: 0.01
-      index: 4
-    - dataref_str: "AirbusFBW/OHPLightsATA30"
-      operator: ">"
-      threshold: 0.01
-      index: 5
+  eng_starter:
+    datarefs:
+      - dataref_str: "AirbusFBW/StartValveArray"
+        operator: ">"
+        threshold: 0.01
 
-eng_starter:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/StartValveArray"
-      operator: ">"
-      threshold: 0.01
+  apu:
+    datarefs:
+      - dataref_str: "AirbusFBW/APUAvail"
+        operator: ">"
+        threshold: 0.01
 
-apu:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/APUAvail"
-      operator: ">"
-      threshold: 0.01
+  master_caution:
+    datarefs:
+      - dataref_str: "AirbusFBW/MasterCaut"
+        operator: ">"
+        threshold: 0.01
 
-master_caution:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/MasterCaut"
-      operator: ">"
-      threshold: 0.01
+  vacuum:
+    condition: "any"
+    datarefs:
+      - dataref_str: "sim/cockpit/misc/vacuum"
+        operator: "<"
+        threshold: 1
+      - dataref_str: "sim/cockpit/misc/vacuum2"
+        operator: "<"
+        threshold: 1
 
-vacuum:
-  profile_type: led
-  condition: "any"
-  datarefs:
-    - dataref_str: "sim/cockpit/misc/vacuum"
-      operator: "<"
-      threshold: 1
-    - dataref_str: "sim/cockpit/misc/vacuum2"
-      operator: "<"
-      threshold: 1
+  hydro_low_pressure:
+    condition: "all"
+    datarefs:
+      - dataref_str: "AirbusFBW/HydSysPressArray"
+        operator: "<"
+        threshold: 2500
 
-hydro_low_pressure:
-  profile_type: led
-  condition: "all"
-  datarefs:
-    - dataref_str: "AirbusFBW/HydSysPressArray"
-      operator: "<"
-      threshold: 2500
+  parking_brake:
+    datarefs:
+      - dataref_str: "AirbusFBW/ParkBrake"
+        operator: "=="
+        threshold: 1
 
-parking_brake:
-  profile_type: led
-  datarefs:
-    - dataref_str: "AirbusFBW/ParkBrake"
-      operator: "=="
-      threshold: 1
+  doors:
+    condition: "any"
+    datarefs:
+      - dataref_str: "AirbusFBW/PaxDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 0
+      - dataref_str: "AirbusFBW/PaxDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 1
+      - dataref_str: "AirbusFBW/PaxDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 2
+      - dataref_str: "AirbusFBW/PaxDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 3
+      - dataref_str: "AirbusFBW/PaxDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 4
+      - dataref_str: "AirbusFBW/PaxDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 5
+      - dataref_str: "AirbusFBW/PaxDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 6
+      - dataref_str: "AirbusFBW/PaxDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 7
+      - dataref_str: "AirbusFBW/CargoDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 0
+      - dataref_str: "AirbusFBW/CargoDoorArray"
+        operator: ">"
+        threshold: 0.01
+        index: 1
+      - dataref_str: "AirbusFBW/BulkDoor"
+        operator: ">"
+        threshold: 0.01
 
-doors:
-  profile_type: led
-  condition: "any"
-  datarefs:
-    - dataref_str: "AirbusFBW/PaxDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 0
-    - dataref_str: "AirbusFBW/PaxDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 1
-    - dataref_str: "AirbusFBW/PaxDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 2
-    - dataref_str: "AirbusFBW/PaxDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 3
-    - dataref_str: "AirbusFBW/PaxDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 4
-    - dataref_str: "AirbusFBW/PaxDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 5
-    - dataref_str: "AirbusFBW/PaxDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 6
-    - dataref_str: "AirbusFBW/PaxDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 7
-    - dataref_str: "AirbusFBW/CargoDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 0
-    - dataref_str: "AirbusFBW/CargoDoorArray"
-      operator: ">"
-      threshold: 0.01
-      index: 1
-    - dataref_str: "AirbusFBW/BulkDoor"
-      operator: ">"
-      threshold: 0.01
+  aux_fuel_pump:
+    condition: "all"
+    datarefs:
+      - dataref_str: "sim/cockpit2/fuel/transfer_pump_right"
+        operator: ">"
+        threshold: 0.01
+      - dataref_str: "sim/cockpit2/fuel/transfer_pump_left"
+        operator: ">"
+        threshold: 0.01
 
-aux_fuel_pump:
-  profile_type: led
-  condition: "all"
-  datarefs:
-    - dataref_str: "sim/cockpit2/fuel/transfer_pump_right"
-      operator: ">"
-      threshold: 0.01
-    - dataref_str: "sim/cockpit2/fuel/transfer_pump_left"
-      operator: ">"
-      threshold: 0.01
+data:
+  retractable_gear:
+    datarefs:
+      - dataref_str: "sim/aircraft/gear/acf_gear_retract"
+        operator: "!="
+        threshold: 0
 
-retractable_gear:
-  profile_type: data
-  datarefs:
-    - dataref_str: "sim/aircraft/gear/acf_gear_retract"
-      operator: "!="
-      threshold: 0
+  bus_voltage:
+    datarefs:
+      - dataref_str: "AirbusFBW/DCBusVoltages"
+        operator: ">"
+        threshold: 0.01
