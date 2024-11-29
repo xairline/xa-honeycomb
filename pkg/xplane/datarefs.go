@@ -311,7 +311,10 @@ func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
 					dataref.Expr = program
 					dataref.Env = env
 				}
-				fieldValue.On, fieldValue.Off = s.assignOnAndOffFuncs(fieldName)
+
+				if typ.Name() == "Leds" {
+					fieldValue.On, fieldValue.Off = s.assignOnAndOffFuncs(fieldName)
+				}
 			}
 
 			// Assign the modified value back to the struct field
