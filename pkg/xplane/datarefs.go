@@ -281,35 +281,37 @@ func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
 
 					datarefType := dataAccess.GetDataRefTypes(myDataref)
 
-					var code string
-					switch datarefType {
-					case dataAccess.TypeFloat:
-						code = fmt.Sprintf("GetFloatData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
-					case dataAccess.TypeInt:
-						code = fmt.Sprintf("GetIntData(myDataref) %s %d", dataref.Operator, int(dataref.Threshold))
-					case dataAccess.TypeFloatArray:
-						code = fmt.Sprintf("GetFloatArrayData(myDataref)[%d] %s %f", dataref.Index, dataref.Operator, dataref.Threshold)
-					case dataAccess.TypeIntArray:
-						code = fmt.Sprintf("GetIntArrayData(myDataref)[%d] %s %d", dataref.Index, dataref.Operator, int(dataref.Threshold))
-					default:
-						s.Logger.Errorf("Dataref type not supported: %v", datarefType)
-					}
+					if dataref.Operator != "" {
+						var code string
+						switch datarefType {
+						case dataAccess.TypeFloat:
+							code = fmt.Sprintf("GetFloatData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
+						case dataAccess.TypeInt:
+							code = fmt.Sprintf("GetIntData(myDataref) %s %d", dataref.Operator, int(dataref.Threshold))
+						case dataAccess.TypeFloatArray:
+							code = fmt.Sprintf("GetFloatArrayData(myDataref)[%d] %s %f", dataref.Index, dataref.Operator, dataref.Threshold)
+						case dataAccess.TypeIntArray:
+							code = fmt.Sprintf("GetIntArrayData(myDataref)[%d] %s %d", dataref.Index, dataref.Operator, int(dataref.Threshold))
+						default:
+							s.Logger.Errorf("Dataref type not supported: %v", datarefType)
+						}
 
-					s.Logger.Infof("---- Compiling expression: %s - %s: %s", code, fieldName, dataref.DatarefStr)
-					env := map[string]interface{}{
-						"GetFloatData":      dataAccess.GetFloatData,
-						"GetIntData":        dataAccess.GetIntData,
-						"GetFloatArrayData": dataAccess.GetFloatArrayData,
-						"GetIntArrayData":   dataAccess.GetIntArrayData,
-						"myDataref":         myDataref,
+						s.Logger.Infof("---- Compiling expression: %s - %s: %s", code, fieldName, dataref.DatarefStr)
+						env := map[string]interface{}{
+							"GetFloatData":      dataAccess.GetFloatData,
+							"GetIntData":        dataAccess.GetIntData,
+							"GetFloatArrayData": dataAccess.GetFloatArrayData,
+							"GetIntArrayData":   dataAccess.GetIntArrayData,
+							"myDataref":         myDataref,
+						}
+						program, err := expr.Compile(code, expr.Env(env))
+						if err != nil {
+							s.Logger.Errorf("Error compiling expression: %v", err)
+							return err
+						}
+						dataref.Expr = program
+						dataref.Env = env
 					}
-					program, err := expr.Compile(code, expr.Env(env))
-					if err != nil {
-						s.Logger.Errorf("Error compiling expression: %v", err)
-						return err
-					}
-					dataref.Expr = program
-					dataref.Env = env
 				}
 
 				if typ.Name() == "Leds" {
