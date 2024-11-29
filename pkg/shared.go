@@ -29,6 +29,7 @@ type BravoProfile struct {
 	Commands  []Command `yaml:"commands,omitempty" json:"commands,omitempty"`
 	On        func()    `json:"-"`
 	Off       func()    `json:"-"`
+	Value     float32   `yaml:"value,omitempty" json:"value,omitempty"`
 }
 
 type Knobs struct {
