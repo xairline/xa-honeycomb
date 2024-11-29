@@ -224,9 +224,20 @@ func (s *xplaneService) updateLeds() {
 
 		if fieldName == "GEAR" {
 			// special case for gear
-			dataref := s.profile.GEAR.Datarefs[0]
-			output := dataAccess.GetFloatArrayData(dataref.Dataref.(dataAccess.DataRef))
-			s.updateGearLEDs(output)
+			retractable_gear_dataref := s.profile.RETRACTABLE_GEAR.Datarefs[0]
+			retractable_gear_output, retractable_gear_err := expr.Run(retractable_gear_dataref.Expr, retractable_gear_dataref.Env)
+			if retractable_gear_err != nil {
+				s.Logger.Errorf("GEAR - Error running retractable_gear expression: %v", retractable_gear_err)
+				continue
+			}
+
+			if retractable_gear_output.(bool) {
+				dataref := s.profile.GEAR.Datarefs[0]
+				output := dataAccess.GetFloatArrayData(dataref.Dataref.(dataAccess.DataRef))
+				s.updateGearLEDs(output)
+			} else {
+				s.updateGearLEDs([]float32{0, 0, 0})
+			}
 			continue
 		}
 
