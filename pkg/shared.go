@@ -70,6 +70,7 @@ type Data struct {
 	BUS_VOLTAGE      BravoProfile `yaml:"bus_voltage,omitempty" json:"bus_voltage,omitempty"`
 	RETRACTABLE_GEAR BravoProfile `yaml:"retractable_gear,omitempty" json:"retractable_gear,omitempty"`
 	AP_STATE         BravoProfile `yaml:"ap_state,omitempty" json:"ap_state,omitempty"`
+	AP_VS_STEP       BravoProfile `yaml:"ap_vs_step,omitempty" json:"ap_vs_step,omitempty"`
 }
 
 type Profile struct {
