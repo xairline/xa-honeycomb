@@ -1,6 +1,8 @@
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
+all: mac win lin
+
 clean:
 	rm -rf dist || true || rm ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/mac.xpl
 mac:
@@ -48,7 +50,6 @@ lin:
 	go build -tags libusb -buildmode c-shared -o build/xa-honeycomb/lin.xpl  \
 		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" plugin/plugin.go
 
-all: mac win lin
 mac-test:
 	GOOS=darwin \
 	GOARCH=arm64 \
