@@ -19,7 +19,7 @@ function App() {
     index: number,
   ) => {
     setSelectedIndex(index);
-    GetProfile(profilesData[index].metadata.name || "").then(profile);
+    GetProfile(profilesData[index].metadata?.name || "").then(profile);
   };
 
   useEffect(() => {

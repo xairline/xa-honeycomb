@@ -42,22 +42,22 @@ export default function MyTabs(props: TabPanelProps) {
 
     let apLightsProfileCopy: any = {
       metadata: props.profile.metadata,
-      ap: props.profile.ap,
-      hdg: props.profile.hdg,
-      nav: props.profile.nav,
-      apr: props.profile.apr,
-      rev: props.profile.rev,
-      alt: props.profile.alt,
-      vs: props.profile.vs,
-      ias: props.profile.ias,
+      ap: props.profile.leds?.ap,
+      hdg: props.profile.leds?.hdg,
+      nav: props.profile.leds?.nav,
+      apr: props.profile.leds?.apr,
+      rev: props.profile.leds?.rev,
+      alt: props.profile.leds?.alt,
+      vs: props.profile.leds?.vs,
+      ias: props.profile.leds?.ias,
     }
     let apKnobsProfileCopy: any = {
       metadata: props.profile.metadata,
-      ap_hdg: props.profile.ap_hdg,
-      ap_vs: props.profile.ap_vs,
-      ap_alt: props.profile.ap_alt,
-      ap_ias: props.profile.ap_ias,
-      ap_crs: props.profile.ap_crs,
+      ap_hdg: props.profile.knobs?.ap_hdg,
+      ap_vs: props.profile.knobs?.ap_vs,
+      ap_alt: props.profile.knobs?.ap_alt,
+      ap_ias: props.profile.knobs?.ap_ias,
+      ap_crs: props.profile.knobs?.ap_crs,
 
     }
     setApLightsProfile(apLightsProfileCopy);

@@ -31,8 +31,8 @@ export default function Profiles(props: TabPanelProps) {
 
   useEffect(() => {
     const newChecked = props.profiles
-      .filter((profile) => profile.metadata.enabled)
-      .map((profile) => profile.metadata.name || ""); // Collect names of enabled profiles
+      .filter((profile) => profile.metadata?.enabled)
+      .map((profile) => profile.metadata?.name || ""); // Collect names of enabled profiles
     setChecked(newChecked);
   }, [props.profiles]);
 
@@ -78,9 +78,9 @@ export default function Profiles(props: TabPanelProps) {
                 <ListItemIcon>
                   <Switch
                     edge="end"
-                    onChange={handleToggle(profile.metadata.name || "")}
+                    onChange={handleToggle(profile.metadata?.name || "")}
                     checked={
-                      checked.includes(profile.metadata.name || "asdf")
+                      checked.includes(profile.metadata?.name || "asdf")
                     }
                     inputProps={{
                       'aria-labelledby': 'switch-list-label-wifi',
@@ -88,7 +88,7 @@ export default function Profiles(props: TabPanelProps) {
                     disabled={true}
                   />
                 </ListItemIcon>
-                <ListItemText primary={profile.metadata.name} style={{marginLeft: "12px"}}/>
+                <ListItemText primary={profile.metadata?.name} style={{marginLeft: "12px"}}/>
               </ListItemButton>
             )
           })
