@@ -72,6 +72,7 @@ type Data struct {
 	AP_STATE         BravoProfile `yaml:"ap_state,omitempty" json:"ap_state,omitempty"`
 	AP_ALT_STEP      BravoProfile `yaml:"ap_alt_step,omitempty" json:"ap_alt_step,omitempty"`
 	AP_VS_STEP       BravoProfile `yaml:"ap_vs_step,omitempty" json:"ap_vs_step,omitempty"`
+	AP_IAS_STEP      BravoProfile `yaml:"ap_ias_step,omitempty" json:"ap_ias_step,omitempty"`
 }
 
 type Profile struct {

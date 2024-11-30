@@ -41,7 +41,13 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 		switch s.apSelector {
 		case "ias":
 			myProfile = s.profile.Knobs.AP_IAS
-			step = 1
+
+			iasStep, foundIasStep := s.valueOf(&s.profile.Data.AP_IAS_STEP)
+			if foundIasStep {
+				step = iasStep
+			} else {
+				step = 1
+			}
 		case "alt":
 			myProfile = s.profile.Knobs.AP_ALT
 
