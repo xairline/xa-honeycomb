@@ -53,11 +53,15 @@ func (s *xplaneService) tryLoadProfile() {
 }
 
 func (s *xplaneService) setupDataRefs(planeProfile pkg.Profile) {
+	// Fill in any missing sections of the profile
 	if planeProfile.Metadata == nil {
 		planeProfile.Metadata = &pkg.Metadata{}
 	}
 	if planeProfile.Data == nil {
 		planeProfile.Data = &pkg.Data{}
+	}
+	if planeProfile.Conditions == nil {
+		planeProfile.Conditions = &pkg.Conditions{}
 	}
 	if planeProfile.Knobs == nil {
 		planeProfile.Knobs = &pkg.Knobs{}
@@ -65,11 +69,42 @@ func (s *xplaneService) setupDataRefs(planeProfile pkg.Profile) {
 	if planeProfile.Leds == nil {
 		planeProfile.Leds = &pkg.Leds{}
 	}
-	err := s.CompileRules(&planeProfile)
+
+	var err error
+	hasErrors := false
+
+	s.Logger.Infof("Loading LEDs")
+	err = rangeStruct(planeProfile.Leds, s.loadProfileElement)
 	if err != nil {
-		s.Logger.Errorf("Error compiling rules: %v", err)
-		s.profile = nil
-		return
+		s.Logger.Errorf("Error loading LEDs: %v", err)
+		hasErrors = true
+	}
+
+	s.Logger.Infof("Loading Datas")
+	err = rangeStruct(planeProfile.Data, s.loadProfileElement)
+	if err != nil {
+		s.Logger.Errorf("Error loading Datas: %v", err)
+		hasErrors = true
+	}
+
+	s.Logger.Infof("Loading Knobs")
+	err = rangeStruct(planeProfile.Knobs, s.loadProfileElement)
+	if err != nil {
+		s.Logger.Errorf("Error loading Knobs: %v", err)
+		hasErrors = true
+	}
+
+	s.Logger.Infof("Loading Conditions")
+	err = rangeStruct(planeProfile.Conditions, s.loadProfileElement)
+	if err != nil {
+		s.Logger.Errorf("Error loading Conditions: %v", err)
+		hasErrors = true
+	}
+
+	if hasErrors {
+		s.Logger.Infof("Loaded profile with errors")
+	} else {
+		s.Logger.Infof("Successfully loaded profile")
 	}
 	s.profile = &planeProfile
 }
@@ -148,25 +183,14 @@ func (s *xplaneService) loadProfile(airplaneConfig string) (pkg.Profile, error) 
 	return res, nil
 }
 
-func (s *xplaneService) CompileRules(p *pkg.Profile) error {
-	err := s.compileRules(p.Leds, p.Data)
-	if err != nil {
-		s.Logger.Errorf("Error compiling rules for leds: %v", err)
-		return err
-	}
-	s.Logger.Infof("Rules compiled successfully")
-	return nil
-}
-
 func (s *xplaneService) updateLeds() {
+	if s.profile == nil {
+		return
+	}
 
 	// special case for bus voltage
-	dataref := s.profile.Data.BUS_VOLTAGE.Datarefs[0]
-	output, err := expr.Run(dataref.Expr, dataref.Env)
-	if err != nil {
-		s.Logger.Errorf("BUS_VOLTAGE - Error running expression: %v", err)
-	}
-	if !output.(bool) {
+	busVoltage, busVoltageOK := s.evaluateCondition((&s.profile.Conditions.BUS_VOLTAGE))
+	if busVoltageOK && !busVoltage {
 		honeycomb.AllOff()
 		return
 	}
@@ -179,67 +203,40 @@ func (s *xplaneService) updateLeds() {
 		// Get the field value as a reflect.Value
 		fieldVal := val.Field(i)
 		// Perform type assertion to BravoProfile
-		fieldValue, ok := fieldVal.Interface().(pkg.BravoProfile)
+		fieldValue, ok := fieldVal.Interface().(pkg.LEDProfile)
 		if !ok {
-			s.Logger.Errorf("Field %s is not of type BravoProfile", fieldName)
+			s.Logger.Errorf("Field %s is not of type LEDProfile", fieldName)
 			continue
 		}
 
-		if fieldValue.Datarefs == nil && fieldValue.Commands == nil {
+		if fieldValue.Datarefs == nil {
 			continue
 		}
 
 		if fieldName == "GEAR" {
 			// special case for gear
-			retractable_gear_dataref := s.profile.Data.RETRACTABLE_GEAR.Datarefs[0]
-			if retractable_gear_dataref.Expr != nil {
-				retractable_gear_output, retractable_gear_err := expr.Run(retractable_gear_dataref.Expr, retractable_gear_dataref.Env)
-				if retractable_gear_err != nil {
-					s.Logger.Errorf("GEAR - Error running retractable_gear expression: %v", retractable_gear_err)
-					continue
-				}
-
-				if !retractable_gear_output.(bool) {
-					s.updateGearLEDs([]float32{0, 0, 0})
-					continue
-				}
+			retractableGear, retractableGearOK := s.evaluateCondition(&s.profile.Conditions.RETRACTABLE_GEAR)
+			if retractableGearOK && !retractableGear {
+				s.updateGearLEDs([]float32{0, 0, 0})
+				continue
 			}
 
 			dataref := s.profile.Leds.GEAR.Datarefs[0]
-			output := dataAccess.GetFloatArrayData(dataref.Dataref.(dataAccess.DataRef))
-			s.updateGearLEDs(output)
+			if dataref.Dataref != nil {
+				output := dataAccess.GetFloatArrayData(dataref.Dataref.(dataAccess.DataRef))
+				s.updateGearLEDs(output)
+			}
 			continue
 		}
 
-		var result bool
-		if fieldValue.Condition == "any" {
-			result = false
-		} else {
-			result = true
-		}
-		for _, dataref := range fieldValue.Datarefs {
-			if dataref.Expr == nil {
-				continue
-			}
-			output, err := expr.Run(dataref.Expr, dataref.Env)
-			if err != nil {
-				s.Logger.Errorf("Error running expression: %v", err)
-				result = false
-				break
-			}
-			if fieldValue.Condition == "any" {
-				result = result || output.(bool)
+		result, resultOK := s.evaluateCondition(&fieldValue.ConditionProfile)
+		if resultOK {
+			if result {
+				fieldValue.On()
 			} else {
-				// all or nothing (single value)
-				result = result && output.(bool)
+				fieldValue.Off()
 			}
 		}
-		if result {
-			fieldValue.On()
-		} else {
-			fieldValue.Off()
-		}
-
 	}
 }
 
@@ -284,99 +281,153 @@ func (s *xplaneService) updateGearLEDs(output []float32) {
 	}
 }
 
-func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
-	var vals []reflect.Value
-	vals = append(vals, reflect.ValueOf(l).Elem(), reflect.ValueOf(d).Elem())
-	for index, _ := range vals {
-		val := vals[index]
-		typ := val.Type()
-		s.Logger.Infof("Compiling rules for: %s", typ.Name())
-		for i := 0; i < val.NumField(); i++ {
-			field := typ.Field(i) // Get the field metadata
-			fieldName := field.Name
-			s.Logger.Infof("-- Compiling rules for: %s", fieldName)
-			// Get the field value as a reflect.Value
-			fieldVal := val.Field(i)
-			// Perform type assertion to BravoProfile
-			fieldValue, ok := fieldVal.Interface().(pkg.BravoProfile)
-			if !ok {
-				s.Logger.Errorf("Field %s is not of type BravoProfile", fieldName)
-				return fmt.Errorf("Field %s is not of type BravoProfile", fieldName)
-			}
+func rangeStruct(s interface{}, modify func(name string, value interface{}) (interface{}, error)) error {
+	v := reflect.ValueOf(s)
 
-			// Modify the fieldValue
-			if fieldValue.Datarefs != nil {
-				for j := range fieldValue.Datarefs {
-					dataref := &fieldValue.Datarefs[j]
-					s.Logger.Infof("---- Compiling dataref: %s", dataref.DatarefStr)
-					// Get a pointer to the actual element
-					myDataref, found := dataAccess.FindDataRef(dataref.DatarefStr)
-					if !found {
-						s.Logger.Errorf("Dataref not found: %s", dataref.DatarefStr)
-						continue
-					}
-					dataref.Dataref = myDataref
+	// Dereference to get the underlying struct
+	v = v.Elem()
+	t := v.Type()
 
-					datarefType := dataAccess.GetDataRefTypes(myDataref)
+	// Iterate over the fields
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		fieldType := t.Field(i)
 
-					if dataref.Operator != "" {
-						if !IsOperatorSupported(dataref.Operator) {
-							s.Logger.Errorf("Unsupported operator found: %s", dataref.Operator)
-							return fmt.Errorf("Unsupported operator: %s", dataref.Operator)
-						}
-
-						var code string
-						switch datarefType {
-						case dataAccess.TypeFloat:
-							code = fmt.Sprintf("GetFloatData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
-						case dataAccess.TypeInt:
-							code = fmt.Sprintf("GetIntData(myDataref) %s %d", dataref.Operator, int(dataref.Threshold))
-						case dataAccess.TypeFloatArray:
-							code = fmt.Sprintf("GetFloatArrayData(myDataref)[%d] %s %f", dataref.Index, dataref.Operator, dataref.Threshold)
-						case dataAccess.TypeIntArray:
-							code = fmt.Sprintf("GetIntArrayData(myDataref)[%d] %s %d", dataref.Index, dataref.Operator, int(dataref.Threshold))
-						default:
-							s.Logger.Errorf("Dataref type not supported: %v", datarefType)
-						}
-
-						s.Logger.Infof("---- Compiling expression: %s - %s: %s", code, fieldName, dataref.DatarefStr)
-						env := map[string]interface{}{
-							"GetFloatData":      dataAccess.GetFloatData,
-							"GetIntData":        dataAccess.GetIntData,
-							"GetFloatArrayData": dataAccess.GetFloatArrayData,
-							"GetIntArrayData":   dataAccess.GetIntArrayData,
-							"myDataref":         myDataref,
-						}
-						program, err := expr.Compile(code, expr.Env(env))
-						if err != nil {
-							s.Logger.Errorf("Error compiling expression: %v", err)
-							return err
-						}
-						dataref.Expr = program
-						dataref.Env = env
-					}
-				}
-
-				if typ.Name() == "Leds" {
-					fieldValue.On, fieldValue.Off = s.assignOnAndOffFuncs(fieldName)
-				}
-			} else {
-				s.Logger.Infof("---- No datarefs specified")
-			}
-
-			// Assign the modified value back to the struct field
-			fieldVal.Set(reflect.ValueOf(fieldValue))
-			s.Logger.Infof("-- Rules compiled successfully for: %s", fieldName)
+		value := field.Interface()
+		newValue, err := modify(fieldType.Name, value)
+		if err != nil {
+			return err
 		}
-		s.Logger.Infof("Rules compiled successfully: %s", typ.Name())
+		field.Set(reflect.ValueOf(newValue))
+	}
+	return nil
+}
+
+func (s *xplaneService) loadProfileElement(fieldName string, value interface{}) (interface{}, error) {
+	dataProfileValue, ok := value.(pkg.DataProfile)
+	if ok {
+		s.Logger.Infof("-- Loading Data: %s", fieldName)
+		err := s.loadDatarefProfile(fieldName, &dataProfileValue.DatarefProfile)
+		return dataProfileValue, err
 	}
 
+	knobProfileValue, ok := value.(pkg.KnobProfile)
+	if ok {
+		s.Logger.Infof("-- Loading Knob: %s", fieldName)
+		err := s.loadDatarefProfile(fieldName, &knobProfileValue.DatarefProfile)
+		return knobProfileValue, err
+	}
+
+	conditionProfileValue, ok := value.(pkg.ConditionProfile)
+	if ok {
+		s.Logger.Infof("-- Loading Condition: %s", fieldName)
+		err := s.loadConditionProfile(fieldName, &conditionProfileValue)
+		return conditionProfileValue, err
+	}
+
+	ledProfileValue, ok := value.(pkg.LEDProfile)
+	if ok {
+		s.Logger.Infof("-- Loading LED: %s", fieldName)
+		err := s.loadLedProfile(fieldName, &ledProfileValue)
+		return ledProfileValue, err
+	}
+
+	return value, fmt.Errorf("Field %s is not of a known type", fieldName)
+}
+
+func (s *xplaneService) loadDatarefProfile(fieldName string, fieldValue *pkg.DatarefProfile) error {
+	if fieldValue.Datarefs != nil {
+		for j := range fieldValue.Datarefs {
+			dataref := &fieldValue.Datarefs[j]
+			dataref.Dataref = s.getDataref(dataref.DatarefStr)
+		}
+	} else {
+		s.Logger.Infof("---- No datarefs specified for %s", fieldName)
+	}
 	return nil
+}
+
+func (s *xplaneService) loadConditionProfile(fieldName string, fieldValue *pkg.ConditionProfile) error {
+	if fieldValue.Datarefs == nil {
+		s.Logger.Infof("---- No datarefs specified")
+		return nil
+	}
+
+	for j := range fieldValue.Datarefs {
+		dataref := &fieldValue.Datarefs[j]
+		myDataref := s.getDataref(dataref.DatarefStr)
+
+		if myDataref == nil {
+			continue
+		}
+
+		dataref.Dataref = myDataref
+		datarefType := dataAccess.GetDataRefTypes(myDataref)
+
+		if dataref.Operator != "" {
+			if !isOperatorSupported(dataref.Operator) {
+				return fmt.Errorf("Unsupported operator found: %s", dataref.Operator)
+			}
+
+			var code string
+			switch datarefType {
+			case dataAccess.TypeFloat:
+				code = fmt.Sprintf("GetFloatData(myDataref) %s %f", dataref.Operator, dataref.Threshold)
+			case dataAccess.TypeInt:
+				code = fmt.Sprintf("GetIntData(myDataref) %s %d", dataref.Operator, int(dataref.Threshold))
+			case dataAccess.TypeFloatArray:
+				code = fmt.Sprintf("GetFloatArrayData(myDataref)[%d] %s %f", dataref.Index, dataref.Operator, dataref.Threshold)
+			case dataAccess.TypeIntArray:
+				code = fmt.Sprintf("GetIntArrayData(myDataref)[%d] %s %d", dataref.Index, dataref.Operator, int(dataref.Threshold))
+			default:
+				return fmt.Errorf("Dataref type not supported: %v", datarefType)
+			}
+
+			s.Logger.Infof("---- Compiling expression: %s - %s[%d]: %s", code, fieldName, j, dataref.DatarefStr)
+			env := map[string]interface{}{
+				"GetFloatData":      dataAccess.GetFloatData,
+				"GetIntData":        dataAccess.GetIntData,
+				"GetFloatArrayData": dataAccess.GetFloatArrayData,
+				"GetIntArrayData":   dataAccess.GetIntArrayData,
+				"myDataref":         myDataref,
+			}
+			program, err := expr.Compile(code, expr.Env(env))
+			if err != nil {
+				return fmt.Errorf("Error compiling expression: %v", err)
+			}
+			dataref.Expr = program
+			dataref.Env = env
+		} else {
+			return fmt.Errorf("Condition missing operator: %s", fieldName)
+		}
+	}
+
+	s.Logger.Infof("-- Rules compiled successfully for: %s", fieldName)
+	return nil
+}
+
+func (s *xplaneService) loadLedProfile(fieldName string, fieldValue *pkg.LEDProfile) error {
+	err := s.loadConditionProfile(fieldName, &fieldValue.ConditionProfile)
+
+	fieldValue.On, fieldValue.Off = s.assignOnAndOffFuncs(fieldName)
+	return err
+}
+
+func (s *xplaneService) getDataref(datarefStr string) dataAccess.DataRef {
+	s.Logger.Infof("---- Finding dataref: %s", datarefStr)
+	// Get a pointer to the actual element
+	myDataref, found := dataAccess.FindDataRef(datarefStr)
+	if !found {
+		s.Logger.Errorf("Dataref not found: %s", datarefStr)
+		return nil
+	}
+
+	return myDataref
 }
 
 // Check whether the given expression operator is allowed in our boolean expressions
 // This prevents arbitrary code execution from user input.
-func IsOperatorSupported(operator string) bool {
+func isOperatorSupported(operator string) bool {
 	return operator == "==" ||
 		operator == ">" ||
 		operator == "<" ||
@@ -385,11 +436,43 @@ func IsOperatorSupported(operator string) bool {
 		operator == "!="
 }
 
-// Extract a value from the given data `BravoProfile`
+// Evaluate a condition
+// Returns:
+// 1. The result of the condition evaluation
+// 2. Whether the condition was valid (if false then it should be ignored)
+func (s *xplaneService) evaluateCondition(condition *pkg.ConditionProfile) (bool, bool) {
+	var valid = false
+	var result bool
+	if condition.Condition == "any" {
+		result = false
+	} else {
+		result = true
+	}
+	for _, dataref := range condition.Datarefs {
+		if dataref.Expr == nil {
+			continue
+		}
+		output, err := expr.Run(dataref.Expr, dataref.Env)
+		if err != nil {
+			s.Logger.Errorf("Error running expression: %v", err)
+			continue
+		}
+		if condition.Condition == "any" {
+			result = result || output.(bool)
+		} else {
+			// all or nothing (single value)
+			result = result && output.(bool)
+		}
+		valid = true
+	}
+	return result, valid
+}
+
+// Extract a value from the given data profile
 // Returns:
 // 1. The value if found, or 0.0
 // 2. Whether a value was found or not
-func (s *xplaneService) valueOf(bp *pkg.BravoProfile) (float64, bool) {
+func (s *xplaneService) dataValue(bp *pkg.DataProfile) (float64, bool) {
 	if len(bp.Datarefs) > 0 {
 		// TODO support something like "condition" that can aggregate multiple datarefs or array datarefs
 		// e.g. "max" or "min" or "sum" or "avg"

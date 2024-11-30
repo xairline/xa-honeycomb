@@ -36,13 +36,13 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 			s.Logger.Debugf("Decrease: %v, Phase: %v, AP Mode: %s, Multiplier: %.1f", command, phase, s.apSelector, multiplier)
 			direction = -1
 		}
-		var myProfile pkg.BravoProfile
+		var myProfile pkg.KnobProfile
 		var step float64
 		switch s.apSelector {
 		case "ias":
 			myProfile = s.profile.Knobs.AP_IAS
 
-			iasStep, foundIasStep := s.valueOf(&s.profile.Data.AP_IAS_STEP)
+			iasStep, foundIasStep := s.dataValue(&s.profile.Data.AP_IAS_STEP)
 			if foundIasStep {
 				step = iasStep
 			} else {
@@ -51,7 +51,7 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 		case "alt":
 			myProfile = s.profile.Knobs.AP_ALT
 
-			altStep, foundAltStep := s.valueOf(&s.profile.Data.AP_ALT_STEP)
+			altStep, foundAltStep := s.dataValue(&s.profile.Data.AP_ALT_STEP)
 			if foundAltStep {
 				step = altStep
 			} else {
@@ -60,7 +60,7 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 		case "vs":
 			myProfile = s.profile.Knobs.AP_VS
 
-			vsStep, foundVsStep := s.valueOf(&s.profile.Data.AP_VS_STEP)
+			vsStep, foundVsStep := s.dataValue(&s.profile.Data.AP_VS_STEP)
 			if foundVsStep {
 				step = vsStep
 			} else {
@@ -89,7 +89,7 @@ func (s *xplaneService) changeAPMode(command utilities.CommandRef, phase utiliti
 	return 0
 }
 
-func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multiplier float64, step float64) {
+func (s *xplaneService) adjust(myProfile pkg.KnobProfile, direction int, multiplier float64, step float64) {
 	if myProfile.Commands != nil {
 		var cmd utilities.CommandRef
 		if direction > 0 {
