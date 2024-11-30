@@ -19,6 +19,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 interface LightsProps {
   title: string;
   lights?: pkg.Leds;
+  keys: string[];
 }
 
 export default function LightConfiguration(props: LightsProps) {
@@ -66,7 +67,9 @@ export default function LightConfiguration(props: LightsProps) {
         </AccordionDetails>
 
         {Object.keys(props.lights || {}).map((key) => {
-
+          if (!props.keys.includes(key)) {
+            return null;
+          }
 
           return (
             <>
@@ -96,7 +99,7 @@ export default function LightConfiguration(props: LightsProps) {
                               </TableCell>
                               <TableCell align="right">{dataref.dataref_str}</TableCell>
                               <TableCell align="right">{dataref.operator}</TableCell>
-                              <TableCell align="right">{dataref.threshold}</TableCell>
+                              <TableCell align="right">{dataref.threshold || "0"}</TableCell>
                               <TableCell align="right">{dataref.index}</TableCell>
                             </TableRow>
                           )

@@ -71,7 +71,9 @@ export namespace pkg {
 	    bus_voltage?: BravoProfile;
 	    retractable_gear?: BravoProfile;
 	    ap_state?: BravoProfile;
+	    ap_alt_step?: BravoProfile;
 	    ap_vs_step?: BravoProfile;
+	    ap_ias_step?: BravoProfile;
 	
 	    static createFrom(source: any = {}) {
 	        return new Data(source);
@@ -82,7 +84,9 @@ export namespace pkg {
 	        this.bus_voltage = this.convertValues(source["bus_voltage"], BravoProfile);
 	        this.retractable_gear = this.convertValues(source["retractable_gear"], BravoProfile);
 	        this.ap_state = this.convertValues(source["ap_state"], BravoProfile);
+	        this.ap_alt_step = this.convertValues(source["ap_alt_step"], BravoProfile);
 	        this.ap_vs_step = this.convertValues(source["ap_vs_step"], BravoProfile);
+	        this.ap_ias_step = this.convertValues(source["ap_ias_step"], BravoProfile);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

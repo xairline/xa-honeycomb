@@ -5,7 +5,6 @@ import {Grid, Stack} from "@mui/material";
 import {pkg} from "../wailsjs/go/models";
 import Profiles from "./components/profiles";
 import Metadata from "./components/metadata";
-import Configuration from './components/lightConfiguration';
 import LightConfiguration from './components/lightConfiguration';
 
 function App() {
@@ -46,11 +45,37 @@ function App() {
                 sx={{width: '100vw', overflow: "auto", bgcolor: "#222e35", height: "100vh"}}>
             <Stack spacing={2} sx={{margin: "18px"}}>
               <Metadata metadata={profileData?.metadata}/>
-              <LightConfiguration lights={profileData?.leds} title={"Autopilot Lights"}/>
-              <Configuration title={"Annunciators Row (Top)"}/>
-              <Configuration title={"Annunciators Row (Bottom)"}/>
-              <Configuration title={"Auto Pilot Knobs"}/>
-              <Configuration title={"Landing Gear Configuration"}/>
+              <LightConfiguration
+                lights={profileData?.leds}
+                title={"Autopilot Lights"}
+                keys={
+                  ["alt", "hdg", "apr", "rev", "nav", "vs", "ap", "ias"]
+                }
+              />
+              <LightConfiguration
+                title={"Annunciators Row (Top)"}
+                lights={profileData?.leds}
+                keys={
+                  ["master_warn", "fire", "oil_low_pressure", "fuel_low_pressure", "anti_ice", "eng_starter", "apu"]
+                }/>
+              <LightConfiguration
+                title={"Annunciators Row (Bottom)"}
+                lights={profileData?.leds}
+                keys={
+                  ["master_caution", "vacuum", "hydro_low_pressure", "aux_fuel_pump", "parking_brake", "volt_low", "doors"]
+                }/>
+              <LightConfiguration
+                title={"Auto Pilot Knobs"}
+                lights={profileData?.leds}
+                keys={
+                  ["ap_alt", "ap_hdg", "ap_vs", "ap_crs", "ap_ias"]
+                }/>
+              <LightConfiguration
+                title={"Landing Gear Configuration"}
+                lights={profileData?.leds}
+                keys={
+                  ["gear"]
+                }/>
             </Stack>
 
           </Grid>
