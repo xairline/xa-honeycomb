@@ -321,6 +321,11 @@ func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
 					datarefType := dataAccess.GetDataRefTypes(myDataref)
 
 					if dataref.Operator != "" {
+						if !IsOperatorSupported(dataref.Operator) {
+							s.Logger.Errorf("Unsupported operator found: %s", dataref.Operator)
+							return fmt.Errorf("Unsupported operator: %s", dataref.Operator)
+						}
+
 						var code string
 						switch datarefType {
 						case dataAccess.TypeFloat:
@@ -366,6 +371,17 @@ func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
 	}
 
 	return nil
+}
+
+// Check whether the given expression operator is allowed in our boolean expressions
+// This prevents arbitrary code execution from user input.
+func IsOperatorSupported(operator string) bool {
+	return operator == "==" ||
+		operator == ">" ||
+		operator == "<" ||
+		operator == ">=" ||
+		operator == "<=" ||
+		operator == "!="
 }
 
 // Extract a value from the given data `BravoProfile`
