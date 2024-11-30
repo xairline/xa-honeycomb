@@ -100,11 +100,11 @@ func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multip
 		utilities.CommandOnce(cmd)
 	}
 
-	if len(myProfile.Datarefs) > 0 {
-		myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[0].DatarefStr)
+	for i := 0; i < len(myProfile.Datarefs); i++ {
+		myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[i].DatarefStr)
 		if !found {
-			s.Logger.Errorf("Dataref not found: %s", myProfile.Datarefs[0].DatarefStr)
-			return
+			s.Logger.Errorf("Dataref[%d] not found: %s", i, myProfile.Datarefs[i].DatarefStr)
+			continue
 		}
 		currentValueType := dataAccess.GetDataRefTypes(myDataref)
 		switch currentValueType {
