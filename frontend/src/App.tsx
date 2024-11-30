@@ -5,7 +5,8 @@ import {Grid, Stack} from "@mui/material";
 import {pkg} from "../wailsjs/go/models";
 import Profiles from "./components/profiles";
 import Metadata from "./components/metadata";
-import Lights from './components/lights';
+import Configuration from './components/lightConfiguration';
+import LightConfiguration from './components/lightConfiguration';
 
 function App() {
   const [profileData, setProfileData] = useState({} as pkg.Profile);
@@ -45,11 +46,11 @@ function App() {
                 sx={{width: '100vw', overflow: "auto", bgcolor: "#222e35", height: "100vh"}}>
             <Stack spacing={2} sx={{margin: "18px"}}>
               <Metadata metadata={profileData?.metadata}/>
-              <Lights lights={profileData.leds} title={"Auto Pilot Lights"}/>
-              <Lights title={"Annunciators Row (Top)"}/>
-              <Lights title={"Annunciators Row (Bottom)"}/>
-              <Lights title={"Auto Pilot Knobs"}/>
-              <Lights title={"Landing Gear Lights"}/>
+              <LightConfiguration lights={profileData?.leds} title={"Autopilot Lights"}/>
+              <Configuration title={"Annunciators Row (Top)"}/>
+              <Configuration title={"Annunciators Row (Bottom)"}/>
+              <Configuration title={"Auto Pilot Knobs"}/>
+              <Configuration title={"Landing Gear Configuration"}/>
             </Stack>
 
           </Grid>
