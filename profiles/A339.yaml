@@ -240,7 +240,7 @@ leds:
         operator: ">"
         threshold: 0.01
 
-data:
+conditions:
   retractable_gear:
     datarefs:
       - dataref_str: "sim/aircraft/gear/acf_gear_retract"

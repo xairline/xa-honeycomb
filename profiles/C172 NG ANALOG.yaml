@@ -171,7 +171,7 @@ leds:
         operator: ">"
         threshold: 0.9
 
-data:
+conditions:
   bus_voltage:
     datarefs:
       - dataref_str: "sim/cockpit2/electrical/bus_volts"
@@ -184,6 +184,7 @@ data:
         operator: "!="
         threshold: 0
 
+data:
   ap_vs_step:
     datarefs:
       - dataref_str: "sim/aircraft/autopilot/vvi_step_ft"
