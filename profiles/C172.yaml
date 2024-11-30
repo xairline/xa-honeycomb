@@ -99,7 +99,8 @@ leds:
 
   fuel_low_pressure:
     datarefs:
-      - dataref_str: "sim/cockpit2/annunciators/fuel_pressure_low"
+      # Show the fuel quantity warning instead of low pressure as there isn't a low fuel pressure annunciator
+      - dataref_str: "sim/cockpit2/annunciators/fuel_quantity"
         operator: ">="
         threshold: 1
 
