@@ -22,5 +22,5 @@ func (s *xplaneService) menuHandler(menuRef interface{}, itemRef interface{}) {
 		s.Logger.Info("Reload Profile Clicked")
 		s.profile = nil
 	}
-	s.Logger.Infof("menu clicked: %v", itemRef)
+	s.Logger.Debugf("menu clicked: %v", itemRef)
 }

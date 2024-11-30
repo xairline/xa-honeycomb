@@ -83,7 +83,7 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 
 func (s *xplaneService) changeAPMode(command utilities.CommandRef, phase utilities.CommandPhase, ref interface{}) int {
 	if s.apSelector != ref.(string) {
-		s.Logger.Infof("AP MODE CHANGE: %v, Phase: %v, ref: %s", command, phase, ref.(string))
+		s.Logger.Debugf("AP MODE CHANGE: %v, Phase: %v, ref: %s", command, phase, ref.(string))
 		s.apSelector = ref.(string)
 	}
 	return 0
@@ -101,9 +101,10 @@ func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multip
 	}
 
 	for i := 0; i < len(myProfile.Datarefs); i++ {
-		myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[i].DatarefStr)
+		myDatarefName := myProfile.Datarefs[i].DatarefStr
+		myDataref, found := dataAccess.FindDataRef(myDatarefName)
 		if !found {
-			s.Logger.Errorf("Dataref[%d] not found: %s", i, myProfile.Datarefs[i].DatarefStr)
+			s.Logger.Errorf("Dataref[%d] not found: %s", i, myDatarefName)
 			continue
 		}
 		currentValueType := dataAccess.GetDataRefTypes(myDataref)
@@ -111,12 +112,12 @@ func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multip
 		case dataAccess.TypeFloat:
 			currentValue := dataAccess.GetFloatData(myDataref)
 			newValue := currentValue + float32(float64(direction)*multiplier*step)
-			s.Logger.Debugf("Current Value[%d]: %f, New Value: %f", i, currentValue, newValue)
+			s.Logger.Debugf("Knob dataref: %s, Current Value: %f, New Value: %f", myDatarefName, currentValue, newValue)
 			dataAccess.SetFloatData(myDataref, newValue)
 		case dataAccess.TypeInt:
 			currentValue := dataAccess.GetIntData(myDataref)
 			newValue := currentValue + int(float64(direction)*multiplier*step)
-			s.Logger.Debugf("Current Value[%d]: %f, New Value: %f", i, currentValue, newValue)
+			s.Logger.Debugf("Knob dataref: %s, Current Value: %f, New Value: %f", myDatarefName, currentValue, newValue)
 			dataAccess.SetIntData(myDataref, newValue)
 		}
 	}
