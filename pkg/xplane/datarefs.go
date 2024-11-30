@@ -186,7 +186,6 @@ func (s *xplaneService) updateLeds() {
 		}
 
 		if fieldValue.Datarefs == nil && fieldValue.Commands == nil {
-			s.Logger.Debugf("No datarefs found for: %s", fieldName)
 			continue
 		}
 
@@ -361,6 +360,8 @@ func (s *xplaneService) compileRules(l *pkg.Leds, d *pkg.Data) error {
 				if typ.Name() == "Leds" {
 					fieldValue.On, fieldValue.Off = s.assignOnAndOffFuncs(fieldName)
 				}
+			} else {
+				s.Logger.Infof("---- No datarefs specified")
 			}
 
 			// Assign the modified value back to the struct field
