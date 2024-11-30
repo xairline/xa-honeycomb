@@ -41,15 +41,27 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 		switch s.apSelector {
 		case "ias":
 			myProfile = s.profile.Knobs.AP_IAS
-			step = 1
+
+			iasStep, foundIasStep := s.valueOf(&s.profile.Data.AP_IAS_STEP)
+			if foundIasStep {
+				step = iasStep
+			} else {
+				step = 1
+			}
 		case "alt":
 			myProfile = s.profile.Knobs.AP_ALT
-			step = 100
+
+			altStep, foundAltStep := s.valueOf(&s.profile.Data.AP_ALT_STEP)
+			if foundAltStep {
+				step = altStep
+			} else {
+				step = 100
+			}
 		case "vs":
 			myProfile = s.profile.Knobs.AP_VS
 
-			vsStep := s.valueOf(&s.profile.Data.AP_VS_STEP)
-			if vsStep != 0 {
+			vsStep, foundVsStep := s.valueOf(&s.profile.Data.AP_VS_STEP)
+			if foundVsStep {
 				step = vsStep
 			} else {
 				step = 1
@@ -62,7 +74,7 @@ func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilit
 			step = 1
 		}
 		s.adjust(myProfile, direction, multiplier, step)
-		s.Logger.Infof("Knob turn: %d, Mode: %s, Multiplier: %.1f, Steo: %.1f", direction, s.apSelector, multiplier, step)
+		s.Logger.Infof("Knob turn: %d, Mode: %s, Multiplier: %.1f, Step: %.1f", direction, s.apSelector, multiplier, step)
 		// Update the last interaction time
 		s.lastKnobTime = now
 	}
@@ -87,23 +99,25 @@ func (s *xplaneService) adjust(myProfile pkg.BravoProfile, direction int, multip
 		}
 		utilities.CommandOnce(cmd)
 	}
-	myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[0].DatarefStr)
-	if !found {
-		s.Logger.Errorf("Dataref not found: %s", myProfile.Datarefs[0].DatarefStr)
-		return
-	}
-	currentValueType := dataAccess.GetDataRefTypes(myDataref)
-	switch currentValueType {
-	case dataAccess.TypeFloat:
-		currentValue := dataAccess.GetFloatData(myDataref)
-		newValue := currentValue + float32(float64(direction)*multiplier*step)
-		s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
-		dataAccess.SetFloatData(myDataref, newValue)
-	case dataAccess.TypeInt:
-		currentValue := dataAccess.GetIntData(myDataref)
-		newValue := currentValue + int(float64(direction)*multiplier*step)
-		s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
-		dataAccess.SetIntData(myDataref, newValue)
-	}
 
+	if len(myProfile.Datarefs) > 0 {
+		myDataref, found := dataAccess.FindDataRef(myProfile.Datarefs[0].DatarefStr)
+		if !found {
+			s.Logger.Errorf("Dataref not found: %s", myProfile.Datarefs[0].DatarefStr)
+			return
+		}
+		currentValueType := dataAccess.GetDataRefTypes(myDataref)
+		switch currentValueType {
+		case dataAccess.TypeFloat:
+			currentValue := dataAccess.GetFloatData(myDataref)
+			newValue := currentValue + float32(float64(direction)*multiplier*step)
+			s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
+			dataAccess.SetFloatData(myDataref, newValue)
+		case dataAccess.TypeInt:
+			currentValue := dataAccess.GetIntData(myDataref)
+			newValue := currentValue + int(float64(direction)*multiplier*step)
+			s.Logger.Infof("Current Value: %f, New Value: %f", currentValue, newValue)
+			dataAccess.SetIntData(myDataref, newValue)
+		}
+	}
 }

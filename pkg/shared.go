@@ -29,7 +29,7 @@ type BravoProfile struct {
 	Commands  []Command `yaml:"commands,omitempty" json:"commands,omitempty"`
 	On        func()    `json:"-"`
 	Off       func()    `json:"-"`
-	Value     float32   `yaml:"value,omitempty" json:"value,omitempty"`
+	Value     *float32  `yaml:"value,omitempty" json:"value,omitempty"`
 }
 
 type Knobs struct {
@@ -70,7 +70,9 @@ type Data struct {
 	BUS_VOLTAGE      BravoProfile `yaml:"bus_voltage,omitempty" json:"bus_voltage,omitempty"`
 	RETRACTABLE_GEAR BravoProfile `yaml:"retractable_gear,omitempty" json:"retractable_gear,omitempty"`
 	AP_STATE         BravoProfile `yaml:"ap_state,omitempty" json:"ap_state,omitempty"`
+	AP_ALT_STEP      BravoProfile `yaml:"ap_alt_step,omitempty" json:"ap_alt_step,omitempty"`
 	AP_VS_STEP       BravoProfile `yaml:"ap_vs_step,omitempty" json:"ap_vs_step,omitempty"`
+	AP_IAS_STEP      BravoProfile `yaml:"ap_ias_step,omitempty" json:"ap_ias_step,omitempty"`
 }
 
 type Profile struct {
