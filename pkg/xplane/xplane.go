@@ -28,7 +28,7 @@ type XplaneService interface {
 	// menu handler
 	menuHandler(menuRef interface{}, itemRef interface{})
 	// datarefs
-	setupDataRefs(airplaneICAO string)
+	tryLoadProfile()
 }
 
 type xplaneService struct {

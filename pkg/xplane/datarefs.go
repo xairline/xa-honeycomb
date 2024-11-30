@@ -12,21 +12,47 @@ import (
 	"reflect"
 )
 
-func (s *xplaneService) setupDataRefs(airplaneICAO string) {
-	s.Logger.Infof("Setup Datarefs for: %s", airplaneICAO)
+func (s *xplaneService) tryLoadProfile() {
+	// Try to load the profile using the aircraft's UI name
+	aircraftNameDrf, found := dataAccess.FindDataRef("sim/aircraft/view/acf_ui_name")
+	if found {
+		aircraftName := dataAccess.GetString(aircraftNameDrf)
 
-	s.Logger.Infof("Loading BravoProfile for: %s", airplaneICAO)
-	var planeProfile pkg.Profile
-	planeProfile, err := s.loadProfile(airplaneICAO)
-	if err != nil {
-		s.Logger.Errorf("Error loading BravoProfile: %v", err)
-		s.Logger.Infof("Loading defalt BravoProfile for: %s", airplaneICAO)
-		planeProfile, err = s.loadProfile("default")
-		if err != nil {
-			s.Logger.Errorf("Error loading default BravoProfile: %v", err)
+		planeProfile, err := s.loadProfile(aircraftName)
+		if err == nil {
+			s.Logger.Infof("Loading BravoProfile for: %s", aircraftName)
+			s.setupDataRefs(planeProfile)
 			return
+		} else {
+			s.Logger.Errorf("Cannot loading BravoProfile for %s: %v", aircraftName, err)
 		}
 	}
+
+	// Try to load the profile using the aircraft's ICAO
+	aircraftIACODrf, found := dataAccess.FindDataRef("sim/aircraft/view/acf_ICAO")
+	if found {
+		aircraftIACO := dataAccess.GetString(aircraftIACODrf)
+
+		planeProfile, err := s.loadProfile(aircraftIACO)
+		if err == nil {
+			s.Logger.Infof("Loading BravoProfile for: %s", aircraftIACO)
+			s.setupDataRefs(planeProfile)
+			return
+		} else {
+			s.Logger.Errorf("Cannot loading BravoProfile for %s: %v", aircraftIACO, err)
+		}
+	}
+
+	s.Logger.Infof("Loading default BravoProfile")
+	planeProfile, err := s.loadProfile("default")
+	if err == nil {
+		s.setupDataRefs(planeProfile)
+	} else {
+		s.Logger.Errorf("Error loading default BravoProfile: %v", err)
+	}
+}
+
+func (s *xplaneService) setupDataRefs(planeProfile pkg.Profile) {
 	if planeProfile.Metadata == nil {
 		planeProfile.Metadata = &pkg.Metadata{}
 	}
@@ -39,7 +65,7 @@ func (s *xplaneService) setupDataRefs(airplaneICAO string) {
 	if planeProfile.Leds == nil {
 		planeProfile.Leds = &pkg.Leds{}
 	}
-	err = s.CompileRules(&planeProfile)
+	err := s.CompileRules(&planeProfile)
 	if err != nil {
 		s.Logger.Errorf("Error compiling rules: %v", err)
 		s.profile = nil
@@ -106,19 +132,17 @@ func (s *xplaneService) assignOnAndOffFuncs(name string) (func(), func()) {
 	}
 }
 
-func (s *xplaneService) loadProfile(airplaneICAO string) (pkg.Profile, error) {
-	// load datarefs for the airplane from csv
-	csvFilePath := path.Join(s.pluginPath, "profiles", fmt.Sprintf("%s.yaml", airplaneICAO))
-	s.Logger.Infof("Loading datarefs from: %s", csvFilePath)
-	f, err := os.ReadFile(csvFilePath)
+func (s *xplaneService) loadProfile(airplaneConfig string) (pkg.Profile, error) {
+	// load datarefs for the airplane from YAML
+	configFilePath := path.Join(s.pluginPath, "profiles", fmt.Sprintf("%s.yaml", airplaneConfig))
+	f, err := os.ReadFile(configFilePath)
 	if err != nil {
-		s.Logger.Errorf("Error opening file: %v", err)
 		return pkg.Profile{}, err
 	}
+	s.Logger.Infof("Loading datarefs from: %s", configFilePath)
 	var res pkg.Profile
 	err = yaml.Unmarshal(f, &res)
 	if err != nil {
-		s.Logger.Errorf("Error reading file: %v", err)
 		return pkg.Profile{}, err
 	}
 	return res, nil
