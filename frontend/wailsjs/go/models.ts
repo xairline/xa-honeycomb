@@ -357,7 +357,6 @@ export namespace pkg {
 	export class Metadata {
 	    name?: string;
 	    description?: string;
-	    enabled?: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Metadata(source);
@@ -367,7 +366,6 @@ export namespace pkg {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
 	        this.description = source["description"];
-	        this.enabled = source["enabled"];
 	    }
 	}
 	export class Profile {

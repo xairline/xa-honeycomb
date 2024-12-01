@@ -74,7 +74,7 @@ func TestSetupDataRefs(t *testing.T) {
 	}
 
 	// Call the setupProfile method
-	xpService.setupProfile(airplaneICAO)
+	xpService.loadProfile(airplaneICAO)
 
 }
 
@@ -105,7 +105,7 @@ func TestSetupDataRefsWithAdvancedExpression(t *testing.T) {
 	}
 
 	// Call the setupProfile method
-	xpService.setupProfile(airplaneICAO)
+	xpService.loadProfile(airplaneICAO)
 
 }
 
@@ -136,6 +136,6 @@ func TestUpdateLeds(t *testing.T) {
 	}
 
 	// Call the setupProfile method
-	xpService.setupProfile(airplaneICAO)
+	xpService.loadProfile(airplaneICAO)
 	xpService.updateLeds()
 }

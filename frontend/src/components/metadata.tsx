@@ -27,7 +27,6 @@ export default function Metadata(props: ListProps) {
         <Typography gutterBottom sx={{color: 'text.secondary', fontSize: 14}}>
           {props.metadata?.description}
         </Typography>
-        {props.metadata?.enabled ? <CheckCircleIcon sx={{color: 'forestgreen', fontSize: 25}}/> : null}
       </CardContent>
     </Card>
   );

@@ -31,7 +31,6 @@ export default function Profiles(props: TabPanelProps) {
 
   useEffect(() => {
     const newChecked = props.profiles
-      .filter((profile) => profile.metadata?.enabled)
       .map((profile) => profile.metadata?.name || ""); // Collect names of enabled profiles
     setChecked(newChecked);
   }, [props.profiles]);
