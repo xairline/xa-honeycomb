@@ -1,6 +1,6 @@
 metadata:
-  name: Default
-  description: Template profile for Honeycomb Bravo
+  name: Zibo 738
+  description: Profile for Zibo 738
   enabled: true
 
 
@@ -190,12 +190,6 @@ leds:
         operator: ">"
         threshold: 0.1
       - dataref_str: "laminar/B738/toggle_switch/flt_dk_door"
-        operator: ">"
-        threshold: 0.1
-      - dataref_str: "737u/doors/Fwd_Cargo"
-        operator: ">"
-        threshold: 0.1
-      - dataref_str: "737u/doors/aft_Cargo"
         operator: ">"
         threshold: 0.1
 
