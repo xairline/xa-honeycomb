@@ -1,7 +1,7 @@
 metadata:
   name: Rotate MD-11
   description: Profile for the Rotate MD-11
-  enabled: true
+
 ##### AP KNOBS #####
 knobs:
   ap_hdg:

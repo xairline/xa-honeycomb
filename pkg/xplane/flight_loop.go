@@ -86,6 +86,8 @@ func (s *xplaneService) updateLeds() {
 			} else {
 				fieldValue.Off()
 			}
+		} else {
+			s.Logger.Errorf("Condition not OK for LED: %s", fieldName)
 		}
 	}
 }

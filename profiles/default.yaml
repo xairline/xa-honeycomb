@@ -1,7 +1,7 @@
 metadata:
   name: Default
   description: Template profile for Honeycomb Bravo
-  enabled: true
+
 
 
 knobs:

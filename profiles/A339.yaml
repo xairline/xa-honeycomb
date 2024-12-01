@@ -1,7 +1,7 @@
 metadata:
   name: Toliss A339
   description: Profile for the Toliss A339
-  enabled: true
+
 
 knobs:
   ap_hdg:
