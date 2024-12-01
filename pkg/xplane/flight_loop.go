@@ -21,7 +21,6 @@ func (s *xplaneService) flightLoop(
 		honeycomb.LED_STATE_CHANGED = true
 		honeycomb.LED_STATE_CHANGED_LOCK.Unlock()
 		s.lastCounter = counter
-		s.Logger.Infof("force led sync, counter: %d", counter)
 	}
 
 	s.updateLeds()

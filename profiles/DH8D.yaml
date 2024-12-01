@@ -1,0 +1,236 @@
+metadata:
+  name: FlyJsim Q400
+  description: Profile for the Dash 8
+  enabled: true
+
+knobs:
+  ap_hdg:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/heading_dial_deg_mag_pilot"
+  ap_alt:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/altitude_dial_ft"
+  ap_vs:
+    datarefs:
+      - dataref_str: "AirbusFBW/FCUVSKnobRotation"
+  ap_ias:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/airspeed_dial_kts_mach"
+  ap_crs:
+    # repurpose to qnh
+    datarefs:
+      - dataref_str: "AirbusFBW/BaroKnobRotationCapt"
+
+leds:
+  volt_low:
+    datarefs:
+      - dataref_str: "sim/cockpit2/electrical/bus_load_amps"
+        operator: ">"
+        threshold: 4
+
+  gear:
+    datarefs:
+      - dataref_str: "sim/flightmodel2/gear/deploy_ratio"
+        operator: "!="
+        threshold: 0
+
+  hdg:
+    condition: "any"
+    datarefs:
+      - dataref_str: "FJS/Q4XP/FMA/roll_act"
+        operator: "=="
+        threshold: 2
+      - dataref_str: "FJS/Q4XP/FMA/roll_act"
+        operator: "=="
+        threshold: 4
+
+  nav:
+    condition: "all"
+    datarefs:
+      - dataref_str: "FJS/Q4XP/FMA/roll_act"
+        operator: "=="
+        threshold: 17
+      - dataref_str: "FJS/Q4XP/FMA/roll_act"
+        operator: "=="
+        threshold: 18
+      - dataref_str: "FJS/Q4XP/FMA/roll_act"
+        operator: "=="
+        threshold: 19
+
+  apr:
+    condition: "all"
+    datarefs:
+      - dataref_str: "FJS/Q4XP/FMA/roll_act"
+        operator: "=="
+        threshold: 8
+      - dataref_str: "FJS/Q4XP/FMA/roll_act"
+        operator: "=="
+        threshold: 9
+      - dataref_str: "FJS/Q4XP/FMA/roll_act"
+        operator: "=="
+        threshold: 10
+      - dataref_str: "FJS/Q4XP/FMA/roll_act"
+        operator: "=="
+        threshold: 11
+
+  rev:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/backcourse_status"
+        operator: ">="
+        threshold: 1
+
+  alt:
+    condition: "any"
+    datarefs:
+      - dataref_str: "FJS/Q4XP/FMA/pitch_act"
+        operator: "=="
+        threshold: 4
+      - dataref_str: "FJS/Q4XP/FMA/pitch_act"
+        operator: "=="
+        threshold: 5
+
+  vs:
+    datarefs:
+      - dataref_str: "FJS/Q4XP/FMA/pitch_act"
+        operator: "=="
+        threshold: 3
+
+  ias:
+    datarefs:
+      - dataref_str: "FJS/Q4XP/FMA/pitch_act"
+        operator: "=="
+        threshold: 2
+
+  ap:
+    datarefs:
+      - dataref_str: "sim/cockpit2/autopilot/servos_on"
+        operator: ">"
+        threshold: 0.01
+
+  master_warn:
+    datarefs:
+      - dataref_str: "FJS/Q4XP/Annunciators/CautWarn_Lit"
+        operator: ">"
+        threshold: 0.01
+
+  fire:
+    datarefs:
+      - dataref_str: "sim/flightmodel2/engines/is_on_fire"
+        operator: ">"
+        threshold: 0.01
+
+  oil_low_pressure:
+    datarefs:
+      - dataref_str: "sim/flightmodel/engine/ENGN_oil_press"
+        operator: "<"
+        threshold: 0.075
+
+  fuel_low_pressure:
+    datarefs:
+      - dataref_str: "sim/cockpit2/engine/indicators/fuel_pressure_psi"
+        operator: "<"
+        threshold: 20
+
+  anti_ice:
+    datarefs:
+      - dataref_str: "sim/cockpit/switches/anti_ice_prop_heat"
+        operator: "=="
+        threshold: 1
+
+  eng_starter:
+    datarefs:
+      - dataref_str: "sim/cockpit2/engine/actuators/starter_hit"
+        operator: ">"
+        threshold: 0.01
+
+  apu:
+    datarefs:
+      - dataref_str: "sim/cockpit2/electrical/APU_running"
+        operator: ">"
+        threshold: 0.01
+
+  master_caution:
+    datarefs:
+      - dataref_str: "FJS/Q4XP/Annunciators/CautWarn_Lit"
+        operator: ">"
+        threshold: 0.01
+
+  vacuum:
+    condition: "any"
+    datarefs:
+      - dataref_str: "sim/cockpit/misc/vacuum"
+        operator: "<"
+        threshold: 1
+      - dataref_str: "sim/cockpit/misc/vacuum2"
+        operator: "<"
+        threshold: 1
+
+  hydro_low_pressure:
+    condition: "all"
+    datarefs:
+      - dataref_str: "sim/operation/failures/hydraulic_pressure_ratio"
+        operator: "<"
+        threshold: 3002
+
+  parking_brake:
+    datarefs:
+      - dataref_str: "sim/cockpit2/controls/parking_brake_ratio"
+        operator: "=="
+        threshold: 1
+
+  doors:
+    condition: "any"
+    datarefs:
+      - dataref_str: "FJS/Q4XP/Manips/CabinDoors_Anim"
+        operator: ">"
+        threshold: 0.01
+        index: 0
+      - dataref_str: "FJS/Q4XP/Manips/CabinMainDoor_Anim"
+        operator: ">"
+        threshold: 0.01
+        index: 1
+      - dataref_str: "FJS/Q4XP/Manips/CargoDoor_Anim"
+        operator: ">"
+        threshold: 0.01
+        index: 2
+
+  aux_fuel_pump:
+    condition: "all"
+    datarefs:
+      - dataref_str: "sim/cockpit2/fuel/transfer_pump_right"
+        operator: ">"
+        threshold: 0.01
+      - dataref_str: "sim/cockpit2/fuel/transfer_pump_left"
+        operator: ">"
+        threshold: 0.01
+
+
+
+
+conditions:
+  retractable_gear:
+    datarefs:
+      - dataref_str: "sim/aircraft/gear/acf_gear_retract"
+        operator: "!="
+        threshold: 0
+
+  bus_voltage:
+    conditions: "any"
+    datarefs:
+      - dataref_str: "sim/cockpit/electrical/battery_array_on"
+        operator: "=="
+        threshold: 1
+        index: 0
+      - dataref_str: "sim/cockpit/electrical/battery_array_on"
+        operator: "=="
+        threshold: 1
+        index: 1
+      - dataref_str: "sim/cockpit/electrical/battery_array_on"
+        operator: "=="
+        threshold: 1
+        index: 2
+      - dataref_str: "sim/cockpit/electrical/battery_array_on"
+        operator: "=="
+        threshold: 1
+        index: 3
+      

@@ -12,10 +12,90 @@ export namespace pkg {
 	        this.command_str = source["command_str"];
 	    }
 	}
-	export class Dataref {
+	export class DatarefCondition {
 	    dataref_str?: string;
+	    index?: number;
 	    operator?: string;
 	    threshold?: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new DatarefCondition(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.dataref_str = source["dataref_str"];
+	        this.index = source["index"];
+	        this.operator = source["operator"];
+	        this.threshold = source["threshold"];
+	    }
+	}
+	export class ConditionProfile {
+	    datarefs?: DatarefCondition[];
+	    condition?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ConditionProfile(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.datarefs = this.convertValues(source["datarefs"], DatarefCondition);
+	        this.condition = source["condition"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Conditions {
+	    bus_voltage?: ConditionProfile;
+	    retractable_gear?: ConditionProfile;
+	
+	    static createFrom(source: any = {}) {
+	        return new Conditions(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.bus_voltage = this.convertValues(source["bus_voltage"], ConditionProfile);
+	        this.retractable_gear = this.convertValues(source["retractable_gear"], ConditionProfile);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Dataref {
+	    dataref_str?: string;
 	    index?: number;
 	
 	    static createFrom(source: any = {}) {
@@ -25,26 +105,20 @@ export namespace pkg {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.dataref_str = source["dataref_str"];
-	        this.operator = source["operator"];
-	        this.threshold = source["threshold"];
 	        this.index = source["index"];
 	    }
 	}
-	export class BravoProfile {
-	    condition?: string;
+	export class DataProfile {
 	    datarefs?: Dataref[];
-	    commands?: Command[];
 	    value?: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new BravoProfile(source);
+	        return new DataProfile(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.condition = source["condition"];
 	        this.datarefs = this.convertValues(source["datarefs"], Dataref);
-	        this.commands = this.convertValues(source["commands"], Command);
 	        this.value = source["value"];
 	    }
 	
@@ -66,14 +140,11 @@ export namespace pkg {
 		    return a;
 		}
 	}
-	
 	export class Data {
-	    bus_voltage?: BravoProfile;
-	    retractable_gear?: BravoProfile;
-	    ap_state?: BravoProfile;
-	    ap_alt_step?: BravoProfile;
-	    ap_vs_step?: BravoProfile;
-	    ap_ias_step?: BravoProfile;
+	    ap_state?: DataProfile;
+	    ap_alt_step?: DataProfile;
+	    ap_vs_step?: DataProfile;
+	    ap_ias_step?: DataProfile;
 	
 	    static createFrom(source: any = {}) {
 	        return new Data(source);
@@ -81,12 +152,10 @@ export namespace pkg {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.bus_voltage = this.convertValues(source["bus_voltage"], BravoProfile);
-	        this.retractable_gear = this.convertValues(source["retractable_gear"], BravoProfile);
-	        this.ap_state = this.convertValues(source["ap_state"], BravoProfile);
-	        this.ap_alt_step = this.convertValues(source["ap_alt_step"], BravoProfile);
-	        this.ap_vs_step = this.convertValues(source["ap_vs_step"], BravoProfile);
-	        this.ap_ias_step = this.convertValues(source["ap_ias_step"], BravoProfile);
+	        this.ap_state = this.convertValues(source["ap_state"], DataProfile);
+	        this.ap_alt_step = this.convertValues(source["ap_alt_step"], DataProfile);
+	        this.ap_vs_step = this.convertValues(source["ap_vs_step"], DataProfile);
+	        this.ap_ias_step = this.convertValues(source["ap_ias_step"], DataProfile);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -108,12 +177,45 @@ export namespace pkg {
 		}
 	}
 	
+	
+	export class KnobProfile {
+	    datarefs?: Dataref[];
+	    commands?: Command[];
+	
+	    static createFrom(source: any = {}) {
+	        return new KnobProfile(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.datarefs = this.convertValues(source["datarefs"], Dataref);
+	        this.commands = this.convertValues(source["commands"], Command);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class Knobs {
-	    ap_hdg?: BravoProfile;
-	    ap_vs?: BravoProfile;
-	    ap_alt?: BravoProfile;
-	    ap_ias?: BravoProfile;
-	    ap_crs?: BravoProfile;
+	    ap_hdg?: KnobProfile;
+	    ap_vs?: KnobProfile;
+	    ap_alt?: KnobProfile;
+	    ap_ias?: KnobProfile;
+	    ap_crs?: KnobProfile;
 	
 	    static createFrom(source: any = {}) {
 	        return new Knobs(source);
@@ -121,11 +223,43 @@ export namespace pkg {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.ap_hdg = this.convertValues(source["ap_hdg"], BravoProfile);
-	        this.ap_vs = this.convertValues(source["ap_vs"], BravoProfile);
-	        this.ap_alt = this.convertValues(source["ap_alt"], BravoProfile);
-	        this.ap_ias = this.convertValues(source["ap_ias"], BravoProfile);
-	        this.ap_crs = this.convertValues(source["ap_crs"], BravoProfile);
+	        this.ap_hdg = this.convertValues(source["ap_hdg"], KnobProfile);
+	        this.ap_vs = this.convertValues(source["ap_vs"], KnobProfile);
+	        this.ap_alt = this.convertValues(source["ap_alt"], KnobProfile);
+	        this.ap_ias = this.convertValues(source["ap_ias"], KnobProfile);
+	        this.ap_crs = this.convertValues(source["ap_crs"], KnobProfile);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class LEDProfile {
+	    datarefs?: DatarefCondition[];
+	    condition?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new LEDProfile(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.datarefs = this.convertValues(source["datarefs"], DatarefCondition);
+	        this.condition = source["condition"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -147,29 +281,29 @@ export namespace pkg {
 		}
 	}
 	export class Leds {
-	    hdg?: BravoProfile;
-	    nav?: BravoProfile;
-	    alt?: BravoProfile;
-	    apr?: BravoProfile;
-	    vs?: BravoProfile;
-	    ap?: BravoProfile;
-	    ias?: BravoProfile;
-	    rev?: BravoProfile;
-	    gear?: BravoProfile;
-	    master_warn?: BravoProfile;
-	    master_caution?: BravoProfile;
-	    fire?: BravoProfile;
-	    oil_low_pressure?: BravoProfile;
-	    fuel_low_pressure?: BravoProfile;
-	    anti_ice?: BravoProfile;
-	    eng_starter?: BravoProfile;
-	    apu?: BravoProfile;
-	    vacuum?: BravoProfile;
-	    hydro_low_pressure?: BravoProfile;
-	    aux_fuel_pump?: BravoProfile;
-	    parking_brake?: BravoProfile;
-	    volt_low?: BravoProfile;
-	    doors?: BravoProfile;
+	    hdg?: LEDProfile;
+	    nav?: LEDProfile;
+	    alt?: LEDProfile;
+	    apr?: LEDProfile;
+	    vs?: LEDProfile;
+	    ap?: LEDProfile;
+	    ias?: LEDProfile;
+	    rev?: LEDProfile;
+	    gear?: LEDProfile;
+	    master_warn?: LEDProfile;
+	    master_caution?: LEDProfile;
+	    fire?: LEDProfile;
+	    oil_low_pressure?: LEDProfile;
+	    fuel_low_pressure?: LEDProfile;
+	    anti_ice?: LEDProfile;
+	    eng_starter?: LEDProfile;
+	    apu?: LEDProfile;
+	    vacuum?: LEDProfile;
+	    hydro_low_pressure?: LEDProfile;
+	    aux_fuel_pump?: LEDProfile;
+	    parking_brake?: LEDProfile;
+	    volt_low?: LEDProfile;
+	    doors?: LEDProfile;
 	
 	    static createFrom(source: any = {}) {
 	        return new Leds(source);
@@ -177,29 +311,29 @@ export namespace pkg {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.hdg = this.convertValues(source["hdg"], BravoProfile);
-	        this.nav = this.convertValues(source["nav"], BravoProfile);
-	        this.alt = this.convertValues(source["alt"], BravoProfile);
-	        this.apr = this.convertValues(source["apr"], BravoProfile);
-	        this.vs = this.convertValues(source["vs"], BravoProfile);
-	        this.ap = this.convertValues(source["ap"], BravoProfile);
-	        this.ias = this.convertValues(source["ias"], BravoProfile);
-	        this.rev = this.convertValues(source["rev"], BravoProfile);
-	        this.gear = this.convertValues(source["gear"], BravoProfile);
-	        this.master_warn = this.convertValues(source["master_warn"], BravoProfile);
-	        this.master_caution = this.convertValues(source["master_caution"], BravoProfile);
-	        this.fire = this.convertValues(source["fire"], BravoProfile);
-	        this.oil_low_pressure = this.convertValues(source["oil_low_pressure"], BravoProfile);
-	        this.fuel_low_pressure = this.convertValues(source["fuel_low_pressure"], BravoProfile);
-	        this.anti_ice = this.convertValues(source["anti_ice"], BravoProfile);
-	        this.eng_starter = this.convertValues(source["eng_starter"], BravoProfile);
-	        this.apu = this.convertValues(source["apu"], BravoProfile);
-	        this.vacuum = this.convertValues(source["vacuum"], BravoProfile);
-	        this.hydro_low_pressure = this.convertValues(source["hydro_low_pressure"], BravoProfile);
-	        this.aux_fuel_pump = this.convertValues(source["aux_fuel_pump"], BravoProfile);
-	        this.parking_brake = this.convertValues(source["parking_brake"], BravoProfile);
-	        this.volt_low = this.convertValues(source["volt_low"], BravoProfile);
-	        this.doors = this.convertValues(source["doors"], BravoProfile);
+	        this.hdg = this.convertValues(source["hdg"], LEDProfile);
+	        this.nav = this.convertValues(source["nav"], LEDProfile);
+	        this.alt = this.convertValues(source["alt"], LEDProfile);
+	        this.apr = this.convertValues(source["apr"], LEDProfile);
+	        this.vs = this.convertValues(source["vs"], LEDProfile);
+	        this.ap = this.convertValues(source["ap"], LEDProfile);
+	        this.ias = this.convertValues(source["ias"], LEDProfile);
+	        this.rev = this.convertValues(source["rev"], LEDProfile);
+	        this.gear = this.convertValues(source["gear"], LEDProfile);
+	        this.master_warn = this.convertValues(source["master_warn"], LEDProfile);
+	        this.master_caution = this.convertValues(source["master_caution"], LEDProfile);
+	        this.fire = this.convertValues(source["fire"], LEDProfile);
+	        this.oil_low_pressure = this.convertValues(source["oil_low_pressure"], LEDProfile);
+	        this.fuel_low_pressure = this.convertValues(source["fuel_low_pressure"], LEDProfile);
+	        this.anti_ice = this.convertValues(source["anti_ice"], LEDProfile);
+	        this.eng_starter = this.convertValues(source["eng_starter"], LEDProfile);
+	        this.apu = this.convertValues(source["apu"], LEDProfile);
+	        this.vacuum = this.convertValues(source["vacuum"], LEDProfile);
+	        this.hydro_low_pressure = this.convertValues(source["hydro_low_pressure"], LEDProfile);
+	        this.aux_fuel_pump = this.convertValues(source["aux_fuel_pump"], LEDProfile);
+	        this.parking_brake = this.convertValues(source["parking_brake"], LEDProfile);
+	        this.volt_low = this.convertValues(source["volt_low"], LEDProfile);
+	        this.doors = this.convertValues(source["doors"], LEDProfile);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -241,6 +375,7 @@ export namespace pkg {
 	    knobs?: Knobs;
 	    leds?: Leds;
 	    data?: Data;
+	    conditions?: Conditions;
 	
 	    static createFrom(source: any = {}) {
 	        return new Profile(source);
@@ -252,6 +387,7 @@ export namespace pkg {
 	        this.knobs = this.convertValues(source["knobs"], Knobs);
 	        this.leds = this.convertValues(source["leds"], Leds);
 	        this.data = this.convertValues(source["data"], Data);
+	        this.conditions = this.convertValues(source["conditions"], Conditions);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
