@@ -42,6 +42,7 @@ type xplaneService struct {
 	profile         *pkg.Profile
 	apSelector      string
 	lastKnobTime    time.Time
+	lastCounter     int
 }
 
 var xplaneSvcLock = &sync.Mutex{}
