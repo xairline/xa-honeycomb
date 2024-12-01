@@ -189,7 +189,7 @@ func (s *xplaneService) updateLeds() {
 	}
 
 	// special case for bus voltage
-	busVoltage, busVoltageOK := s.evaluateCondition((&s.profile.Conditions.BUS_VOLTAGE))
+	busVoltage, busVoltageOK := s.evaluateCondition(&s.profile.Conditions.BUS_VOLTAGE)
 	if busVoltageOK && !busVoltage {
 		honeycomb.AllOff()
 		return
