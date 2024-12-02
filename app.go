@@ -2,14 +2,26 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert/yaml"
 	"github.com/xairline/xa-honeycomb/pkg"
+	"io"
+	"net/http"
 	"os"
 	"path"
 	"runtime"
 	"strings"
 )
+
+type ListResponse struct {
+	Data []struct {
+		ID         int64  `json:"id"`
+		IsWritable bool   `json:"is_writable"`
+		Name       string `json:"name"`
+		ValueType  string `json:"value_type"`
+	} `json:"data"`
+}
 
 // App struct
 type App struct {
@@ -90,4 +102,111 @@ func (a *App) GetProfiles() []pkg.Profile {
 func (a *App) GetProfileFiles() []string {
 	//return "default,A339"
 	return a.profileFiles
+}
+
+func (a *App) GetXplane() []string {
+	//GET http://localhost:8086/api/v1/datarefs
+	datarefIds := []int64{
+		getDatarefId("sim/aircraft/view/acf_ICAO"),
+		getDatarefId("sim/aircraft/view/acf_ui_name"),
+	}
+	res := []string{}
+	for _, id := range datarefIds {
+		body := getDatarefValue(id)
+		res = append(res, body)
+	}
+	return res
+}
+
+func (a *App) GetXplaneDataref(datarefStr string) string {
+	id := getDatarefId(datarefStr)
+	res := getDatarefValue(id)
+	return res
+}
+
+func getDatarefId(datarefStr string) int64 {
+	// URL for the GET request
+	url := fmt.Sprintf("http://localhost:8086/api/v1/datarefs?filter[name]=%s", datarefStr)
+
+	// Create a new HTTP client
+	client := &http.Client{}
+
+	// Create a new GET request
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		return 0
+	}
+
+	// Set headers if needed
+	req.Header.Set("Accept", "application/json")
+
+	// Execute the request
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error executing request:", err)
+		return 0
+	}
+	defer resp.Body.Close()
+
+	// Check the response status
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Error: Status code %d\n", resp.StatusCode)
+		return 0
+	}
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading response body:", err)
+		return 0
+	}
+
+	var response ListResponse
+	if err := json.Unmarshal(body, &response); err != nil {
+		fmt.Println("Error parsing JSON:", err)
+		return 0
+	}
+	return response.Data[0].ID
+}
+
+func getDatarefValue(id int64) string {
+	// URL for the GET request
+	url := fmt.Sprintf("http://localhost:8086/api/v1/datarefs/%d/value", id)
+
+	// Create a new HTTP client
+	client := &http.Client{}
+
+	// Create a new GET request
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		return ""
+	}
+
+	// Set headers if needed
+	req.Header.Set("Accept", "application/json")
+
+	// Execute the request
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error executing request:", err)
+		return ""
+	}
+	defer resp.Body.Close()
+
+	// Check the response status
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Error: Status code %d\n", resp.StatusCode)
+		return ""
+	}
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading response body:", err)
+		return ""
+	}
+
+	return string(body)
 }

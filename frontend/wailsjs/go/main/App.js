@@ -13,3 +13,11 @@ export function GetProfileFiles() {
 export function GetProfiles() {
   return window['go']['main']['App']['GetProfiles']();
 }
+
+export function GetXplane() {
+  return window['go']['main']['App']['GetXplane']();
+}
+
+export function GetXplaneDataref(arg1) {
+  return window['go']['main']['App']['GetXplaneDataref'](arg1);
+}

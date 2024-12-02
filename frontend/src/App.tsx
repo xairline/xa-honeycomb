@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import {GetProfile, GetProfiles} from "../wailsjs/go/main/App";
-import {Grid, Stack} from "@mui/material";
+import {Fab, Grid, Stack} from "@mui/material";
 import {pkg} from "../wailsjs/go/models";
 import Profiles from "./components/profiles";
 import Metadata from "./components/metadata";
 import LightConfiguration from './components/lightConfiguration';
+import Xplane from "./components/xplane";
+import CachedIcon from '@mui/icons-material/Cached';
 
 function App() {
   const [profileData, setProfileData] = useState({} as pkg.Profile);
@@ -38,7 +40,12 @@ function App() {
     <div id="App">
       <Grid container spacing={0} columns={16} style={{height: "100vh", overflow: "hidden"}}>
         <Grid item xs={4} style={{border: "white", overflow: "hidden"}}>
-          <Profiles profiles={profilesData} selectedIndex={selectedIndex} handleListItemClick={handleListItemClick}/>
+          <Grid item xs={16} style={{border: "white", overflow: "hidden", height: "80vh"}}>
+            <Profiles profiles={profilesData} selectedIndex={selectedIndex} handleListItemClick={handleListItemClick}/>
+          </Grid>
+          <Grid item xs={16} style={{border: "white", overflow: "hidden", height: "20vh"}}>
+            <Xplane/>
+          </Grid>
         </Grid>
         <Grid item xs={12} sx={{width: '100vw', overflow: "hidden", height: "100vh"}}>
           <Grid item xs={16}
@@ -77,8 +84,18 @@ function App() {
                   ["gear"]
                 }/>
             </Stack>
-
+            {/*<Fab color="secondary" aria-label="edit" sx={{*/}
+            {/*  position: 'absolute',*/}
+            {/*  bottom: 16,*/}
+            {/*  right: 32,*/}
+            {/*}} onClick={event => {*/}
+            {/*  console.log("Refreshing profiles")*/}
+            {/*  GetProfiles().then(profiles)*/}
+            {/*}}>*/}
+            {/*  <CachedIcon/>*/}
+            {/*</Fab>*/}
           </Grid>
+
         </Grid>
       </Grid>
 
