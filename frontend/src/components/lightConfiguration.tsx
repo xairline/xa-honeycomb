@@ -63,6 +63,16 @@ export default function LightConfiguration(props: LightsProps) {
                 <Typography variant="h6" component="div" sx={{textAlign: 'left'}}>
                   {key.toUpperCase()}
                 </Typography>
+                {
+                  // @ts-ignore
+                  props.lights?.[key]?.condition && (
+                    <Typography variant="h6" component="div" sx={{color: 'text.secondary', textAlign: 'right'}}>
+                      - {
+                      // @ts-ignore
+                      props.lights?.[key]?.condition
+                    }
+                    </Typography>)
+                }
               </AccordionSummary>
               <AccordionDetails>
                 {
