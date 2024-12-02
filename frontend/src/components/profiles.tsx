@@ -2,9 +2,10 @@ import * as React from 'react';
 import {useEffect} from 'react';
 import Box from '@mui/material/Box';
 import {pkg} from '../../wailsjs/go/models';
-import {Divider, Grid2, IconButton, List, ListItemButton, ListItemIcon, Switch, Typography} from "@mui/material";
+import {Divider, Grid2, IconButton, List, ListItemButton, ListItemIcon, Typography} from "@mui/material";
 import ListItemText from '@mui/material/ListItemText';
 import AddIcon from '@mui/icons-material/Add';
+import LocalAirportOutlinedIcon from '@mui/icons-material/LocalAirportOutlined';
 
 interface TabPanelProps {
   profiles: pkg.Profile[];
@@ -75,19 +76,9 @@ export default function Profiles(props: TabPanelProps) {
                 onClick={(event) => props.handleListItemClick(event, index)}
               >
                 <ListItemIcon>
-                  <Switch
-                    edge="end"
-                    onChange={handleToggle(profile.metadata?.name || "")}
-                    checked={
-                      checked.includes(profile.metadata?.name || "asdf")
-                    }
-                    inputProps={{
-                      'aria-labelledby': 'switch-list-label-wifi',
-                    }}
-                    disabled={true}
-                  />
+                  <LocalAirportOutlinedIcon sx={{color:"forestgreen"}}/>
                 </ListItemIcon>
-                <ListItemText primary={profile.metadata?.name} style={{marginLeft: "12px"}}/>
+                <ListItemText primary={profile.metadata?.name}/>
               </ListItemButton>
             )
           })
