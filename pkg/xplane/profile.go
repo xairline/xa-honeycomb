@@ -8,45 +8,55 @@ import (
 	"gopkg.in/yaml.v3"
 	"os"
 	"path"
+	"strings"
 )
 
 func (s *xplaneService) tryLoadProfile() {
-	// Try to load the profile using the aircraft's UI name
-	aircraftNameDrf, found := dataAccess.FindDataRef("sim/aircraft/view/acf_ui_name")
-	if found {
-		aircraftName := dataAccess.GetString(aircraftNameDrf)
+	// Try to load profiles using the aircraft's ICAO
 
-		planeProfile, err := s.loadProfile(aircraftName)
-		if err == nil {
-			s.Logger.Infof("Loading BravoProfile for: %s", aircraftName)
-			s.setupProfile(planeProfile)
-			return
-		} else {
-			s.Logger.Errorf("Cannot loading BravoProfile for %s: %v", aircraftName, err)
-		}
-	}
-
-	// Try to load the profile using the aircraft's ICAO
 	aircraftIACODrf, found := dataAccess.FindDataRef("sim/aircraft/view/acf_ICAO")
 	if found {
+		var planeProfile pkg.Profile
 		aircraftIACO := dataAccess.GetString(aircraftIACODrf)
-
+		// Try to load the profile using the aircraft's ICAO
 		planeProfile, err := s.loadProfile(aircraftIACO)
-		if err == nil {
-			s.Logger.Infof("Loading BravoProfile for: %s", aircraftIACO)
-			s.setupProfile(planeProfile)
-			return
-		} else {
-			s.Logger.Errorf("Cannot loading BravoProfile for %s: %v", aircraftIACO, err)
+		if err != nil {
+			// there is no profile for the aircraft
+			// we use default profile
+			s.Logger.Warningf("Cannot loading BravoProfile for %s: %v, using default", aircraftIACO, err)
+			planeProfile, err = s.loadProfile("default")
 		}
-	}
 
-	s.Logger.Infof("Loading default BravoProfile")
-	planeProfile, err := s.loadProfile("default")
-	if err == nil {
+		// try to load other profiles for this aircraft
+		aircraftNameDrf, found := dataAccess.FindDataRef("sim/aircraft/view/acf_ui_name")
+		if found {
+			aircraftName := dataAccess.GetString(aircraftNameDrf)
+			configFilePath := path.Join(s.pluginPath, "profiles")
+			entries, err := os.ReadDir(configFilePath)
+			if err != nil {
+				s.Logger.Errorf("Error reading profiles folder: %v", err)
+				return
+			}
+			for _, entry := range entries {
+				if !entry.IsDir() && path.Ext(entry.Name()) == ".yaml" && strings.HasPrefix(entry.Name(), aircraftIACO) {
+					s.Logger.Infof("Checking profile: %s", entry.Name())
+					profile, err := s.loadProfile(strings.Replace(entry.Name(), ".yaml", "", 1))
+					if err != nil {
+						s.Logger.Errorf("Error loading profile %s: %v", entry.Name(), err)
+					}
+					for _, selector := range profile.Metadata.Selectors {
+						if selector == aircraftName {
+							planeProfile = profile
+							break
+						} else {
+							s.Logger.Infof("Skipping profile %s for %s, ui name: %s", entry.Name(), selector, aircraftName)
+						}
+					}
+				}
+			}
+		}
+		s.Logger.Infof("Loaded profile: %s", planeProfile.Metadata.Name)
 		s.setupProfile(planeProfile)
-	} else {
-		s.Logger.Errorf("Error loading default BravoProfile: %v", err)
 	}
 }
 
