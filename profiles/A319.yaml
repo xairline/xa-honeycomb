@@ -1,6 +1,9 @@
 metadata:
   name: Toliss A319
   description: Profile for the Toliss A319
+  selectors:
+    - ToLiSs A319 Hi Def
+    - ToLiSs A319 Std Def
 
 
 knobs:

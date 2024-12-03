@@ -1,6 +1,9 @@
 metadata:
   name: Zibo 738
   description: Profile for Zibo 738
+  selectors:
+    - B737-800X
+    - B737-800X (4k)
 
 
 

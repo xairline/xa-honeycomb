@@ -1,7 +1,9 @@
 metadata:
   name: Toliss A339
   description: Profile for the Toliss A339
-
+  selectors:
+    - ToLiss Airbus A330-941 Hi Def
+    - ToLiss Airbus A330-941 Std Def
 
 knobs:
   ap_hdg:

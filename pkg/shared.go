@@ -24,8 +24,9 @@ type DatarefCondition struct {
 }
 
 type Metadata struct {
-	Name        string `yaml:"name,omitempty" json:"name,omitempty"`
-	Description string `yaml:"description,omitempty" json:"description,omitempty"`
+	Name        string   `yaml:"name,omitempty" json:"name,omitempty"`
+	Description string   `yaml:"description,omitempty" json:"description,omitempty"`
+	Selectors   []string `yaml:"selectors,omitempty" json:"selectors,omitempty"`
 }
 
 type ConditionProfile struct {

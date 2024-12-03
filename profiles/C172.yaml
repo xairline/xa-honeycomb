@@ -1,7 +1,9 @@
 metadata:
   name: Laminar C172 Skyhawk
   description: Laminar Cessna 172 Skyhawk
-
+  selectors:
+    - Cessna Skyhawk
+    - Cessna Skyhawk (G1000)
 
 knobs:
   ap_hdg:

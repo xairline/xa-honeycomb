@@ -1,7 +1,9 @@
 metadata:
   name: C172 NG ANALOG
   description: Airfoillabs C172 NG Analog
-
+  selectors:
+    - C172 NG ANALOG
+    - C172 NG DIGITAL
 
 knobs:
   ap_hdg:
