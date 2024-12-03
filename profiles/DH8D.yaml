@@ -1,6 +1,7 @@
 metadata:
   name: FlyJSim Q400
   description: Profile for the Dash 8
+  enabled: true
 ##### AP KNOBS #####
 knobs:
   ap_hdg:
@@ -121,7 +122,7 @@ leds:
         threshold: 5
 
   nav:
-    condition: "all"
+    condition: "any"
     datarefs:
       - dataref_str: "FJS/Q4XP/FMA/roll_act"
         operator: "=="
@@ -134,7 +135,7 @@ leds:
         threshold: 19
 
   apr:
-    condition: "all"
+    condition: "any"
     datarefs:
       - dataref_str: "FJS/Q4XP/FMA/roll_act"
         operator: "=="
@@ -170,6 +171,30 @@ leds:
       - dataref_str: "FJS/Q4XP/FMA/roll_act"
         operator: "=="
         threshold: 4
+
+  fire:
+    condition: "any"
+    datarefs:
+      - dataref_str: "FJS/Q4XP/Manips/TwoSwitch_Anim"
+        operator: "<"
+        threshold: -0.01
+        index: 41
+      - dataref_str: "FJS/Q4XP/Manips/TwoSwitch_Anim"
+        operator: ">"
+        threshold: 0.01
+        index: 41
+
+  aux_fuel_pump:
+    condition: "any"
+    datarefs:
+      - dataref_str: "FJS/Q4XP/Manips/TwoSwitchLock_Anim"
+        operator: ">"
+        threshold: 0.01
+        index: 7
+      - dataref_str: "FJS/Q4XP/Manips/TwoSwitchLock_Anim"
+        operator: "<"
+        threshold: -0.01
+        index: 7
 
 conditions:
   retractable_gear:
