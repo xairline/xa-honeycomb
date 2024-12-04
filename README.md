@@ -1,6 +1,32 @@
 # xa-honeycomb
 
-## Bravo Knobs Mapping
+## Supported Planes
+> Note: unchecked are still in progress
+
+- [ ] A20N by toliss
+- [x] A319 by toliss
+- [ ] A321 by toliss
+- [x] A339 by toliss
+- [ ] A346 by toliss
+- [x] B738 by Zibo
+- [ ] B752 by FF
+- [ ] B753 by FF
+- [ ] B763 by FF
+- [ ] B764 by FF
+- [x] C172 by LR
+- [ ] C172 by Airfoilabs
+- [x] DH8D by FlyJSim
+- [ ] E55P
+- [x] MD11 by Rotate
+
+## Install
+
+1. Download `xa-honeycombo.zip` from [Release Page](https://github.com/xairline/xa-honeycomb/releases/latest).
+2. Drop the folder into XP's plugins folder
+3. see above about knobs mapping
+4. (WIP) A gui tool is included to help adding/changing profiels. It is not ready yet. At this time, it is an read-only app. Mac users might need to run `chmod -R 755 bravo.app` to launch the UI.
+
+### Bravo Knobs Mapping
 ![image](https://github.com/user-attachments/assets/99477be6-2e40-4dc4-b57d-605c3d7457a0)
 
 Above can be found by searching "honeycomb" after click `Edit`.
