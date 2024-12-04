@@ -108,9 +108,9 @@ leds:
 
   anti_ice:
     datarefs:
-      - dataref_str: "sim/cockpit2/annunciators/pitot_heat"
-        operator: ">"
-        threshold: 0.01
+      - dataref_str: "sim/cockpit/switches/pitot_heat_on"
+        operator: "=="
+        threshold: 1
 
   eng_starter:
     datarefs:
