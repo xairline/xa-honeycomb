@@ -40,5 +40,6 @@ Above can be found by searching "honeycomb" after click `Edit`.
 
 ## Roadmap
 - [x] yaml based profile
+- [x] Auto reconnect 
 - [ ] GUI to help mapping dataref/cmds (WIP)
 - [ ] AP Buttons push/pull by single/double click
