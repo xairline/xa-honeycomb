@@ -1,5 +1,9 @@
 # xa-honeycomb
 
+>NOTE: I didn't test on Windows and Linux build is currently broken
+>
+>NOTE: UI is still WIP
+
 ## Supported Planes
 > Note: unchecked are still in progress
 
