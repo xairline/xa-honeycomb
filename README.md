@@ -38,3 +38,7 @@ Above can be found by searching "honeycomb" after click `Edit`.
 
 ![image](https://github.com/user-attachments/assets/b0397f82-d074-4b14-aded-793a9c272b66)
 
+## Roadmap
+- [x] yaml based profile
+- [ ] GUI to help mapping dataref/cmds (WIP)
+- [ ] AP Buttons push/pull by single/double click
