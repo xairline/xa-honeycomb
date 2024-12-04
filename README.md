@@ -47,3 +47,6 @@ Above can be found by searching "honeycomb" after click `Edit`.
 ## UI: current state
 
 ![image](https://github.com/user-attachments/assets/e787f605-ece9-4dc1-9dae-4f2d1ac7c4f9)
+
+## How to read/change profiles
+[Profiles](./PROFILES.md) explanation
