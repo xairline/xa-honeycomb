@@ -5,6 +5,13 @@ metadata:
     - ToLiss Airbus A330-941 Hi Def
     - ToLiss Airbus A330-941 Std Def
 
+buttons:
+  rev:
+    single_click:
+      - command_str: "AirbusFBW/REV"
+    double_click:
+      - command_str: "AirbusFBW/TOGA"
+
 knobs:
   ap_hdg:
     datarefs:

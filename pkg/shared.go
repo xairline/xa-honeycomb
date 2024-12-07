@@ -54,6 +54,11 @@ type KnobProfile struct {
 	Commands       []Command `yaml:"commands,omitempty" json:"commands,omitempty"`
 }
 
+type ButtonProfile struct {
+	SingleClick []Command `yaml:"single_click,omitempty" json:"single_click,omitempty"`
+	DoubleClick []Command `yaml:"double_click,omitempty" json:"double_click,omitempty"`
+}
+
 type Knobs struct {
 	AP_HDG KnobProfile `yaml:"ap_hdg,omitempty" json:"ap_hdg,omitempty"`
 	AP_VS  KnobProfile `yaml:"ap_vs,omitempty" json:"ap_vs,omitempty"`
@@ -100,8 +105,20 @@ type Conditions struct {
 	RETRACTABLE_GEAR ConditionProfile `yaml:"retractable_gear,omitempty" json:"retractable_gear,omitempty"`
 }
 
+type Buttons struct {
+	HDG ButtonProfile `yaml:"hdg,omitempty" json:"hdg,omitempty"`
+	NAV ButtonProfile `yaml:"nav,omitempty" json:"nav,omitempty"`
+	ALT ButtonProfile `yaml:"alt,omitempty" json:"alt,omitempty"`
+	APR ButtonProfile `yaml:"apr,omitempty" json:"apr,omitempty"`
+	VS  ButtonProfile `yaml:"vs,omitempty" json:"vs,omitempty"`
+	AP  ButtonProfile `yaml:"ap,omitempty" json:"ap,omitempty"`
+	IAS ButtonProfile `yaml:"ias,omitempty" json:"ias,omitempty"`
+	REV ButtonProfile `yaml:"rev,omitempty" json:"rev,omitempty"`
+}
+
 type Profile struct {
 	Metadata   *Metadata   `yaml:"metadata" json:"metadata"`
+	Buttons    *Buttons    `yaml:"buttons,omitempty" json:"buttons,omitempty"`
 	Knobs      *Knobs      `yaml:"knobs,omitempty" json:"knobs,omitempty"`
 	Leds       *Leds       `yaml:"leds,omitempty" json:"leds,omitempty"`
 	Data       *Data       `yaml:"data,omitempty" json:"data,omitempty"`

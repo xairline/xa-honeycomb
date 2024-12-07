@@ -2,6 +2,14 @@ metadata:
   name: Default
   description: Template profile for Honeycomb Bravo
 
+buttons:
+  rev:
+    single_click:
+      # we chose array such that you can map multiple commands to a single button
+      # for example: you can map REV to lights where single click turns on all lights
+      - command_str: "AirbusFBW/REV"
+    double_click:
+      - command_str: "AirbusFBW/TOGA"
 
 
 knobs:

@@ -12,6 +12,83 @@ export namespace pkg {
 	        this.command_str = source["command_str"];
 	    }
 	}
+	export class ButtonProfile {
+	    single_click?: Command;
+	    double_click?: Command;
+	
+	    static createFrom(source: any = {}) {
+	        return new ButtonProfile(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.single_click = this.convertValues(source["single_click"], Command);
+	        this.double_click = this.convertValues(source["double_click"], Command);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Buttons {
+	    hdg?: ButtonProfile;
+	    nav?: ButtonProfile;
+	    alt?: ButtonProfile;
+	    apr?: ButtonProfile;
+	    vs?: ButtonProfile;
+	    ap?: ButtonProfile;
+	    ias?: ButtonProfile;
+	    rev?: ButtonProfile;
+	
+	    static createFrom(source: any = {}) {
+	        return new Buttons(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hdg = this.convertValues(source["hdg"], ButtonProfile);
+	        this.nav = this.convertValues(source["nav"], ButtonProfile);
+	        this.alt = this.convertValues(source["alt"], ButtonProfile);
+	        this.apr = this.convertValues(source["apr"], ButtonProfile);
+	        this.vs = this.convertValues(source["vs"], ButtonProfile);
+	        this.ap = this.convertValues(source["ap"], ButtonProfile);
+	        this.ias = this.convertValues(source["ias"], ButtonProfile);
+	        this.rev = this.convertValues(source["rev"], ButtonProfile);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
 	export class DatarefCondition {
 	    dataref_str?: string;
 	    index?: number;
@@ -372,6 +449,7 @@ export namespace pkg {
 	}
 	export class Profile {
 	    metadata?: Metadata;
+	    buttons?: Buttons;
 	    knobs?: Knobs;
 	    leds?: Leds;
 	    data?: Data;
@@ -384,6 +462,7 @@ export namespace pkg {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.metadata = this.convertValues(source["metadata"], Metadata);
+	        this.buttons = this.convertValues(source["buttons"], Buttons);
 	        this.knobs = this.convertValues(source["knobs"], Knobs);
 	        this.leds = this.convertValues(source["leds"], Leds);
 	        this.data = this.convertValues(source["data"], Data);
