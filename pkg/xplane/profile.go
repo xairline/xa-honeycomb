@@ -57,7 +57,7 @@ func (s *xplaneService) tryLoadProfile() {
 			}
 		}
 		s.Logger.Infof("Loaded profile: %s", planeProfile.Metadata.Name)
-		if planeProfile.Metadata.Name != "default" {
+		if planeProfile.Metadata.Name == "Default" {
 			utilities.SpeakString("Warning! No Plane specific profile found! Using default profile!")
 		}
 		s.setupProfile(planeProfile)
