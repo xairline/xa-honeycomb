@@ -3,6 +3,7 @@ package honeycomb
 import (
 	"context"
 	"github.com/sstallion/go-hid"
+	"github.com/xairline/goplane/xplm/utilities"
 	"github.com/xairline/xa-honeycomb/pkg"
 	"sync"
 	"time"
@@ -10,6 +11,7 @@ import (
 
 var Vendor uint16 = 0x294B
 var Product uint16 = 0x1901
+var BRAVO_CONNECTED = true
 
 type BravoService interface {
 	UpdateLeds()
@@ -71,6 +73,9 @@ func (b *bravoService) UpdateLeds() {
 }
 
 func (b *bravoService) Exit() {
+	if BRAVO_CONNECTED == false {
+		return
+	}
 	b.cancelFunc()
 
 	b.hidReportBuffer[0] = 0x0
@@ -119,6 +124,15 @@ func NewBravoService(logger pkg.Logger) BravoService {
 			hidReportBuffer: make([]byte, 65),
 			cancelFunc:      cancel,
 		}
+
+		bravo, err := hid.OpenFirst(Vendor, Product)
+		if err != nil || bravo == nil {
+			logger.Errorf("failed to open device: %v", err)
+			utilities.SpeakString("Bravo device not found")
+			BRAVO_CONNECTED = false
+		}
+		bravo.Close()
+
 		bravoSvc.UpdateLeds()
 		return bravoSvc
 	}

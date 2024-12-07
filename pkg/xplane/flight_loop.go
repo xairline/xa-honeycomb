@@ -15,6 +15,10 @@ func (s *xplaneService) flightLoop(
 	ref interface{},
 ) float32 {
 
+	if honeycomb.BRAVO_CONNECTED == false {
+		return 0
+	}
+
 	if s.profile == nil {
 		s.Logger.Info("Profile is nil, try to load it again")
 		s.tryLoadProfile()

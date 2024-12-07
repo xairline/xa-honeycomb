@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/expr-lang/expr"
 	"github.com/xairline/goplane/xplm/dataAccess"
+	"github.com/xairline/goplane/xplm/utilities"
 	"github.com/xairline/xa-honeycomb/pkg"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -56,6 +57,9 @@ func (s *xplaneService) tryLoadProfile() {
 			}
 		}
 		s.Logger.Infof("Loaded profile: %s", planeProfile.Metadata.Name)
+		if planeProfile.Metadata.Name != "default" {
+			utilities.SpeakString("Warning! No Plane specific profile found! Using default profile!")
+		}
 		s.setupProfile(planeProfile)
 	}
 }
