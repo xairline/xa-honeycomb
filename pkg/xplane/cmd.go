@@ -181,6 +181,7 @@ func (s *xplaneService) apPressed(command utilities.CommandRef, phase utilities.
 			// Double-click detected, cancel the timer and trigger double-click logic
 			timer.Stop()
 			delete(s.clickTimers, buttonRef)
+			s.Logger.Debugf("Double-click detected for button: %s, timestamp: %s", buttonRef, now)
 			s.doubleClick(buttonRef)
 			return 0
 		}

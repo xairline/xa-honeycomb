@@ -13,8 +13,8 @@ export namespace pkg {
 	    }
 	}
 	export class ButtonProfile {
-	    single_click?: Command;
-	    double_click?: Command;
+	    single_click?: Command[];
+	    double_click?: Command[];
 	
 	    static createFrom(source: any = {}) {
 	        return new ButtonProfile(source);
