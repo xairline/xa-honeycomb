@@ -33,6 +33,10 @@
 ### Bravo Knobs Mapping
 ![image](https://github.com/user-attachments/assets/99477be6-2e40-4dc4-b57d-605c3d7457a0)
 
+### Bravo AP Buttons Mapping
+![image](https://github.com/user-attachments/assets/922bff1a-9255-4245-ab5c-fc93d8604262)
+
+
 Above can be found by searching "honeycomb" after click `Edit`.
 
 
