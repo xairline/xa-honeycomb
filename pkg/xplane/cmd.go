@@ -1,11 +1,14 @@
 package xplane
 
+import "C"
 import (
 	"github.com/xairline/goplane/xplm/dataAccess"
 	"github.com/xairline/goplane/xplm/utilities"
 	"github.com/xairline/xa-honeycomb/pkg"
 	"time"
 )
+
+const doubleClickThreshold = 500 * time.Millisecond // Define double-click threshold
 
 func (s *xplaneService) changeApValue(command utilities.CommandRef, phase utilities.CommandPhase, ref interface{}) int {
 	// Handle only when command phase is CommandEnd
@@ -167,8 +170,93 @@ func (s *xplaneService) setupApCmds() {
 
 func (s *xplaneService) apPressed(command utilities.CommandRef, phase utilities.CommandPhase, ref interface{}) int {
 	if phase == utilities.Phase_CommandEnd {
+		buttonRef := ref.(string) // Convert ref to string (or your button identifier type)
 		now := time.Now()
-		s.Logger.Debugf("AP Pressed: %v, Phase: %v, ref: %s, timestamp: %s", command, phase, ref.(string), now)
+
+		s.mutex.Lock()
+		defer s.mutex.Unlock()
+
+		// Check if there's an existing timer for the button
+		if timer, exists := s.clickTimers[buttonRef]; exists {
+			// Double-click detected, cancel the timer and trigger double-click logic
+			timer.Stop()
+			delete(s.clickTimers, buttonRef)
+			s.doubleClick(buttonRef)
+			return 0
+		}
+
+		// Single-click detected; set a timer to delay action
+		timer := time.AfterFunc(doubleClickThreshold, func() {
+			s.mutex.Lock()
+			defer s.mutex.Unlock()
+
+			// Ensure the timer is not removed by a double-click
+			if s.clickTimers[buttonRef] != nil {
+				delete(s.clickTimers, buttonRef)
+				s.Logger.Debugf("Single-click detected for button: %s, timestamp: %s", buttonRef, now)
+				s.singleClick(buttonRef)
+			}
+		})
+
+		// Store the timer in the map
+		s.clickTimers[buttonRef] = timer
+		s.lastClickTime[buttonRef] = now
 	}
+
 	return 0
+}
+
+func (s *xplaneService) singleClick(ref string) {
+	s.cmdEventQueueMu.Lock()
+	defer s.cmdEventQueueMu.Unlock()
+	switch ref {
+	case "hdg":
+		s.commands(s.profile.Buttons.HDG.SingleClick)
+	case "nav":
+		s.commands(s.profile.Buttons.NAV.SingleClick)
+	case "alt":
+		s.commands(s.profile.Buttons.ALT.SingleClick)
+	case "apr":
+		s.commands(s.profile.Buttons.APR.SingleClick)
+	case "vs":
+		s.commands(s.profile.Buttons.VS.SingleClick)
+	case "ap":
+		s.commands(s.profile.Buttons.AP.SingleClick)
+	case "rev":
+		s.commands(s.profile.Buttons.REV.SingleClick)
+	case "ias":
+		s.commands(s.profile.Buttons.IAS.SingleClick)
+	default:
+		s.Logger.Debugf("Single-click detected for button: %s", ref)
+	}
+}
+
+func (s *xplaneService) doubleClick(ref string) {
+	s.cmdEventQueueMu.Lock()
+	defer s.cmdEventQueueMu.Unlock()
+	switch ref {
+	case "hdg":
+		s.commands(s.profile.Buttons.HDG.DoubleClick)
+	case "nav":
+		s.commands(s.profile.Buttons.NAV.DoubleClick)
+	case "alt":
+		s.commands(s.profile.Buttons.ALT.DoubleClick)
+	case "apr":
+		s.commands(s.profile.Buttons.APR.DoubleClick)
+	case "vs":
+		s.commands(s.profile.Buttons.VS.DoubleClick)
+	case "ap":
+		s.commands(s.profile.Buttons.AP.DoubleClick)
+	case "rev":
+		s.commands(s.profile.Buttons.REV.DoubleClick)
+	case "ias":
+		s.commands(s.profile.Buttons.IAS.DoubleClick)
+	default:
+		s.Logger.Debugf("Double-click detected for button: %s", ref)
+	}
+}
+func (s *xplaneService) commands(commands []pkg.Command) {
+	for _, cmd := range commands {
+		s.cmdEventQueue = append(s.cmdEventQueue, cmd.CommandStr)
+	}
 }

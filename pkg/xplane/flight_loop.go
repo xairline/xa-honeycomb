@@ -2,6 +2,7 @@ package xplane
 
 import (
 	"github.com/xairline/goplane/xplm/dataAccess"
+	"github.com/xairline/goplane/xplm/utilities"
 	"github.com/xairline/xa-honeycomb/pkg"
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
 	"reflect"
@@ -33,6 +34,17 @@ func (s *xplaneService) flightLoop(
 	}
 
 	s.updateLeds()
+
+	s.cmdEventQueueMu.Lock()
+	defer s.cmdEventQueueMu.Unlock()
+	for _, cmdStr := range s.cmdEventQueue {
+		cmd := utilities.FindCommand(cmdStr)
+		if cmd != nil {
+			s.Logger.Debugf("Executing command: %s", cmdStr)
+			utilities.CommandOnce(cmd)
+		}
+	}
+	s.cmdEventQueue = []string{}
 
 	return 0.1
 }

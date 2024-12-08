@@ -6,11 +6,38 @@ metadata:
     - ToLiss Airbus A330-941 Std Def
 
 buttons:
-  rev:
+  # rev:
+  # nav:
+  hdg:
     single_click:
-      - command_str: "AirbusFBW/REV"
+      - command_str: "AirbusFBW/PushHDGSel"
     double_click:
-      - command_str: "AirbusFBW/TOGA"
+      - command_str: "AirbusFBW/PullHDGSel"
+  ias:
+    single_click:
+      - command_str: "AirbusFBW/PushSPDSel"
+    double_click:
+      - command_str: "AirbusFBW/PullSPDSel"
+  alt:
+    single_click:
+      - command_str: "AirbusFBW/PushAltitude"
+    double_click:
+      - command_str: "AirbusFBW/PullAltitude"
+  vs:
+    single_click:
+      - command_str: "AirbusFBW/PushVSSel"
+    double_click:
+      - command_str: "AirbusFBW/PullVSSel"
+  apr:
+    single_click:
+      - command_str: "AirbusFBW/APPRbutton"
+    double_click:
+      - command_str: "AirbusFBW/APPRbutton"
+  ap:
+    single_click:
+      - command_str: "toliss_airbus/ap1_push"
+    double_click:
+      - command_str: "toliss_airbus/ap2_push"
 
 knobs:
   ap_hdg:

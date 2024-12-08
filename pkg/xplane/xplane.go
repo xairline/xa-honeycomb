@@ -4,6 +4,7 @@ package xplane
 
 //go:generate mockgen -destination=./__mocks__/xplane.go -package=mocks -source=xplane.go
 
+import "C"
 import (
 	"github.com/xairline/goplane/extra"
 	"github.com/xairline/goplane/xplm/menus"
@@ -17,6 +18,7 @@ import (
 )
 
 var VERSION = "development"
+var MESSAGE_ID plugins.MessageId = 134218828
 
 type XplaneService interface {
 	// init
@@ -43,6 +45,11 @@ type xplaneService struct {
 	apSelector      string
 	lastKnobTime    time.Time
 	lastCounter     int
+	lastClickTime   map[string]time.Time // Map to track the last click time for each button
+	mutex           sync.Mutex
+	clickTimers     map[string]*time.Timer
+	cmdEventQueue   []string
+	cmdEventQueueMu sync.Mutex
 }
 
 var xplaneSvcLock = &sync.Mutex{}
@@ -63,12 +70,14 @@ func NewXplaneService(
 		pluginPath := filepath.Join(systemPath, "Resources", "plugins", "xa-honeycomb")
 
 		xplaneSvc := &xplaneService{
-			Plugin:       extra.NewPlugin("xa honeycomb - "+VERSION, "com.github.xairline.xa-honeycomb", "honeycomb bridge"),
-			BravoService: honeycomb.NewBravoService(logger),
-			Logger:       logger,
-			pluginPath:   pluginPath,
-			profile:      nil,
-			apSelector:   "",
+			Plugin:        extra.NewPlugin("xa honeycomb - "+VERSION, "com.github.xairline.xa-honeycomb", "honeycomb bridge"),
+			BravoService:  honeycomb.NewBravoService(logger),
+			Logger:        logger,
+			pluginPath:    pluginPath,
+			profile:       nil,
+			apSelector:    "",
+			lastClickTime: make(map[string]time.Time),
+			clickTimers:   make(map[string]*time.Timer),
 		}
 		xplaneSvc.Plugin.SetPluginStateCallback(xplaneSvc.onPluginStateChanged)
 		xplaneSvc.Plugin.SetMessageHandler(xplaneSvc.messageHandler)
@@ -82,4 +91,14 @@ func (s *xplaneService) messageHandler(message plugins.Message) {
 		s.profile = nil
 		honeycomb.AllOff()
 	}
+
+	if message.MessageId == MESSAGE_ID {
+		cmdStr := C.GoString((*C.char)(message.Data))
+		s.Logger.Infof("Command: %s", cmdStr)
+		cmd := utilities.FindCommand(cmdStr)
+		if cmd != nil {
+			utilities.CommandOnce(cmd)
+		}
+	}
+
 }
