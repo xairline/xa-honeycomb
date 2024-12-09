@@ -35,6 +35,9 @@ func (b *bravoService) UpdateLeds() {
 				b.Logger.Infof("UpdateLeds: Context canceled, exiting goroutine")
 				return
 			default:
+				if BRAVO_CONNECTED == false {
+					continue
+				}
 				LED_STATE_CHANGED_LOCK.Lock()
 				ledStateChanged := LED_STATE_CHANGED
 				LED_STATE_CHANGED = false
