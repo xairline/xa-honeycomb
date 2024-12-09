@@ -41,8 +41,7 @@ func (s *xplaneService) flightLoop(
 		cmd := utilities.FindCommand(cmdStr)
 		if cmd != nil {
 			s.Logger.Debugf("Executing command: %s", cmdStr)
-			utilities.CommandBegin(cmd)
-			utilities.CommandEnd(cmd)
+			utilities.CommandOnce(cmd)
 		} else {
 			s.Logger.Errorf("Command not found: %s", cmdStr)
 		}
