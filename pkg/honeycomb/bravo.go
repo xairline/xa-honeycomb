@@ -52,7 +52,7 @@ func (b *bravoService) UpdateLeds() {
 					b.hidReportBuffer[3] = ANUNCIATOR_W1
 					b.hidReportBuffer[4] = ANUNCIATOR_W2
 					bravo, err := hid.OpenFirst(Vendor, Product)
-					if err != nil {
+					if err != nil || bravo == nil {
 						b.Logger.Errorf("failed to open device: %v", err)
 						continue
 					}
