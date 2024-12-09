@@ -134,7 +134,9 @@ func NewBravoService(logger pkg.Logger) BravoService {
 			utilities.SpeakString("Bravo device not found")
 			BRAVO_CONNECTED = false
 		}
-		bravo.Close()
+		if bravo != nil {
+			bravo.Close()
+		}
 
 		bravoSvc.UpdateLeds()
 		return bravoSvc
