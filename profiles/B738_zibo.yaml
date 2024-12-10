@@ -13,7 +13,35 @@ buttons:
       - command_str: "laminar/B738/autopilot/hdg_sel_press"
     double_click:
       - command_str: "laminar/B738/autopilot/lnav_press"
-
+  nav:
+    single_click:
+      - command_str: "laminar/B738/autopilot/lnav_press"
+    double_click:
+      - command_str: "laminar/B738/autopilot/vnav_press"
+  apr:
+    single_click:
+      - command_str: "laminar/B738/autopilot/app_press"
+    double_click:
+      - command_str: "laminar/B738/autopilot/vorloc_press"
+  #rev
+  alt:
+    single_click:
+      - command_str: "laminar/B738/autopilot/alt_hld_press"
+    double_click:
+      - command_str: "laminar/B738/autopilot/lvl_chg_press"
+  vs:
+    single_click:
+      - command_str: "laminar/B738/autopilot/vs_press"
+  ias:
+    single_click:
+      - command_str: "laminar/B738/autopilot/speed_press"
+    double_click:
+      - command_str: "laminar/B738/autopilot/n1_press"
+  ap:
+    single_click:
+      - command_str: "laminar/B738/autopilot/cmd_a_press"
+    double_click:
+      - command_str: "laminar/B738/autopilot/cws_a_press"
 
 knobs:
   ap_hdg:
