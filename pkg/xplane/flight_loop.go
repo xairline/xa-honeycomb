@@ -6,6 +6,7 @@ import (
 	"github.com/xairline/xa-honeycomb/pkg"
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
 	"reflect"
+	"time"
 )
 
 // flightloop, high freq code!
@@ -42,6 +43,7 @@ func (s *xplaneService) flightLoop(
 		if cmd != nil {
 			s.Logger.Debugf("Executing command: %s", cmdStr)
 			utilities.CommandBegin(cmd)
+			time.Sleep(100 * time.Millisecond)
 			utilities.CommandEnd(cmd)
 		} else {
 			s.Logger.Errorf("Command not found: %s", cmdStr)
