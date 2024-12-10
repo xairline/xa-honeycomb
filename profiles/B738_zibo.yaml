@@ -2,9 +2,17 @@ metadata:
   name: Zibo 738
   description: Profile for Zibo 738
   selectors:
-    - B737-800X
-    - B737-800X (4k)
+    - Boeing 737-800X
+    - Boeing 737-800X (4k)
 
+buttons:
+  # rev:
+  # nav:
+  hdg:
+    single_click:
+      - command_str: "laminar/B738/autopilot/hdg_sel_press"
+    double_click:
+      - command_str: "laminar/B738/autopilot/lnav_press"
 
 
 knobs:

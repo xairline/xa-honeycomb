@@ -8,7 +8,7 @@ import (
 	"reflect"
 )
 
-// flightloop, high freq code!
+// flightLoop is called periodically. You return 0.1, meaning it runs every ~100ms
 func (s *xplaneService) flightLoop(
 	elapsedSinceLastCall,
 	elapsedTimeSinceLastFlightLoop float32,
@@ -26,6 +26,9 @@ func (s *xplaneService) flightLoop(
 		s.lastCounter = 0
 	}
 
+	// Bump global time by elapsed since last call
+	s.globalTime += float64(elapsedSinceLastCall)
+
 	if counter-s.lastCounter > 200 {
 		honeycomb.LED_STATE_CHANGED_LOCK.Lock()
 		honeycomb.LED_STATE_CHANGED = true
@@ -36,18 +39,47 @@ func (s *xplaneService) flightLoop(
 	s.updateLeds()
 
 	s.cmdEventQueueMu.Lock()
-	defer s.cmdEventQueueMu.Unlock()
-	for _, cmdStr := range s.cmdEventQueue {
+	queuedCommands := s.cmdEventQueue
+	s.cmdEventQueue = []string{}
+	s.cmdEventQueueMu.Unlock()
+
+	// Process new command events:
+	for _, cmdStr := range queuedCommands {
 		cmd := utilities.FindCommand(cmdStr)
-		if cmd != nil {
-			s.Logger.Debugf("Executing command: %s", cmdStr)
-			utilities.CommandOnce(cmd)
-		} else {
+		if cmd == nil {
 			s.Logger.Errorf("Command not found: %s", cmdStr)
+			continue
+		}
+
+		// Start the command if it's not already active
+		if _, exists := s.commandStates[cmdStr]; !exists {
+			s.Logger.Debugf("Beginning command: %s", cmdStr)
+			utilities.CommandBegin(cmd)
+			s.commandStates[cmdStr] = &commandState{
+				startTime: s.globalTime,
+				active:    true,
+			}
+		} else {
+			// If this command is already active, either handle it differently
+			// or log a message. Typically you'd want one begin/end cycle at a time.
+			s.commandStates[cmdStr].startTime = -9999
+			s.Logger.Warningf("Command %s is already active.", cmdStr)
 		}
 	}
-	s.cmdEventQueue = []string{}
 
+	// End commands that have been held for at least 200ms
+	for cmdStr, state := range s.commandStates {
+		if state.active && (s.globalTime-state.startTime) >= 0.2 {
+			cmd := utilities.FindCommand(cmdStr)
+			if cmd != nil {
+				s.Logger.Debugf("Ending command: %s", cmdStr)
+				utilities.CommandEnd(cmd)
+			}
+			delete(s.commandStates, cmdStr)
+		}
+	}
+
+	// Return 0.1 to run again in ~100ms
 	return 0.1
 }
 

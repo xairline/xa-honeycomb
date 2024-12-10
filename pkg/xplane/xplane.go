@@ -20,6 +20,11 @@ import (
 
 var VERSION = "development"
 
+type commandState struct {
+	startTime float64
+	active    bool
+}
+
 type XplaneService interface {
 	// init
 	onPluginStateChanged(state extra.PluginState, plugin *extra.XPlanePlugin)
@@ -51,6 +56,8 @@ type xplaneService struct {
 	cmdEventQueue   []string
 	cmdEventQueueMu sync.Mutex
 	cancelFunc      context.CancelFunc
+	commandStates   map[string]*commandState
+	globalTime      float64
 }
 
 var xplaneSvcLock = &sync.Mutex{}
@@ -82,6 +89,8 @@ func NewXplaneService(
 			lastClickTime: make(map[string]time.Time),
 			clickTimers:   make(map[string]*time.Timer),
 			cancelFunc:    cancelFunc,
+			commandStates: make(map[string]*commandState),
+			globalTime:    0.0,
 		}
 		xplaneSvc.Plugin.SetPluginStateCallback(xplaneSvc.onPluginStateChanged)
 		xplaneSvc.Plugin.SetMessageHandler(xplaneSvc.messageHandler)
