@@ -6,7 +6,6 @@ import (
 	"github.com/xairline/xa-honeycomb/pkg"
 	"github.com/xairline/xa-honeycomb/pkg/honeycomb"
 	"reflect"
-	"time"
 )
 
 // flightloop, high freq code!
