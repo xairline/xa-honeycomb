@@ -182,7 +182,7 @@ func (s *xplaneService) apPressed(command utilities.CommandRef, phase utilities.
 			timer.Stop()
 			delete(s.clickTimers, buttonRef)
 			s.Logger.Debugf("Double-click detected for button: %s, timestamp: %s", buttonRef, now)
-			s.doubleClick(buttonRef)
+			s.handleClick(buttonRef, true)
 			return 0
 		}
 
@@ -195,7 +195,7 @@ func (s *xplaneService) apPressed(command utilities.CommandRef, phase utilities.
 			if s.clickTimers[buttonRef] != nil {
 				delete(s.clickTimers, buttonRef)
 				s.Logger.Debugf("Single-click detected for button: %s, timestamp: %s", buttonRef, now)
-				s.singleClick(buttonRef)
+				s.handleClick(buttonRef, false)
 			}
 		})
 
@@ -207,57 +207,59 @@ func (s *xplaneService) apPressed(command utilities.CommandRef, phase utilities.
 	return 0
 }
 
-func (s *xplaneService) singleClick(ref string) {
-	s.cmdEventQueueMu.Lock()
-	defer s.cmdEventQueueMu.Unlock()
+func (s *xplaneService) getButtonCommands(ref string, doubleClick bool) []pkg.Command {
+	if s.profile == nil || s.profile.Buttons == nil {
+		return nil
+	}
+
+	var btn *pkg.ButtonProfile
 	switch ref {
 	case "hdg":
-		s.commands(s.profile.Buttons.HDG.SingleClick)
+		btn = &s.profile.Buttons.HDG
 	case "nav":
-		s.commands(s.profile.Buttons.NAV.SingleClick)
+		btn = &s.profile.Buttons.NAV
 	case "alt":
-		s.commands(s.profile.Buttons.ALT.SingleClick)
+		btn = &s.profile.Buttons.ALT
 	case "apr":
-		s.commands(s.profile.Buttons.APR.SingleClick)
+		btn = &s.profile.Buttons.APR
 	case "vs":
-		s.commands(s.profile.Buttons.VS.SingleClick)
+		btn = &s.profile.Buttons.VS
 	case "ap":
-		s.commands(s.profile.Buttons.AP.SingleClick)
+		btn = &s.profile.Buttons.AP
 	case "rev":
-		s.commands(s.profile.Buttons.REV.SingleClick)
+		btn = &s.profile.Buttons.REV
 	case "ias":
-		s.commands(s.profile.Buttons.IAS.SingleClick)
+		btn = &s.profile.Buttons.IAS
 	default:
-		s.Logger.Debugf("Single-click detected for button: %s", ref)
+		// Unknown button ref
+		return nil
 	}
+
+	if btn == nil {
+		return nil
+	}
+
+	if doubleClick {
+		return btn.DoubleClick
+	}
+	return btn.SingleClick
 }
 
-func (s *xplaneService) doubleClick(ref string) {
+func (s *xplaneService) handleClick(ref string, doubleClick bool) {
 	s.cmdEventQueueMu.Lock()
 	defer s.cmdEventQueueMu.Unlock()
-	switch ref {
-	case "hdg":
-		s.commands(s.profile.Buttons.HDG.DoubleClick)
-	case "nav":
-		s.commands(s.profile.Buttons.NAV.DoubleClick)
-	case "alt":
-		s.commands(s.profile.Buttons.ALT.DoubleClick)
-	case "apr":
-		s.commands(s.profile.Buttons.APR.DoubleClick)
-	case "vs":
-		s.commands(s.profile.Buttons.VS.DoubleClick)
-	case "ap":
-		s.commands(s.profile.Buttons.AP.DoubleClick)
-	case "rev":
-		s.commands(s.profile.Buttons.REV.DoubleClick)
-	case "ias":
-		s.commands(s.profile.Buttons.IAS.DoubleClick)
-	default:
-		s.Logger.Debugf("Double-click detected for button: %s", ref)
-	}
-}
-func (s *xplaneService) commands(commands []pkg.Command) {
-	for _, cmd := range commands {
-		s.cmdEventQueue = append(s.cmdEventQueue, cmd.CommandStr)
+
+	cmds := s.getButtonCommands(ref, doubleClick)
+	if cmds != nil && len(cmds) > 0 {
+		for _, cmd := range cmds {
+			s.cmdEventQueue = append(s.cmdEventQueue, cmd.CommandStr)
+		}
+	} else {
+		// Differentiating log message based on single/double click
+		clickType := "Single-click"
+		if doubleClick {
+			clickType = "Double-click"
+		}
+		s.Logger.Warningf("%s detected for button: %s (no commands configured)", clickType, ref)
 	}
 }

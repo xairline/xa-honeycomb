@@ -6,6 +6,7 @@ package xplane
 
 import "C"
 import (
+	"context"
 	"github.com/xairline/goplane/extra"
 	"github.com/xairline/goplane/xplm/menus"
 	"github.com/xairline/goplane/xplm/plugins"
@@ -18,7 +19,6 @@ import (
 )
 
 var VERSION = "development"
-var MESSAGE_ID plugins.MessageId = 134218828
 
 type XplaneService interface {
 	// init
@@ -50,6 +50,7 @@ type xplaneService struct {
 	clickTimers     map[string]*time.Timer
 	cmdEventQueue   []string
 	cmdEventQueueMu sync.Mutex
+	cancelFunc      context.CancelFunc
 }
 
 var xplaneSvcLock = &sync.Mutex{}
@@ -69,6 +70,8 @@ func NewXplaneService(
 		systemPath := utilities.GetSystemPath()
 		pluginPath := filepath.Join(systemPath, "Resources", "plugins", "xa-honeycomb")
 
+		_, cancelFunc := context.WithCancel(context.Background())
+
 		xplaneSvc := &xplaneService{
 			Plugin:        extra.NewPlugin("xa honeycomb - "+VERSION, "com.github.xairline.xa-honeycomb", "honeycomb bridge"),
 			BravoService:  honeycomb.NewBravoService(logger),
@@ -78,6 +81,7 @@ func NewXplaneService(
 			apSelector:    "",
 			lastClickTime: make(map[string]time.Time),
 			clickTimers:   make(map[string]*time.Timer),
+			cancelFunc:    cancelFunc,
 		}
 		xplaneSvc.Plugin.SetPluginStateCallback(xplaneSvc.onPluginStateChanged)
 		xplaneSvc.Plugin.SetMessageHandler(xplaneSvc.messageHandler)
@@ -91,14 +95,4 @@ func (s *xplaneService) messageHandler(message plugins.Message) {
 		s.profile = nil
 		honeycomb.AllOff()
 	}
-
-	if message.MessageId == MESSAGE_ID {
-		cmdStr := C.GoString((*C.char)(message.Data))
-		s.Logger.Infof("Command: %s", cmdStr)
-		cmd := utilities.FindCommand(cmdStr)
-		if cmd != nil {
-			utilities.CommandOnce(cmd)
-		}
-	}
-
 }
