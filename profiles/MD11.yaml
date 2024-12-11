@@ -4,7 +4,7 @@ metadata:
 
 buttons:
   # rev:
-  # nav:
+  # vs:
   hdg:
     single_click:
       - command_str: "Rotate/aircraft/controls_c/fgs_hdg_mode_sel_up"
@@ -17,24 +17,20 @@ buttons:
       - command_str: "Rotate/aircraft/controls_c/fgs_spd_sel_mode_dn"
   alt:
     single_click:
-      - command_str: "AirbusFBW/PushAltitude"
+      - command_str: "Rotate/aircraft/controls_c/fgs_alt_mode_sel_up"
     double_click:
-      - command_str: "AirbusFBW/PullAltitude"
-  vs:
-    single_click:
-      - command_str: "AirbusFBW/PushVSSel"
-    double_click:
-      - command_str: "AirbusFBW/PullVSSel"
+      - command_str: "Rotate/aircraft/controls_c/fgs_alt_mode_sel_dn"
   apr:
     single_click:
-      - command_str: "AirbusFBW/APPRbutton"
-    double_click:
-      - command_str: "AirbusFBW/APPRbutton"
+      - command_str: "Rotate/aircraft/controls_c/fgs_appr_land"
   ap:
     single_click:
-      - command_str: "toliss_airbus/ap1_push"
+      - command_str: "Rotate/aircraft/controls_c/fgs_autoflight"
+  nav:
+    single_click:
+      - command_str: "Rotate/aircraft/controls_c/fgs_nav"
     double_click:
-      - command_str: "toliss_airbus/ap2_push"
+      - command_str: "Rotate/aircraft/controls_c/fgs_prof"
 
 ##### AP KNOBS #####
 knobs:
