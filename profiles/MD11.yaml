@@ -1,6 +1,9 @@
 metadata:
   name: Rotate MD-11
   description: Profile for the Rotate MD-11
+  selectors:
+    - Rotate MD-11F
+    - Rotate MD-11
 
 buttons:
   # rev:
