@@ -39,6 +39,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - run: |
+          rustup target add x86_64-pc-windows-gnu
           export VERSION=${GITHUB_REF##*/} 
           VERSION=${GITHUB_REF##*/} make mac win -j 2
           
