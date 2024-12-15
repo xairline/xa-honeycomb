@@ -4,6 +4,7 @@ name: Release
 on:
   push:
     pull_request:
+      - "*"
     tags:
       - 'v*'
   # Allows you to run this workflow manually from the Actions tab
