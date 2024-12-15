@@ -6,3 +6,4 @@ frontend/dist
 # Added by cargo
 
 /target
+/build

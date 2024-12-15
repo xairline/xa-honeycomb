@@ -38,7 +38,6 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - run: |
-          go mod tidy
           export VERSION=${GITHUB_REF##*/} 
           VERSION=${GITHUB_REF##*/} make mac win -j 2
           
