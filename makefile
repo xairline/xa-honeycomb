@@ -18,6 +18,7 @@ mac:
 
 dev:
 	cargo build
+	mkdir dir -p ${xplane_dir}/Resources/plugins/xa-honeycomb || true
 	mv target/debug/libxa_honeycomb.dylib build/xa-honeycomb/mac.xpl
 	cp build/xa-honeycomb/mac.xpl ${xplane_dir}/Resources/plugins/xa-honeycomb/mac.xpl
 
