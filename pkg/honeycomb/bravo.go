@@ -12,6 +12,7 @@ import (
 var Vendor uint16 = 0x294B
 var Product uint16 = 0x1901
 var BRAVO_CONNECTED = true
+var PROFILE_LOADED = false
 
 type BravoService interface {
 	UpdateLeds()
@@ -35,7 +36,7 @@ func (b *bravoService) UpdateLeds() {
 				b.Logger.Infof("UpdateLeds: Context canceled, exiting goroutine")
 				return
 			default:
-				if BRAVO_CONNECTED == false {
+				if BRAVO_CONNECTED == false || PROFILE_LOADED == false {
 					continue
 				}
 				LED_STATE_CHANGED_LOCK.Lock()

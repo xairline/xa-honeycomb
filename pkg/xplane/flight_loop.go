@@ -85,8 +85,11 @@ func (s *xplaneService) flightLoop(
 
 func (s *xplaneService) updateLeds() {
 	if s.profile == nil {
+		honeycomb.PROFILE_LOADED = false
 		return
 	}
+
+	honeycomb.PROFILE_LOADED = true
 
 	// special case for bus voltage
 	busVoltage, busVoltageOK := s.evaluateCondition(&s.profile.Conditions.BUS_VOLTAGE)
