@@ -3,6 +3,6 @@ extern crate xplm;
 #[macro_export]
 macro_rules! plugin_debugln {
     ($($arg:tt)*) => {
-        xplm::debugln!("[XA Honeycomb] {}", format!($($arg)*))
+        xplm::debugln!("[xa-honeycomb] {}", format!($($arg)*))
     };
 }

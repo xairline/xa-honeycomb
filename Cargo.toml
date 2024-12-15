@@ -6,8 +6,11 @@ edition = "2021"
 [dependencies]
 xplm = { git = "https://github.com/samcrow/rust-xplm", branch = "master" }
 xplm-sys = "0.5.1"
-dirs = "5.0.1"
-rust-ini = "0.21"
+lazy_static = "1.4"
+paste = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"   # For YAML serialization and deserialization
+serde_json = "1.0"   # For JSON handling
 
 [profile.dev]
 opt-level = 2
