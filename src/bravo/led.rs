@@ -1,5 +1,6 @@
+use crate::plugin_debugln;
 use std::fmt::Write;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 // LED Constants
 pub const LED_FUEL_PUMP: u8 = 1;
@@ -145,4 +146,12 @@ pub fn all_off() {
     *lg = 0;
     *ap = 0;
     *state_changed = true;
+}
+
+// Simulate sending HID report
+fn send_hid_report(hid_report_buffer: &Arc<Mutex<[u8; 5]>>) -> Result<usize, String> {
+    let buffer = hid_report_buffer.lock().unwrap();
+    // Simulated HID write logic
+    plugin_debugln!("Sending HID report: {:?}", *buffer);
+    Ok(buffer.len()) // Simulated bytes written
 }

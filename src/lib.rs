@@ -1,48 +1,42 @@
 // src/lib.rs
 extern crate xplm;
 mod bravo;
+mod flight_loop;
 mod misc;
-mod profile;
+pub mod profile;
+pub use profile::types::Profile;
+use std::os::raw::c_void;
 
-use xplm::flight_loop::{FlightLoop, LoopState};
-// Declare the `misc` module
-use crate::misc::path::get_system_path;
+use xplm::flight_loop::FlightLoop;
+use xplm::plugin::messages::XPLM_MSG_PLANE_LOADED;
 use xplm::plugin::{Plugin, PluginInfo};
 use xplm::xplane_plugin;
 
-struct MinimalPlugin {
+struct XaHoneycombPlugin {
     _flight_loop: FlightLoop,
+    _current_profile: Option<Profile>,
 }
 
-impl Plugin for MinimalPlugin {
+impl Plugin for XaHoneycombPlugin {
     type Error = std::convert::Infallible;
 
     fn start() -> Result<Self, Self::Error> {
         plugin_debugln!("Plugin Started");
-        // let xp_perf_path = get_system_path();
-        // plugin_debugln!("Plugin path: {:?}", xp_perf_path);
-        // match read_xplane_preferences(&xp_perf_path) {
-        //     Ok(true) => {
-        //         plugin_debugln!("Load flight on start is enabled.");
-        //         plugin_debugln!("Mount AO and wait for all mounts to finish.");
-        //     }
-        //     Ok(false) => {
-        //         plugin_debugln!("Load flight on start is not enabled.");
-        //         plugin_debugln!("Mount AO and return immediately.");
-        //     }
-        //     Err(err) => eprintln!("An error occurred: {}", err),
-        // }
-        // xplm::flight_loop::FlightLoopCallback::new(|_, _, _, _| {
-        //     plugin_debugln!("Flight loop callback");
-        //     xplm::flight_loop::FlightLoopPhase::AfterFlightModel
-        // });
-        let mut flight_loop = FlightLoop::new(move |loop_state: &mut LoopState| {
-            plugin_debugln!("Flight loop callback");
-        });
-        flight_loop.schedule_immediate();
-        Ok(MinimalPlugin {
-            _flight_loop: flight_loop,
+        Ok(XaHoneycombPlugin {
+            _flight_loop: FlightLoop::new(flight_loop::FlightLoopHandler),
+            _current_profile: None,
         })
+    }
+
+    fn enable(&mut self) -> Result<(), Self::Error> {
+        plugin_debugln!("enabling flight loop callback");
+        self._flight_loop.schedule_immediate();
+        Ok(())
+    }
+
+    fn disable(&mut self) {
+        plugin_debugln!("disabling");
+        self._flight_loop.deactivate();
     }
 
     fn info(&self) -> PluginInfo {
@@ -52,6 +46,14 @@ impl Plugin for MinimalPlugin {
             description: String::from("A plugin to configure honeycomb bravo"),
         }
     }
+
+    fn receive_message(&mut self, from: i32, message: i32, param: *mut c_void) {
+        if message == XPLM_MSG_PLANE_LOADED {
+            plugin_debugln!("Plane loaded");
+            self._current_profile = None;
+            bravo::led::all_off();
+        }
+    }
 }
 
-xplane_plugin!(MinimalPlugin);
+xplane_plugin!(XaHoneycombPlugin);
