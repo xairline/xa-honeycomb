@@ -212,8 +212,8 @@ leds:
   parking_brake:
     datarefs:
       - dataref_str: "laminar/B738/annunciator/parking_brake"
-        operator: "<"
-        threshold: 0.2
+        operator: ">"
+        threshold: 0.1
 
   volt_low:
     datarefs:
