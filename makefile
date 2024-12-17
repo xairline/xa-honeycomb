@@ -1,73 +1,34 @@
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
+xplane_dir := "/Volumes/storage/X-Plane 12"
 
-all: mac win lin
+all: mac win
 
 clean:
-	rm -rf dist || true || rm ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/mac.xpl
+	rm -rf dist || true || rm ${xplane_dir}/Resources/plugins/xa-honeycomb/mac.xpl
+
 mac:
-	GOOS=darwin \
-	GOARCH=arm64 \
-	CGO_ENABLED=1 \
-	CGO_CFLAGS="-DAPL=1 -DIBM=0 -DLIN=0 -O2 -g" \
-	CGO_LDFLAGS="-F/System/Library/Frameworks/ -F${CURDIR}/Libraries/Mac -framework XPLM" \
-	go build -buildmode c-shared -o build/xa-honeycomb/mac_arm.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}"  plugin/plugin.go
-	GOOS=darwin \
-	GOARCH=amd64 \
-	CGO_ENABLED=1 \
-	CGO_CFLAGS="-DAPL=1 -DIBM=0 -DLIN=0 -O2 -g" \
-	CGO_LDFLAGS="-F/System/Library/Frameworks/ -F${CURDIR}/Libraries/Mac -framework XPLM" \
-	go build -buildmode c-shared -o build/xa-honeycomb/mac_amd.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" plugin/plugin.go
+	mkdir -p build/xa-honeycomb
+	cargo build --release --target aarch64-apple-darwin
+	mv target/aarch64-apple-darwin/release/libxa_honeycomb.dylib build/xa-honeycomb/mac_arm.xpl
+	cargo build --release --target x86_64-apple-darwin
+	mv target/x86_64-apple-darwin/release/libxa_honeycomb.dylib build/xa-honeycomb/mac_amd.xpl
 	lipo build/xa-honeycomb/mac_arm.xpl build/xa-honeycomb/mac_amd.xpl -create -output build/xa-honeycomb/mac.xpl
+	rm -rf build/xa-honeycomb/mac_arm.xpl build/xa-honeycomb/mac_amd.xpl
+
 dev:
-	GOOS=darwin \
-	GOARCH=arm64 \
-	CGO_ENABLED=1 \
-	CGO_CFLAGS="-DAPL=1 -DIBM=0 -DLIN=0 -O2 -g" \
-	CGO_LDFLAGS="-F/System/Library/Frameworks/ -F${CURDIR}/Libraries/Mac -framework XPLM" \
-	go build -buildmode c-shared -o ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/mac.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=development" plugin/plugin.go
-	cp -r profiles ~/X-Plane\ 12/Resources/plugins/xa-honeycomb/
+	cargo build
+	mkdir dir -p ${xplane_dir}/Resources/plugins/xa-honeycomb || true
+	mv target/debug/libxa_honeycomb.dylib build/xa-honeycomb/mac.xpl
+	cp build/xa-honeycomb/mac.xpl ${xplane_dir}/Resources/plugins/xa-honeycomb/mac.xpl
+	cp -r profiles ${xplane_dir}/Resources/plugins/xa-honeycomb/profiles
+
 win:
-	CGO_CFLAGS="-DIBM=1 -static -O2 -g" \
-	CGO_LDFLAGS="-L${CURDIR}/Libraries/Win -lXPLM_64 -static-libgcc -static-libstdc++ -Wl,--exclude-libs,ALL" \
-	GOOS=windows \
-	GOARCH=amd64 \
-	CGO_ENABLED=1 \
-	CC=x86_64-w64-mingw32-gcc \
-	CXX=x86_64-w64-mingw32-g++ \
-	go build --buildmode c-shared -o build/xa-honeycomb/win.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}"  plugin/plugin.go
-lin:
-	GOOS=linux \
-	GOARCH=amd64 \
-	CGO_ENABLED=1 \
-	CC=/usr/local/bin/x86_64-linux-musl-cc \
-	CGO_CFLAGS="-DLIN=1 -O2 -g" \
-	CGO_LDFLAGS="-shared -rdynamic -nodefaultlibs -undefined_warning" \
-	go build -tags libusb -buildmode c-shared -o build/xa-honeycomb/lin.xpl  \
-		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" plugin/plugin.go
+	mkdir -p build/xa-honeycomb
+	cargo build --release --target x86_64-pc-windows-gnu
+	mv target/x86_64-pc-windows-gnu/release/xa_honeycomb.dll build/xa-honeycomb/win.xpl
 
-mac-test:
-	GOOS=darwin \
-	GOARCH=arm64 \
-	CGO_ENABLED=1 \
-	CGO_CFLAGS="-DAPL=1 -DIBM=0 -DLIN=0" \
-	CGO_LDFLAGS="-F/System/Library/Frameworks/ -F${CURDIR}/Libraries/Mac -framework XPLM" \
-	DYLD_FRAMEWORK_PATH="/Users/dzou/git//xa-honeycomb/Libraries/Mac" \
-	go test -race -coverprofile=coverage.txt -covermode=atomic ./... -v
-
-# build on Windows msys2/mingw64
-PLUG_DIR=$(XPL_ROOT)/Resources/plugins/xa-honeycomb
-
-msys2:
-	@if [ -z "$(XPL_ROOT)" ]; then echo "Environment is not setup"; exit 1; fi
-	go build --buildmode c-shared -o build/xa-honeycomb/win.xpl \
-		-ldflags="-X github.com/xairline/xa-honeycomb/pkg/xplane.VERSION=${VERSION}" plugin/plugin.go
-	[ -d "$(PLUG_DIR)" ] && cp -p build/xa-honeycomb/win.xpl "$(PLUG_DIR)/."
-
-msys2-test:
-	@if [ -z "$(XPL_ROOT)" ]; then echo "Environment is not setup"; exit 1; fi
-	go test -race -coverprofile=coverage.txt -covermode=atomic ./... -v
+# lin:
+# 	mkdir -p build/xa-honeycomb
+# 	cargo build --release --target x86_64-unknown-linux-gnu
+# 	mv target/aarch64-apple-darwin/release/libxa_honeycomb.dylib build/xa-honeycomb/lin.xpl
