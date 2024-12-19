@@ -2,3 +2,9 @@
 build/bin
 node_modules
 frontend/dist
+
+# Added by cargo
+
+/target
+/build
+/Resources
