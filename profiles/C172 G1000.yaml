@@ -1,9 +1,45 @@
 metadata:
-  name: Laminar C172 Skyhawk
-  description: Laminar Cessna 172 Skyhawk
+  name: Laminar C172 Skyhawk (G1000)
+  description: Laminar Cessna 172 Skyhawk (G1000) FOSM
   selectors:
-    - Cessna Skyhawk
     - Cessna Skyhawk (G1000)
+buttons:
+  # rev:
+  nav:
+    single_click:
+      - command_str: "sim/GPS/g1000n3_nav"
+    double_click:
+      - command_str: "sim/GPS/g1000n3_nav"
+  hdg:
+    single_click:
+      - command_str: "sim/GPS/g1000n3_hdg"
+    double_click:
+      - command_str: "sim/GPS/g1000n3_hdg_sync"
+  ias:
+    single_click:
+      - command_str: "sim/GPS/g1000n3_flc"
+    double_click:
+      - command_str: "sim/GPS/g1000n3_flc"
+  alt:
+    single_click:
+      - command_str: "sim/GPS/g1000n3_alt"
+    double_click:
+      - command_str: "sim/GPS/g1000n3_alt"
+  vs:
+    single_click:
+      - command_str: "sim/GPS/g1000n3_vs"
+    double_click:
+      - command_str: "sim/GPS/g1000n3_vnv"
+  apr:
+    single_click:
+      - command_str: "sim/GPS/g1000n3_apr"
+    double_click:
+      - command_str: "sim/GPS/g1000n3_apr"
+  ap:
+    single_click:
+      - command_str: "sim/autopilot/servos_toggle"
+    double_click:
+      - command_str: "sim/autopilot/servos_toggle"
 
 knobs:
   ap_hdg:
@@ -11,17 +47,16 @@ knobs:
       - dataref_str: "sim/cockpit2/autopilot/heading_dial_deg_mag_pilot"
   ap_alt:
     datarefs:
-      - dataref_str: "sim/cockpit/autopilot/current_altitude"
+      - dataref_str: "sim/cockpit/autopilot/altitude"
   ap_vs:
     datarefs:
       - dataref_str: "sim/cockpit2/autopilot/vvi_dial_fpm"
-  # ap_ias:
-  #   datarefs:
-  #     - dataref_str: "sim/cockpit2/autopilot/airspeed_dial_kts_mach"
+  ap_ias:
+     datarefs:
+       - dataref_str: "sim/cockpit2/autopilot/airspeed_dial_kts_mach"
   ap_crs:
     datarefs:
       - dataref_str: "sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot"
-
 leds:
   hdg:
     datarefs:
@@ -63,11 +98,11 @@ leds:
         operator: ">="
         threshold: 1
 
-  # ias:
-  #   datarefs:
-  #     - dataref_str: "sim/cockpit2/autopilot/autothrottle_on"
-  #       operator: "=="
-  #       threshold: 1
+  ias:
+    datarefs:
+       - dataref_str: "sim/cockpit/autopilot/autopilot_state"
+         operator: "=="
+         threshold: 106
 
   ap:
     datarefs:
