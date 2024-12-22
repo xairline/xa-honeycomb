@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/expr-lang/expr"
 	"github.com/xairline/goplane/xplm/dataAccess"
+	"github.com/xairline/goplane/xplm/menus"
 	"github.com/xairline/goplane/xplm/utilities"
 	"github.com/xairline/xa-honeycomb/pkg"
 	"gopkg.in/yaml.v3"
@@ -57,6 +58,7 @@ func (s *xplaneService) tryLoadProfile() {
 			}
 		}
 		s.Logger.Infof("Loaded profile: %s", planeProfile.Metadata.Name)
+		menus.SetMenuItemName(s.myMenuId, 0, fmt.Sprintf("Reload Profile (Current: %s)", planeProfile.Metadata.Name), true)
 		if planeProfile.Metadata.Name == "Default" {
 			utilities.SpeakString("Warning! No Plane specific profile found! Using default profile!")
 		}

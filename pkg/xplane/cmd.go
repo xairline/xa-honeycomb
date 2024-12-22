@@ -100,7 +100,9 @@ func (s *xplaneService) adjust(myProfile pkg.KnobProfile, direction int, multipl
 		} else {
 			cmd = utilities.FindCommand(myProfile.Commands[1].CommandStr)
 		}
-		utilities.CommandOnce(cmd)
+		for i := 0; i < int(multiplier); i++ {
+			utilities.CommandOnce(cmd)
+		}
 	}
 
 	for i := 0; i < len(myProfile.Datarefs); i++ {

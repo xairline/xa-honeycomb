@@ -1,6 +1,8 @@
 module github.com/xairline/xa-honeycomb
 
-go 1.20
+go 1.21
+
+toolchain go1.23.4
 
 require (
 	github.com/expr-lang/expr v1.16.9
