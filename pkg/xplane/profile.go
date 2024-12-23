@@ -13,9 +13,16 @@ import (
 	"strings"
 )
 
-func (s *xplaneService) tryLoadProfile() {
-	// Try to load profiles using the aircraft's ICAO
+func (s *xplaneService) tryLoadProfile() error {
+	defer func() error {
+		if r := recover(); r != nil {
+			s.Logger.Errorf("Recovered from panic: %v", r)
+			return fmt.Errorf("recovered from panic: %v", r)
+		}
+		return nil
+	}()
 
+	// Try to load profiles using the aircraft's ICAO
 	aircraftIACODrf, found := dataAccess.FindDataRef("sim/aircraft/view/acf_ICAO")
 	if found {
 		var planeProfile pkg.Profile
@@ -37,7 +44,7 @@ func (s *xplaneService) tryLoadProfile() {
 			entries, err := os.ReadDir(configFilePath)
 			if err != nil {
 				s.Logger.Errorf("Error reading profiles folder: %v", err)
-				return
+				return err
 			}
 			for _, entry := range entries {
 				if !entry.IsDir() && path.Ext(entry.Name()) == ".yaml" && strings.HasPrefix(entry.Name(), aircraftIACO) {
@@ -62,11 +69,12 @@ func (s *xplaneService) tryLoadProfile() {
 		if planeProfile.Metadata.Name == "Default" {
 			utilities.SpeakString("Warning! No Plane specific profile found! Using default profile!")
 		}
-		s.setupProfile(planeProfile)
+		return s.setupProfile(planeProfile)
 	}
+	return nil
 }
 
-func (s *xplaneService) setupProfile(planeProfile pkg.Profile) {
+func (s *xplaneService) setupProfile(planeProfile pkg.Profile) error {
 	// Fill in any missing sections of the profile
 	if planeProfile.Metadata == nil {
 		planeProfile.Metadata = &pkg.Metadata{}
@@ -121,6 +129,11 @@ func (s *xplaneService) setupProfile(planeProfile pkg.Profile) {
 		s.Logger.Infof("Successfully loaded profile")
 	}
 	s.profile = &planeProfile
+	if hasErrors {
+		return fmt.Errorf("Loaded profile with errors")
+	} else {
+		return nil
+	}
 }
 
 func (s *xplaneService) loadProfile(airplaneConfig string) (pkg.Profile, error) {

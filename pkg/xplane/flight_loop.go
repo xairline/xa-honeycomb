@@ -22,8 +22,13 @@ func (s *xplaneService) flightLoop(
 
 	if s.profile == nil {
 		s.Logger.Info("Profile is nil, try to load it again")
-		s.tryLoadProfile()
 		s.lastCounter = 0
+		err := s.tryLoadProfile()
+		if err != nil {
+			s.profile = nil
+			return 1
+		}
+
 	}
 
 	// Bump global time by elapsed since last call

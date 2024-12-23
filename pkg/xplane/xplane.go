@@ -35,7 +35,7 @@ type XplaneService interface {
 	// menu handler
 	menuHandler(menuRef interface{}, itemRef interface{})
 	// datarefs
-	tryLoadProfile()
+	tryLoadProfile() error
 }
 
 type xplaneService struct {
