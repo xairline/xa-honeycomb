@@ -45,11 +45,15 @@ buttons:
 
 knobs:
   ap_hdg:
-    datarefs:
-      - dataref_str: "laminar/B738/autopilot/mcp_hdg_dial"
+    profile_type: knob
+    commands:
+      - command_str: laminar/B738/autopilot/heading_up
+      - command_str: laminar/B738/autopilot/heading_dn
   ap_alt:
-    datarefs:
-      - dataref_str: "laminar/B738/autopilot/mcp_alt_dial"
+    profile_type: knob
+    commands:
+      - command_str: laminar/B738/autopilot/altitude_up
+      - command_str: laminar/B738/autopilot/altitude_dn
   ap_vs:
     datarefs:
       - dataref_str: "sim/cockpit2/autopilot/vvi_dial_fpm"
