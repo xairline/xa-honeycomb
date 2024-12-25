@@ -66,19 +66,19 @@ knobs:
 leds:
   hdg:
     datarefs:
-      - dataref_str: "sim/cockpit2/autopilot/heading_mode"
+      - dataref_str: "laminar/B738/autopilot/hdg_sel_status"
         operator: "=="
         threshold: 1
 
   nav:
     datarefs:
-      - dataref_str: "sim/cockpit2/autopilot/nav_status"
+      - dataref_str: "laminar/B738/autopilot/lnav_status"
         operator: "=="
         threshold: 1
 
   apr:
     datarefs:
-      - dataref_str: "sim/cockpit2/autopilot/approach_status"
+      - dataref_str: "laminar/B738/autopilot/app_status"
         operator: "=="
         threshold: 1
 
