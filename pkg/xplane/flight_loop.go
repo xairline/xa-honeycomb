@@ -155,38 +155,54 @@ func (s *xplaneService) updateGearLEDs(output []float32) {
 		honeycomb.OnLEDNoseGearGreen()
 		honeycomb.OffLEDNoseGearRed()
 	}
-	if output[1] >= 0.99 {
-		honeycomb.OnLEDLeftGearGreen()
-		honeycomb.OffLEDLeftGearRed()
-	}
-	if output[2] >= 0.99 {
-		honeycomb.OnLEDRightGearGreen()
-		honeycomb.OffLEDRightGearRed()
-	}
-
 	if output[0] <= 0.01 {
 		honeycomb.OffLEDNoseGearGreen()
 		honeycomb.OffLEDNoseGearRed()
+	}
+	if output[0] > 0.01 && output[0] < 0.99 {
+		honeycomb.OffLEDNoseGearGreen()
+		honeycomb.OnLEDNoseGearRed()
+	}
+
+	if output[1] >= 0.99 {
+		honeycomb.OnLEDLeftGearGreen()
+		honeycomb.OffLEDLeftGearRed()
 	}
 	if output[1] <= 0.01 {
 		honeycomb.OffLEDLeftGearGreen()
 		honeycomb.OffLEDLeftGearRed()
 	}
-	if output[2] <= 0.01 {
-		honeycomb.OffLEDRightGearGreen()
-		honeycomb.OffLEDRightGearRed()
-	}
-
-	if output[0] > 0.01 && output[0] < 0.99 {
-		honeycomb.OffLEDNoseGearGreen()
-		honeycomb.OnLEDNoseGearRed()
-	}
 	if output[1] > 0.01 && output[1] < 0.99 {
 		honeycomb.OffLEDLeftGearGreen()
 		honeycomb.OnLEDLeftGearRed()
 	}
-	if output[2] > 0.01 && output[2] < 0.99 {
-		honeycomb.OffLEDRightGearGreen()
-		honeycomb.OnLEDRightGearRed()
+
+	if s.profile.Metadata.Name != "Flight Factor B772" {
+		if output[2] >= 0.99 {
+			honeycomb.OnLEDRightGearGreen()
+			honeycomb.OffLEDRightGearRed()
+		}
+		if output[2] <= 0.01 {
+			honeycomb.OffLEDRightGearGreen()
+			honeycomb.OffLEDRightGearRed()
+		}
+		if output[2] > 0.01 && output[2] < 0.99 {
+			honeycomb.OffLEDRightGearGreen()
+			honeycomb.OnLEDRightGearRed()
+		}
+	} else {
+		if output[3] >= 0.99 {
+			honeycomb.OnLEDRightGearGreen()
+			honeycomb.OffLEDRightGearRed()
+		}
+		if output[3] <= 0.01 {
+			honeycomb.OffLEDRightGearGreen()
+			honeycomb.OffLEDRightGearRed()
+		}
+		if output[3] > 0.01 && output[3] < 0.99 {
+			honeycomb.OffLEDRightGearGreen()
+			honeycomb.OnLEDRightGearRed()
+		}
 	}
+
 }
